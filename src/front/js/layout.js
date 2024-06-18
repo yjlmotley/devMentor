@@ -1,9 +1,9 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
-import { Home } from "./pages/home";
+import { Home } from "./pages/Home";
 import { MentorDashboard } from "./pages/MentorDashboard";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { MentorProfile } from "./pages/MentorProfile";

@@ -8,8 +8,9 @@ export const CreateSession = () => {
 
 	return (
 		<div className="container">
+            <h2>TBD: CREATE SESSION PAGE</h2>
 			<ul className="list-group">
-				{store.createSession.map((item, index) => {
+				{store.demo.map((item, index) => {
 					return (
 						<li
 							key={index}

@@ -8,7 +8,7 @@ export const MentorDashboard = () => {
 
 	return (
 		<div className="text-center mt-5">
-			<h1>Hello Rigo!!</h1>
+			<h1>TBD: MENTOR DASHBOARD</h1>
 			<p>
 				<img src={rigoImageUrl} />
 			</p>

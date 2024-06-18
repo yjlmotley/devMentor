@@ -9,8 +9,9 @@ export const MentorSessionBoard = () => {
 
 	return (
 		<div className="container">
+            <h2>TBD: MENTOR SESSION BOARD</h2>
 			<ul className="list-group">
-				{store.mentorSessionBoard.map((item, index) => {
+				{store.demo.map((item, index) => {
 					return (
 						<li
 							key={index}
