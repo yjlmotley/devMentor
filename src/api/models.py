@@ -54,6 +54,7 @@ class Mentor(db.Model):
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     past_session = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[]) ## Days Avaiable 
+    price = db.Column(db.Integer, primary_key=True)
     
 
     profile_photo = db.relationship("MentorPhoto", back_populates="")   ######
@@ -93,16 +94,18 @@ class Session(db.Model):
     details = db.Column(db.String(2500), unique=False, nullable=False),
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[]),
     hours_needed = db.Column(db.Integer, unique=False, nullable=False),
-    days = db.Column(db)
+    days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
 
+    def __repr__(self):
+        return f'<Mentor {self.email}>'
 
-
-
-# Customer Create
-# Mentor Session
-# Title	
-# Details
-# Skills / Lang required
-# # Of Hours
-# Availability
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "details": self.details,
+            "skills": [skill for skill in self.skills],
+            "hours_needed": self.hours_needed,
+            "days":[day for day in self.days]
+        }
 
