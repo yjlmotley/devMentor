@@ -11,6 +11,8 @@ db = SQLAlchemy()
     
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(30), unique=False, nullable=False)
+    last_name = db.Column(db.String(30), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
@@ -22,8 +24,11 @@ class Customer(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
             "email": self.email,
-            "is_active": self.is_active
+            "is_active": self.is_active,
+            "date_joined": self.date_joined
         }
     
 class Mentor(db.Model):
