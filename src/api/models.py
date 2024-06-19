@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.types import ARRAY
 from sqlalchemy import DateTime
