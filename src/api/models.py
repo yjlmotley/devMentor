@@ -2,32 +2,20 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.types import ARRAY
+from sqlalchemy import DateTime
+
+import datetime
+
 
 db = SQLAlchemy()
 
-class Admin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    date_joined = db.Column(db.DateTime(timezone=True, server_default=db.func.now()))
-
-    def __repr__(self):
-        return f'<Admin {self.email}>'
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            "is_active": self.is_active
-        }
     
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    date_joined = db.Column(db.DateTime(timezone=True, server_default=db.func.now()))
+    date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     def __repr__(self):
         return f'<Customer {self.email}>'
@@ -55,15 +43,16 @@ class Mentor(db.Model):
     past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
     price = db.Column(db.Integer)
+    date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     
-
-    profile_photo = db.relationship("MentorImage", back_populates="mentor")   ######
+    profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
     portfolio_photos = db.relationship("PortfolioPhoto", back_populates="mentor")   ######
+
     # ratings = 
     about_me = db.Column(db.String(2500), unique=False)
     
     
-    date_joined = db.Column(db.DateTime(timezone=True, server_default=db.func.now()))
+    
 
     def __repr__(self):
         return f'<Mentor {self.email}>'
@@ -120,7 +109,7 @@ class MentorImage(db.Model):
     public_id = db.Column(db.String(500), nullable=False, unique=True)
     image_url = db.Column(db.String(500), nullable=False, unique=True)
     mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
-    mentor = db.relationship("mentor", back_populates="profile_photo")
+    mentor = db.relationship("Mentor", back_populates="profile_photo", uselist=False)
 
     def __init__(self, public_id, image_url, mentor_id):
         self.public_id = public_id
@@ -136,22 +125,43 @@ class MentorImage(db.Model):
 class PortfolioPhoto(db.Model):
     """Portfolio Images to be uploaded by the mentor for profile """
 
-# __table_args__ = (
-#     db.UniqueConstraint("user_username", name="unique_user_image"),
-# )
-id = db.Column(db.Integer, primary_key=True)
-public_id = db.Column(db.String(500), nullable=False, unique=True)
-image_url = db.Column(db.String(500), nullable=False, unique=True)
-mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
-portfolio_photo = db.relationship("mentor", back_populates="portfolio_photos")
+    # __table_args__ = (
+    #     db.UniqueConstraint("user_username", name="unique_user_image"),
+    # )
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(500), nullable=False, unique=True)
+    image_url = db.Column(db.String(500), nullable=False, unique=True)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
+    mentor = db.relationship("Mentor", back_populates="portfolio_photos")
 
-def __init__(self, public_id, image_url, mentor_id):
-    self.public_id = public_id
-    self.image_url = image_url.strip()
-    self.mentor_id = mentor_id
+    def __init__(self, public_id, image_url, mentor_id):
+        self.public_id = public_id
+        self.image_url = image_url.strip()
+        self.mentor_id = mentor_id
 
-def serialize(self):
-    return {
-        "id": self.id,
-        "image_url": self.image_url
+    def serialize(self):
+        return {
+            "id": self.id,
+            "image_url": self.image_url
     }
+
+
+# class Chat(db.Model):
+#     __tablename__ = 'comments'
+
+#     id = db.Column(db.Integer, primary_key=True)
+#     work_order_id = db.Column(db.Integer, db.ForeignKey("work_orders.id"), nullable=False)
+#     message = db.Column(db.String(500), unique=False, nullable=False)
+#     work_order = db.relationship("WorkOrder", back_populates="comments")
+#     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+
+#     def __repr__(self):
+#         return f'<Comment {self.id}>'
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "work_order_id": self.work_order_id,
+#             "message": self.message,
+#             "time_created": self.time_created,
+#         }
