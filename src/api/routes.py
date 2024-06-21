@@ -42,6 +42,12 @@ def handle_mentor_login():
         )
     return jsonify(access_token=access_token), 201
 
+@api.route('/mentors', methods=['GET'])
+def all_mentors():
+   mentors = Mentor.query.all()
+   return jsonify([mentor.serialize() for mentor in mentors]), 200
+
+
 
 # customer routes
 

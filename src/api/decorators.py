@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Customer
+from api.models import db, Customer
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
