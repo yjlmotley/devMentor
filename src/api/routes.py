@@ -6,7 +6,7 @@ from api.models import db, Mentor, Customer
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from api.decorators import admin_required
+from api.decorators import mentor_required
 
 api = Blueprint('api', __name__)
 
@@ -25,7 +25,7 @@ CORS(api)
 
 # user routes
 @api.route('/mentor/login', methods=['POST'])
-def handle_mentor_login():
+def mentor_login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     if email is None or password is None:
@@ -38,7 +38,7 @@ def handle_mentor_login():
 
     access_token = create_access_token(
         identity=mentor.id,
-        additional_claims = {"role": "owner"} 
+        additional_claims = {"role": "mentor"} 
         )
     return jsonify(access_token=access_token), 201
 
@@ -46,6 +46,66 @@ def handle_mentor_login():
 def all_mentors():
    mentors = Mentor.query.all()
    return jsonify([mentor.serialize() for mentor in mentors]), 200
+
+@api.route('/mentor/<int:mentor_id>', methods=['GET'])
+def mentor_by_id(mentor_id):
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+    return jsonify(mentor.serialize()), 200
+
+@api.route('/mentor/signup', methods=['POST'])
+def mentor_signup(): ##email password first_name last_name city state country
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    first_name = request.json.get("first_name", None)
+    last_name = request.json.get("last_name", None)
+    city = request.json.get("city", None)
+    state = request.json.get("state", None)
+    country = request.json.get("country", None)
+    if email is None or password is None or first_name is None or last_name is None or city is None or state is None or country is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    mentor = Mentor.query.filter_by(email=email).one_or_none()
+    if mentor:
+        return jsonify({"msg": "An account associated with the email already exists"}), 409
+    mentor = Mentor(email=email, password=password, first_name=first_name, last_name=last_name, city=city, state=state, country=country)
+    db.session.add(mentor)
+    db.session.commit()
+    db.session.refresh(mentor)
+    response_body = {"msg": "Mentor Account successfully created!",
+    "mentor":mentor.serialize()}
+    return jsonify(response_body), 201
+
+@api.route('/mentor/edit-self', methods={'PUT'})
+@mentor_required
+def mentor_edit_self():
+    email = request.json.get("email")
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    city = request.json.get("city")
+    state = request.json.get("state")
+    country = request.json.get("country")
+    
+    if email is None or first_name is None or last_name is None or city is None or state is None or country is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    
+    mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+    
+    mentor.email=email
+    mentor.first_name=first_name
+    mentor.last_name=last_name
+    mentor.city=city    
+    mentor.state=state
+    mentor.country=country
+    db.session.commit()
+    db.session.refresh(mentor)
+
+    response_body = {"msg": "Mentor Account sucessfully edited",
+    "mentor":mentor.serialize()}
+    return jsonify(response_body, 201)
 
 
 
@@ -115,7 +175,7 @@ def handle_customer_edit_by_customer():
     return jsonify(response_body), 201
 
 @api.route('/user/get-customer/<int:cust_id>', methods=['GET'])
-@admin_required()
+@mentor_required()
 def get_customer(cust_id):
     # current_user_id = get_jwt_identity()
     # current_user = User.query.get(current_user_id)
@@ -137,7 +197,7 @@ def get_current_customer():
     return jsonify(customer.serialize()), 200
 
 @api.route('/customers', methods=['GET'])
-@admin_required()
+@mentor_required()
 def get_all_customers():
     customers = Customer.query.all()
     return jsonify([customer.serialize() for customer in customers]), 200
