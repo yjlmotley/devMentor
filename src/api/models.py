@@ -13,9 +13,10 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
+    phone = db.Column(db.String(30), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), unique=False,)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     def __repr__(self):
@@ -26,6 +27,7 @@ class Customer(db.Model):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "phone": self.phone,
             "email": self.email,
             "is_active": self.is_active,
             "date_joined": self.date_joined
@@ -39,6 +41,7 @@ class Mentor(db.Model):
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
     nick_name = db.Column(db.String(30), unique=False)
+    phone = db.Column(db.String(30), unique=True, nullable=False)
     city = db.Column(db.String(30), unique=False, nullable=False)
     state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
@@ -69,6 +72,7 @@ class Mentor(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "nick_name": self.nick_name,
+            "phone": self.phone,
             "city": self.city,
             "state": self.state,
             "country": self.country,

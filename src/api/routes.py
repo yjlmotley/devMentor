@@ -77,54 +77,79 @@ def mentor_signup(): ##email password first_name last_name city state country
     "mentor":mentor.serialize()}
     return jsonify(response_body), 201
 
-@api.route('/mentor/edit-self', methods={'PUT'})
-@mentor_required
-def mentor_edit_self():
-    email = request.json.get("email")
-    first_name = request.json.get("first_name")
-    last_name = request.json.get("last_name")
-    city = request.json.get("city")
-    state = request.json.get("state")
-    country = request.json.get("country")
+# @api.route('/mentor/edit-self', methods={'PUT'})
+# @jwt_required
+# def mentor_edit_self():
+#     email = request.json.get("email")
+#     first_name = request.json.get("first_name")
+#     last_name = request.json.get("last_name")
+#     city = request.json.get("city")
+#     state = request.json.get("state")
+#     country = request.json.get("country")
     
-    if email is None or first_name is None or last_name is None or city is None or state is None or country is None:
-        return jsonify({"msg": "Some fields are missing in your request"}), 400
+#     if email is None or first_name is None or last_name is None or city is None or state is None or country is None:
+#         return jsonify({"msg": "Some fields are missing in your request"}), 400
     
-    mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
-    if mentor is None:
-        return jsonify({"msg": "No mentor found"}), 404
+#     mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
+#     if mentor is None:
+#         return jsonify({"msg": "No mentor found"}), 404
     
-    mentor.email=email
-    mentor.first_name=first_name
-    mentor.last_name=last_name
-    mentor.city=city    
-    mentor.state=state
-    mentor.country=country
-    db.session.commit()
-    db.session.refresh(mentor)
+#     mentor.email=email
+#     mentor.first_name=first_name
+#     mentor.last_name=last_name
+#     mentor.city=city    
+#     mentor.state=state
+#     mentor.country=country
+#     db.session.commit()
+#     db.session.refresh(mentor)
 
-    response_body = {"msg": "Mentor Account sucessfully edited",
-    "mentor":mentor.serialize()}
-    return jsonify(response_body, 201)
+#     response_body = {"msg": "Mentor Account sucessfully edited",
+#     "mentor":mentor.serialize()}
+#     return jsonify(response_body, 201)
 
 
 
 # customer routes
 
-@api.route('/customer/signup', methods=['POST'])
-def handle_customer_signup():
+@api.route('/customer/login', methods=['POST'])
+def customer_login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
+    if email is None or password is None:
+        return jsonify({"msg": "No email or password"}), 400
+    customer = Customer.query.filter_by(email=email).one_or_none()
+    if customer is None:
+        return jsonify({"msg": "no such user"}), 404
+    if customer.password != password:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(
+        identity=customer.id,
+        additional_claims = {"role": "customer"} 
+        )
+    return jsonify(access_token=access_token), 201
+
+@api.route('/customers', methods=['GET'])
+def all_customers():
+   customers = Customer.query.all()
+   return jsonify([customer.serialize() for customer in customers]), 200
+
+@api.route('/customer/signup', methods=['POST'])
+def handle_customer_signup():
+   
     first_name = request.json.get("first_name", None)
     last_name = request.json.get("last_name", None)
-    address = request.json.get("address", None)
     phone = request.json.get("phone", None)
-    if email is None or password is None or first_name is None or last_name is None or address is None or phone is None:
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    
+    
+    if first_name is None or last_name is None or phone is None or email is None or password is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     customer = Customer.query.filter_by(email=email).one_or_none()
     if customer:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
-    customer = Customer(email=email, password=password, first_name=first_name, last_name=last_name, address=address, phone=phone, is_active=True)
+    customer = Customer(first_name=first_name, last_name=last_name, phone=phone, email=email)
     db.session.add(customer)
     db.session.commit()
     db.session.refresh(customer)
@@ -175,7 +200,7 @@ def handle_customer_edit_by_customer():
     return jsonify(response_body), 201
 
 @api.route('/user/get-customer/<int:cust_id>', methods=['GET'])
-@mentor_required()
+# @mentor_required()
 def get_customer(cust_id):
     # current_user_id = get_jwt_identity()
     # current_user = User.query.get(current_user_id)
@@ -197,7 +222,7 @@ def get_current_customer():
     return jsonify(customer.serialize()), 200
 
 @api.route('/customers', methods=['GET'])
-@mentor_required()
+# @mentor_required()
 def get_all_customers():
     customers = Customer.query.all()
     return jsonify([customer.serialize() for customer in customers]), 200
