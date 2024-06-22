@@ -263,6 +263,15 @@ def all_sessions():
     sessions = Session.query.all()
     return jsonify([session.serialize() for session in sessions]), 200
 
+@api.route('/session/<int:session_id>', methods=["GET"])
+def session_by_id(session_id):
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+    
+    return jsonify(session.serialize()), 200
+
 @api.route('/session/create', methods=['POST'])
 def create_session():
 
@@ -281,3 +290,42 @@ def create_session():
     db.session.refresh(session)
     response_body = {"msg": "Session successfully created!", "session":session.serialize()}
     return jsonify(response_body), 201
+
+@api.route('/session/edit/<int:session_id>', methods=['PUT'])
+def edit_session(session_id):
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "no session found"}), 404
+
+    title = request.json.get("title")
+    details = request.json.get("details")
+    skills = request.json.get("skills")
+    hours_needed = request.json.get("hours_needed")
+    days = request.json.get("days")
+
+    if title is None or details is None or skills is None or hours_needed is None or days is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    
+    session.title=title
+    session.details=details
+    session.skills=skills
+    session.hours_needed=hours_needed
+    session.days=days
+    db.session.commit()
+    db.session.refresh(session)
+
+    response_body = {"msg": "Mentor Session succesfully edited!", "session":session.serialize()}
+    return jsonify(response_body), 200
+    
+@api.route('/session/delete/<int:sess_id>', methods =["DELETE"])
+def delete_session(sess_id):
+
+    session = Session.query.get(sess_id)
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+
+    db.session.delete(session)
+    db.session.commit()
+    return jsonify({"msg": "Session Sucessfully Deleted"}), 200
+
