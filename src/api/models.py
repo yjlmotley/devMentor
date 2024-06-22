@@ -13,6 +13,7 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
+    address = db.Column(db.String(50), unique=False, nullable=False)
     phone = db.Column(db.String(30), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
@@ -27,6 +28,7 @@ class Customer(db.Model):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "address": self.address,
             "phone": self.phone,
             "email": self.email,
             "is_active": self.is_active,
@@ -36,7 +38,7 @@ class Customer(db.Model):
 class Mentor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    # last_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    last_active = db.Column(db.Boolean(), unique=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
@@ -68,7 +70,7 @@ class Mentor(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            # "last_active": self.last_active,
+            "last_active": self.last_active,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "nick_name": self.nick_name,
