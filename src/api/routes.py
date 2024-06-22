@@ -6,7 +6,7 @@ from api.models import db, Mentor, Customer
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from api.decorators import mentor_required
+from api.decorators import mentor_required, customer_required
 
 api = Blueprint('api', __name__)
 
@@ -82,7 +82,7 @@ def mentor_signup():
     return jsonify(response_body), 201
 
 @api.route('/mentor/edit-self', methods={'PUT'})
-@jwt_required()
+@mentor_required
 def mentor_edit_self():
     email = request.json.get("email")
     first_name = request.json.get("first_name")
@@ -110,6 +110,23 @@ def mentor_edit_self():
     response_body = {"msg": "Mentor Account sucessfully edited",
     "mentor":mentor.serialize()}
     return jsonify(response_body, 201)
+
+@api.route('/mentor/delete/<int:cust_id>', methods =['DELETE'])
+def delete_mentor(cust_id):
+    mentor = Mentor.query.get(cust_id)
+    if mentor is None:
+        return jsonify({"msg": "mentor not found" }), 404
+    
+    # picture_public_ids = [image.image_url.split("/")[-1].split(".")[0] for image in work_order.images]
+
+    # for public_id in picture_public_ids:
+    #     delete_response = destroy(public_id)
+    #     if delete_response.get("result") != "ok":
+    #         print(f"Failed to delete picture with public ID: {public_id}")
+
+    db.session.delete(mentor)
+    db.session.commit()
+    return jsonify({"msg": "mentor successfully deleted"}), 200
 
 
 
@@ -175,7 +192,7 @@ def customer_signup():
     return jsonify(response_body), 201
 
 @api.route('/customer/edit-self', methods=['PUT'])
-@jwt_required()
+@customer_required
 def handle_customer_edit_by_customer():
     email = request.json.get("email")
     first_name = request.json.get("first_name")
