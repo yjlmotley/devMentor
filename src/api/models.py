@@ -101,7 +101,7 @@ class Session(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id,
+            "id": self.id, 
             "title": self.title,
             "details": self.details,
             "skills": [skill for skill in self.skills],

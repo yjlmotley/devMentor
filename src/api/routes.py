@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, Mentor, Customer
+from api.models import db, Mentor, Customer, Session
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -23,7 +23,16 @@ CORS(api)
 
 #     return jsonify(response_body), 200
 
-# user routes
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
+
+@api.route('/mentors', methods=['GET'])
+def all_mentors():
+   mentors = Mentor.query.all()
+   return jsonify([mentor.serialize() for mentor in mentors]), 200
+
 @api.route('/mentor/login', methods=['POST'])
 def mentor_login():
     email = request.json.get("email", None)
@@ -42,10 +51,7 @@ def mentor_login():
         )
     return jsonify(access_token=access_token), 201
 
-@api.route('/mentors', methods=['GET'])
-def all_mentors():
-   mentors = Mentor.query.all()
-   return jsonify([mentor.serialize() for mentor in mentors]), 200
+
 
 @api.route('/mentor/<int:mentor_id>', methods=['GET'])
 def mentor_by_id(mentor_id):
@@ -68,8 +74,8 @@ def mentor_signup():
     phone = request.json.get("phone", "None")
 
 
-    # if email is None or password is None or first_name is None or last_name is None or city is None or state is None or country is None or phone is None:
-    #     return jsonify({"msg": "Some fields are missing in your request"}), 400
+    if email is None or password is None or first_name is None or last_name is None or city is None or state is None or country is None or phone is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
     mentor = Mentor.query.filter_by(email=email).one_or_none()
     if mentor:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
@@ -130,7 +136,10 @@ def delete_mentor(cust_id):
 
 
 
-# customer routes
+# Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
+# Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
+# Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
+# Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
 
 @api.route('/customers', methods=['GET'])
 def all_customers():
@@ -246,3 +255,29 @@ def delete_customer(cust_id):
     db.session.delete(customer)
     db.session.commit()
     return jsonify({"msg": "customer successfully deleted"}), 200
+
+# Session Routes Start
+
+@api.route('/sessions', methods= ['GET'])
+def all_sessions():
+    sessions = Session.query.all()
+    return jsonify([session.serialize() for session in sessions]), 200
+
+@api.route('/session/create', methods=['POST'])
+def create_session():
+
+    title = request.json.get("title", None)
+    details = request.json.get("details", None)
+    skills = request.json.get("skills", None)
+    hours_needed = request.json.get("hours_needed", None)
+    days = request.json.get("days", None) 
+
+    if title is None or details is None or skills is None or hours_needed is None or days is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    
+    session = Session(title=title, details=details, skills=skills, hours_needed=hours_needed, days=days)
+    db.session.add(session)
+    db.session.commit()
+    db.session.refresh(session)
+    response_body = {"msg": "Session successfully created!", "session":session.serialize()}
+    return jsonify(response_body), 201
