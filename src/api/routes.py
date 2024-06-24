@@ -93,9 +93,17 @@ def mentor_edit_self():
     email = request.json.get("email")
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
+    nick_name = request.json.get("nick_name")
+    phone = request.json.get("phone")
     city = request.json.get("city")
     what_state = request.json.get("what_state")
     country = request.json.get("country")
+    years_exp = request.json.get("years_exp")
+    skills = request.json.get("skills")
+    past_sessions = request.json.get("past_sessions")
+    days = request.json.get("days")
+    price = request.json.get("price")
+    about_me = request.json.get("about_me")
     
     if email is None or first_name is None or last_name is None or city is None or what_state is None or country is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
@@ -107,9 +115,17 @@ def mentor_edit_self():
     mentor.email=email
     mentor.first_name=first_name
     mentor.last_name=last_name
+    mentor.nick_name=nick_name
+    mentor.phone=phone
     mentor.city=city    
     mentor.what_state=what_state
     mentor.country=country
+    mentor.years_exp=years_exp
+    mentor.skills=skills
+    mentor.past_sessions=past_sessions
+    mentor.days=days
+    mentor.price=price
+    mentor.about_me=about_me
     db.session.commit()
     db.session.refresh(mentor)
 
