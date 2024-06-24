@@ -1,39 +1,37 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-
 import { Context } from "../store/appContext";
 
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
-	const [mentors, setMentors] = useState({
-		email: store.mentors?.email || '',
-		first_name: store.mentors?.first_name || '',
-		last_name: store.mentors?.last_name || '',
-		nick_name: store.mentors?.nick_name || '',
-		phone: store.mentors?.phone || '',
-		city: store.mentors?.city || '',
-		what_state: store.mentors?.what_state || '',
-		country: store.mentors?.country || '',
-		years_exp: store.mentors?.years_exp || '',
-		skills: store.mentors?.skills || '',
-		past_sessions: store.mentors?.past_sessions || '',
-		days: store.mentors?.days || '',
-		price: store.mentors?.price || '',
-		about_me: store.mentors?.about_me || '',
+	const [mentor, setMentor] = useState({
+		email: '',
+		first_name: '',
+		last_name: '',
+		nick_name: '',
+		phone: '',
+		city: '',
+		what_state: '',
+		country: '',
+		years_exp: '',
+		skills: '',
+		past_sessions: '',
+		days: '',
+		price: '',
+		about_me: '',
 	});
 
 	const handleEdit = (e) => {
 		const { name, value } = e.target;
-		setMentors({
-			...mentors,
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
 			[name]: value
-		});
+		}));
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const success = await actions.editMentor(mentors);
+		const success = await actions.editMentor(mentor);
 		if (success) {
 			alert('Mentor information updated sucessfully')
 		} else {
@@ -41,12 +39,21 @@ export const MentorProfile = () => {
 		}
 	}
 
+	useEffect(() => {
+		fetch(process.env.BACKEND_URL + "/api/mentor", {
+			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
+		})
+			.then(resp => resp.json())
+			.then(data => setMentor(data))
+	}, []);
+
+
 	return (
 		<div className="container">
 			<h2>TBD: MENTOR PROFILE</h2>
 
 			<form onSubmit={handleSubmit}>
-				{Object.keys(mentors).map((key, index) => (
+				{Object.keys(mentor).map((key, index) => (
 					<div className="form-group" key={index}>
 						<label htmlFor={key}>
 							{key.replace('_', ' ').toUpperCase()}
@@ -56,10 +63,11 @@ export const MentorProfile = () => {
 							className="form-control"
 							id={key}
 							name={key}
-							value={mentors[key]}
+							value={mentor[key] ? mentor[key] : ""}
+							placeholder={"Specify your " + key}
 							onChange={handleEdit}
 						/>
-						
+
 					</div>
 				))}
 				<button type="submit" className="btn btn-primary">Edit mentor profile</button>

@@ -53,8 +53,10 @@ def mentor_login():
 
 
 
-@api.route('/mentor/<int:mentor_id>', methods=['GET'])
-def mentor_by_id(mentor_id):
+@api.route('/mentor', methods=['GET'])
+@mentor_required
+def mentor_by_id():
+    mentor_id = get_jwt_identity()
     mentor = Mentor.query.get(mentor_id)
     if mentor is None:
         return jsonify({"msg": "No mentor found"}), 404

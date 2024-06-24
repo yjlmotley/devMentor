@@ -54,7 +54,7 @@ export const ValidateAddress = (address, setInvalidItems) => {
 };
 
 export const ValidateCity = (city, setInvalidItems) => {
-    if (city.trim() === "" || city.length <= 6 || city.length > 80) {
+    if (city.trim() === "" || city.length <= 2 || city.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "city"]);
         return false;
     }
@@ -62,7 +62,7 @@ export const ValidateCity = (city, setInvalidItems) => {
 };
 
 export const ValidateWhatState = (whatState, setInvalidItems) => {
-    if (whatState.trim() === "" || whatState.length <= 6 || whatState.length > 80) {
+    if (whatState.trim() === "" || whatState.length <= 2 || whatState.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "whatState"]);
         return false;
     }
@@ -70,7 +70,7 @@ export const ValidateWhatState = (whatState, setInvalidItems) => {
 };
 
 export const ValidateCountry = (country, setInvalidItems) => {
-    if (country.trim() === "" || country.length <= 6 || country.length > 80) {
+    if (country.trim() === "" || country.length <= 3 || country.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "country"]);
         return false;
     }
