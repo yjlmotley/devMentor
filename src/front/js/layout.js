@@ -4,7 +4,10 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import { Home } from "./pages/Home";
+import { MentorSignup } from "./pages/MentorSignup";
+import { MentorLogin } from "./component/MentorLogin";
 import { MentorDashboard } from "./pages/MentorDashboard";
+import { CustomerLogin } from "./component/CustomerLogin";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { MentorProfile } from "./pages/MentorProfile";
 import { MentorSessionBoard } from "./pages/MentorSessionBoard";
@@ -31,8 +34,11 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         <Route element={<Home />} path="/" />
+                        <Route element={<MentorSignup />} path="/mentor-signup" />
+                        <Route element={<MentorLogin />} path="/mentor-login" />
                         <Route element={<MentorDashboard />} path="/mentor-dashboard" />
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
+                        <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<MentorProfile />} path="/mentor-profile" />
                         <Route element={<MentorSessionBoard />} path="/mentor-session-board" />
                         <Route element={<CreateSession />} path="/create-session" />

@@ -69,17 +69,17 @@ def mentor_signup():
     first_name = request.json.get("first_name", None)
     last_name = request.json.get("last_name", None)
     city = request.json.get("city", None)
-    state = request.json.get("state", None)
+    what_state = request.json.get("what_state", None)
     country = request.json.get("country", None)
     phone = request.json.get("phone", "None")
 
 
-    if email is None or password is None or first_name is None or last_name is None or city is None or state is None or country is None or phone is None:
+    if email is None or password is None or first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     mentor = Mentor.query.filter_by(email=email).one_or_none()
     if mentor:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
-    mentor = Mentor(email=email, password=password, first_name=first_name, last_name=last_name, city=city, state=state, country=country, phone=phone)
+    mentor = Mentor(email=email, password=password, first_name=first_name, last_name=last_name, city=city, what_state=what_state, country=country, phone=phone)
     db.session.add(mentor)
     db.session.commit()
     db.session.refresh(mentor)
@@ -94,10 +94,10 @@ def mentor_edit_self():
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
     city = request.json.get("city")
-    state = request.json.get("state")
+    what_state = request.json.get("what_state")
     country = request.json.get("country")
     
-    if email is None or first_name is None or last_name is None or city is None or state is None or country is None:
+    if email is None or first_name is None or last_name is None or city is None or what_state is None or country is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     
     mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
@@ -108,7 +108,7 @@ def mentor_edit_self():
     mentor.first_name=first_name
     mentor.last_name=last_name
     mentor.city=city    
-    mentor.state=state
+    mentor.what_state=what_state
     mentor.country=country
     db.session.commit()
     db.session.refresh(mentor)

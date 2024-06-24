@@ -1,52 +1,111 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+            // isLoggedIn: false,
+            // mentors: [],
+            mentors: [],
+            customerId: undefined,
+            // customerId: undefined,
+            // sessions: [],
+			// message: null,
+			token: undefined,
+            sessionStorageChecked: !!sessionStorage.getItem("token")
+			
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
+			logInMentor: async (mentor) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/mentor/login", {
+                    method: "POST",
+                    body: JSON.stringify({ email: mentor.email, password: mentor.password }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+                );
+                if (response.status !== 201) return false;
+                const responseBody = await response.json();
+                setStore({
+                    token: responseBody.access_token,
+                    isLoggedIn: true
+                });
+                sessionStorage.setItem("token", responseBody.access_token);
 
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
-				}
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+                return true;
+            },
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+			logOutAny: () => {
+                setStore({
+                    token: undefined,
+                    customerId: undefined
+                });
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("customerId");
+                setStore({ isLoggedIn: false });
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
+                console.log("Logged out:", getStore().token)
+            },
+
+			logInCustomer: async (customerCredentials) => {
+                const response = await fetch(`${process.env.BACKEND_URL}/api/customer/login`, {
+                    method: "POST",
+                    body: JSON.stringify(customerCredentials),
+                    headers: { "Content-Type": "application/json" }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setStore({
+                        token: data.access_token,
+                        customerId: data.customer_id,
+                        isLoggedIn: true
+                    });
+                    sessionStorage.setItem("token", data.access_token);
+                    sessionStorage.setItem("customerId", data.customer_id);
+                    return true;
+                } else {
+                    console.error("Login failed with status:", response.status);
+                    return false;
+                }
+            },
+
+			verifyCustomer: ({ access_token, customer_id, ...args }) => {
+                setStore({
+                    token: access_token,
+                    customerId: customer_id
+                });
+                sessionStorage.setItem("token", access_token);
+                sessionStorage.setItem("customerId", customer_id);
+            },
+
+            checkStorage: () => {
+                const token = sessionStorage.getItem("token", undefined)  
+                const customer_id = sessionStorage.getItem("customerId", undefined)
+                setStore({
+                    token: token,
+                    customerId: customer_id
+                });
+            },
+
+            signUpMentor: async (mentor) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/mentor/signup", {
+                    method: "POST",
+                    body: JSON.stringify({ first_name: mentor.first_name, email: mentor.email, password: mentor.password, last_name: mentor.last_name, city: mentor.city, what_state: mentor.what_state, country: mentor.country, phone: mentor.phone }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+                );
+                if (response.status !== 201) return false;
+                const responseBody = await response.json();
+                console.log(responseBody)
+
+                return true;
+            },
+
+
+
+			
 		}
 	};
 };

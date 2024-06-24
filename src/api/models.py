@@ -45,7 +45,7 @@ class Mentor(db.Model):
     nick_name = db.Column(db.String(30), unique=False)
     phone = db.Column(db.String(30), unique=True, nullable=False)
     city = db.Column(db.String(30), unique=False, nullable=False)
-    state = db.Column(db.String(30), unique=False, nullable=False)
+    what_state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
     years_exp = db.Column(db.String(30), unique=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
@@ -76,7 +76,7 @@ class Mentor(db.Model):
             "nick_name": self.nick_name,
             "phone": self.phone,
             "city": self.city,
-            "state": self.state,
+            "what_state": self.what_state,
             "country": self.country,
             "years_exp": self.years_exp,
             "skills": [skill for skill in self.skills],
