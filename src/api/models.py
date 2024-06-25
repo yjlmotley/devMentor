@@ -38,6 +38,7 @@ class Customer(db.Model):
 class Mentor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
     last_active = db.Column(db.Boolean(), unique=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     first_name = db.Column(db.String(30), unique=False, nullable=False)

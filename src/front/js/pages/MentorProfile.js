@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 
+
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
 	const [mentor, setMentor] = useState({
@@ -39,6 +40,27 @@ export const MentorProfile = () => {
 		}
 	}
 
+	const handleDeactivate = async () => {
+		const token = sessionStorage.getItem('token');
+		console.log(sessionStorage.getItem('token'));
+		if (!token) {
+			alert('No token found');
+			return
+		}
+		const response = await fetch(process.env.BACKEND_URL + "/api/mentor/deactivate", {
+			method: 'PUT',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
+		});
+		if (response.ok) {
+			alert('Account deactivated succesfully')
+		} else {
+			alert('Failed to deactivate account')
+		}
+	}
+
 	useEffect(() => {
 		fetch(process.env.BACKEND_URL + "/api/mentor", {
 			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
@@ -51,6 +73,7 @@ export const MentorProfile = () => {
 	return (
 		<div className="container">
 			<h2>TBD: MENTOR PROFILE</h2>
+			<button onClick={handleDeactivate}>Deactivate Account</button>
 
 			<form onSubmit={handleSubmit}>
 				{Object.keys(mentor).map((key, index) => (
@@ -71,6 +94,7 @@ export const MentorProfile = () => {
 					</div>
 				))}
 				<button type="submit" className="btn btn-primary">Edit mentor profile</button>
+
 			</form>
 
 
