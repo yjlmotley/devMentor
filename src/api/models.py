@@ -44,7 +44,7 @@ class Mentor(db.Model):
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
     nick_name = db.Column(db.String(30), unique=False)
-    phone = db.Column(db.String(30), unique=True, nullable=False)
+    phone = db.Column(db.String(30), nullable=False)
     city = db.Column(db.String(30), unique=False, nullable=False)
     what_state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
@@ -71,6 +71,7 @@ class Mentor(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            "is_active": self.is_active,
             "last_active": self.last_active,
             "first_name": self.first_name,
             "last_name": self.last_name,

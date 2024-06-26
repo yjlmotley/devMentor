@@ -5,8 +5,10 @@ import { Context } from "../store/appContext";
 
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
+	const [editMode, setEditMode] = useState(false);
 	const [mentor, setMentor] = useState({
 		email: '',
+		is_active: true,
 		first_name: '',
 		last_name: '',
 		nick_name: '',
@@ -15,14 +17,13 @@ export const MentorProfile = () => {
 		what_state: '',
 		country: '',
 		years_exp: '',
-		skills: '',
-		past_sessions: '',
-		days: '',
+		skills: [],
+		days: [],
 		price: '',
 		about_me: '',
 	});
 
-	const handleEdit = (e) => {
+	const handleChange = (e) => {
 		const { name, value } = e.target;
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
@@ -35,6 +36,7 @@ export const MentorProfile = () => {
 		const success = await actions.editMentor(mentor);
 		if (success) {
 			alert('Mentor information updated sucessfully')
+			setEditMode(false)
 		} else {
 			alert('Failed to update mentor information')
 		}
@@ -47,6 +49,7 @@ export const MentorProfile = () => {
 			alert('No token found');
 			return
 		}
+		setMentor((prevMentor) => ({ ...prevMentor, is_active: false }));
 		const response = await fetch(process.env.BACKEND_URL + "/api/mentor/deactivate", {
 			method: 'PUT',
 			headers: {
@@ -67,41 +70,167 @@ export const MentorProfile = () => {
 		})
 			.then(resp => resp.json())
 			.then(data => setMentor(data))
+			.then(() => { setLoading(false) })
+			.catch(error => console.log(error))
 	}, []);
 
 
+	const [loading, setLoading] = useState(true);
+
+	if (loading) {
+		return <div>Loading...</div>;
+	}
+
+	if (!mentor) {
+		return <div>Mentor not found</div>;
+	}
+
 	return (
-		<div className="container">
-			<h2>TBD: MENTOR PROFILE</h2>
-			<button onClick={handleDeactivate}>Deactivate Account</button>
+		<div className="container mt-5">
+			<h2 className="mb-4">Mentor Profile</h2>
+			{editMode == false ? (<button onClick={() => setEditMode(true)}>Edit Profile</button>) : ''}
+			<div className="row">
+				<div className="col-md-4 mb-4">
+					{mentor.profile_photo && (
+						<img src={mentor.profile_photo.url} alt="Profile" className="img-fluid rounded" />
+					)}
+				</div>
+				<div className="col-md-8">
+					<dl className="row">
+						<dt className="col-sm-4">Email:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.email
+							)}
+						</dd>
 
-			<form onSubmit={handleSubmit}>
-				{Object.keys(mentor).map((key, index) => (
-					<div className="form-group" key={index}>
-						<label htmlFor={key}>
-							{key.replace('_', ' ').toUpperCase()}
-						</label>
-						<input
-							type="text"
-							className="form-control"
-							id={key}
-							name={key}
-							value={mentor[key] ? mentor[key] : ""}
-							placeholder={"Specify your " + key}
-							onChange={handleEdit}
-						/>
+						<dt className="col-sm-4">First Name:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="first_name" value={mentor.first_name} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.first_name
+							)}
+						</dd>
 
+						<dt className="col-sm-4">Last Name:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="last_name" value={mentor.last_name} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.last_name
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Nickname:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="nick_name" value={mentor.nick_name} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.nick_name
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Phone:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="phone" value={mentor.phone} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.phone
+							)}
+						</dd>
+
+						<dt className="col-sm-4">City:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="city" value={mentor.city} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.city
+							)}
+						</dd>
+
+						<dt className="col-sm-4">State:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="what_state" value={mentor.what_state} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.what_state
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Country:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="country" value={mentor.country} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.country
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Years of Experience:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="years_exp" value={mentor.years_exp} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.years_exp
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Skills:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="skills" value={mentor.skills.join(", ")} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.skills.join(", ")
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Days Available:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="text" name="days" value={mentor.days.join(", ")} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.days.join(", ")
+							)}
+						</dd>
+
+						<dt className="col-sm-4">Price:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<input type="number" name="price" value={mentor.price} onChange={handleChange} className="form-control" />
+							) : (
+								mentor.price
+							)}
+						</dd>
+
+						<dt className="col-sm-4">About Me:</dt>
+						<dd className="col-sm-8">
+							{editMode ? (
+								<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control"></textarea>
+							) : (
+								mentor.about_me
+							)}
+						</dd>
+					</dl>
+				</div>
+			</div>
+
+			{/* {mentor.portfolio_photos && mentor.portfolio_photos.length > 0 && (
+				<div className="mt-4">
+					<h4>Portfolio Photos</h4>
+					<div className="row">
+						{mentor.portfolio_photos.map((photo, index) => (
+							<div key={index} className="col-md-3 mb-4">
+								<img src={photo.url} alt={`Portfolio ${index}`} className="img-fluid rounded" />
+							</div>
+						))}
 					</div>
-				))}
-				<button type="submit" className="btn btn-primary">Edit mentor profile</button>
-
-			</form>
-
-
-			<br />
-			<Link to="/">
-				<button className="btn btn-primary">Back home</button>
-			</Link>
+				</div>
+			)} */}
+			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
+			<button onClick={handleDeactivate}>Deactivate Account</button>
 		</div>
 	);
 };

@@ -94,6 +94,7 @@ def mentor_signup():
 @mentor_required
 def mentor_edit_self():
     email = request.json.get("email")
+    is_active = request.json.get("is_active")
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
     nick_name = request.json.get("nick_name")
@@ -103,7 +104,6 @@ def mentor_edit_self():
     country = request.json.get("country")
     years_exp = request.json.get("years_exp")
     skills = request.json.get("skills")
-    past_sessions = request.json.get("past_sessions")
     days = request.json.get("days")
     price = request.json.get("price")
     about_me = request.json.get("about_me")
@@ -116,6 +116,7 @@ def mentor_edit_self():
         return jsonify({"msg": "No mentor found"}), 404
     
     mentor.email=email
+    mentor.is_active=is_active
     mentor.first_name=first_name
     mentor.last_name=last_name
     mentor.nick_name=nick_name
@@ -125,7 +126,6 @@ def mentor_edit_self():
     mentor.country=country
     mentor.years_exp=years_exp
     mentor.skills=skills
-    mentor.past_sessions=past_sessions
     mentor.days=days
     mentor.price=price
     mentor.about_me=about_me
