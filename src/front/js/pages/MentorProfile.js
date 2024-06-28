@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { arrayOf } from "prop-types";
 
 
 export const MentorProfile = () => {
@@ -25,9 +26,19 @@ export const MentorProfile = () => {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
+		let x = value
+		if (name == "skills" || name == "days") {
+			if (value.includes(",")) {
+				x = value.split(",")
+			} else {
+				let array = []
+				array.push(value)
+				x = array
+			}
+		}
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
-			[name]: value
+			[name]: x
 		}));
 	};
 
@@ -181,7 +192,7 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Skills:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="skills" value={mentor.skills.join(", ")} onChange={handleChange} className="form-control" />
+								<input type="text" name="skills" value={mentor.skills} onChange={handleChange} className="form-control" />
 							) : (
 								mentor.skills.join(", ")
 							)}
@@ -190,7 +201,7 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Days Available:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="days" value={mentor.days.join(", ")} onChange={handleChange} className="form-control" />
+								<input type="text" name="days" value={mentor.days} onChange={handleChange} className="form-control" />
 							) : (
 								mentor.days.join(", ")
 							)}

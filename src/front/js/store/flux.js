@@ -1,19 +1,19 @@
 const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
+    return {
+        store: {
             // isLoggedIn: false,
             // mentors: [],
             mentors: [],
             customerId: undefined,
             // customerId: undefined,
             // sessions: [],
-			// message: null,
-			token: undefined,
+            // message: null,
+            token: sessionStorage.getItem("token"),
             sessionStorageChecked: !!sessionStorage.getItem("token")
-			
-		},
-		actions: {
-			logInMentor: async (mentor) => {
+
+        },
+        actions: {
+            logInMentor: async (mentor) => {
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/mentor/login", {
                     method: "POST",
@@ -34,7 +34,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 return true;
             },
 
-			logOutAny: () => {
+            logOutAny: () => {
                 setStore({
                     token: undefined,
                     customerId: undefined
@@ -46,7 +46,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.log("Logged out:", getStore().token)
             },
 
-			logInCustomer: async (customerCredentials) => {
+            logInCustomer: async (customerCredentials) => {
                 const response = await fetch(`${process.env.BACKEND_URL}/api/customer/login`, {
                     method: "POST",
                     body: JSON.stringify(customerCredentials),
@@ -68,7 +68,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-			verifyCustomer: ({ access_token, customer_id, ...args }) => {
+            verifyCustomer: ({ access_token, customer_id, ...args }) => {
                 setStore({
                     token: access_token,
                     customerId: customer_id
@@ -78,7 +78,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             checkStorage: () => {
-                const token = sessionStorage.getItem("token", undefined)  
+                const token = sessionStorage.getItem("token", undefined)
                 const customer_id = sessionStorage.getItem("customerId", undefined)
                 setStore({
                     token: token,
@@ -109,30 +109,30 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.log("Token being used:", token);
                 console.log("Updating mentor with data:", mentor);
                 const response = await fetch(
-                    process.env.BACKEND_URL +  "/api/mentor/edit-self", {
-                        method:"PUT",
-                        body: JSON.stringify(mentor),
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
-                        }
+                    process.env.BACKEND_URL + "/api/mentor/edit-self", {
+                    method: "PUT",
+                    body: JSON.stringify(mentor),
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
                     }
+                }
                 );
                 if (response.status !== 200) {
                     console.log("Error updating mentor information");
                     return false
                 };
                 const responseBody = await response.json();
-                setStore({...getStore(),mentor:responseBody})
+                setStore({ ...getStore(), mentor: responseBody })
                 console.log(responseBody)
-                    return true;
+                return true;
             }
 
 
 
-			
-		}
-	};
+
+        }
+    };
 };
 
 export default getState;
