@@ -2,6 +2,9 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { arrayOf } from "prop-types";
+import Select from 'react-select';
+import CreatableSelect from "react-select/creatable";
+import { colourOptions, daysOfTheWeek } from "../store/data";
 
 
 export const MentorProfile = () => {
@@ -42,6 +45,14 @@ export const MentorProfile = () => {
 		}));
 	};
 
+	const handleSelectChange = (selectedOptions, { name }) => {
+		const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
+			[name]: values
+		}));
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const success = await actions.editMentor(mentor);
@@ -74,6 +85,17 @@ export const MentorProfile = () => {
 			alert('Failed to deactivate account')
 		}
 	}
+
+	// const customStyles = {
+	// 	option: (provided, state) => ({
+	// 		...provided,
+	// 		color: state.data.type === 'colour' ? 'blue' : 'green',
+	// 	}),
+	// 	multiValue: (provided, state) => ({
+	// 		...provided,
+	// 		backgroundColor: state.data.type === 'colour' ? 'lightblue' : 'lightgreen',
+	// 	}),
+	// };
 
 	useEffect(() => {
 		fetch(process.env.BACKEND_URL + "/api/mentor", {
@@ -192,7 +214,15 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Skills:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="skills" value={mentor.skills} onChange={handleChange} className="form-control" />
+								<CreatableSelect
+									isMulti
+									name="skills"
+									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
+									onChange={handleSelectChange}
+									options={colourOptions}
+									isDisabled={!editMode}
+								// styles={customStyles}
+								/>
 							) : (
 								mentor.skills.join(", ")
 							)}
@@ -201,7 +231,14 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Days Available:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="days" value={mentor.days} onChange={handleChange} className="form-control" />
+								<Select
+									isMulti
+									name="days"
+									options={daysOfTheWeek}
+									className="basic-multi-select"
+									classNamePrefix="select"
+									isDisable={!editMode}
+								/>
 							) : (
 								mentor.days.join(", ")
 							)}
