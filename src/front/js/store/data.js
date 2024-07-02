@@ -1,24 +1,3 @@
-// Colour options
-export const colourOptions = [
-    { value: 'ocean', label: 'Ocean', color: '#00B8D9', isFixed: true },
-    { value: 'blue', label: 'Blue', color: '#0052CC', isDisabled: true },
-    { value: 'purple', label: 'Purple', color: '#5243AA' },
-    { value: 'red', label: 'Red', color: '#FF5630', isFixed: true },
-    { value: 'orange', label: 'Orange', color: '#FF8B00' },
-    { value: 'yellow', label: 'Yellow', color: '#FFC400' },
-    { value: 'green', label: 'Green', color: '#36B37E' },
-    { value: 'forest', label: 'Forest', color: '#00875A' },
-    { value: 'slate', label: 'Slate', color: '#253858' },
-    { value: 'silver', label: 'Silver', color: '#666666' },
-];
-
-// Flavour options
-export const flavourOptions = [
-    { value: 'vanilla', label: 'Vanilla', rating: 'safe' },
-    { value: 'chocolate', label: 'Chocolate', rating: 'good' },
-    { value: 'strawberry', label: 'Strawberry', rating: 'wild' },
-    { value: 'salted-caramel', label: 'Salted Caramel', rating: 'crazy' },
-];
 
 // Day of the week options
 export const daysOfTheWeek = [
@@ -120,11 +99,79 @@ export const dogOptions = [
 // Grouped options
 export const groupedOptions = [
     {
-        label: 'Colours',
-        options: colourOptions,
+        label: 'Skills',
+        options: skillsList,
     },
     {
-        label: 'Flavours',
-        options: flavourOptions,
+        label: 'State',
+        options: stateOptions,
     },
+];
+
+// Skills options
+export const skillsList = [
+    { id: 1, label: 'Python' },
+    { id: 2, label: 'JavaScript' },
+    { id: 3, label: 'Java' },
+    { id: 4, label: 'C++' },
+    { id: 5, label: 'C#' },
+    { id: 6, label: 'Ruby' },
+    { id: 7, label: 'Go' },
+    { id: 8, label: 'TypeScript' },
+    { id: 9, label: 'PHP' },
+    { id: 10, label: 'Swift' },
+    { id: 11, label: 'Kotlin' },
+    { id: 12, label: 'HTML' },
+    { id: 13, label: 'CSS' },
+    { id: 14, label: 'React' },
+    { id: 15, label: 'Angular' },
+    { id: 16, label: 'Vue.js' },
+    { id: 17, label: 'Node.js' },
+    { id: 18, label: 'Django' },
+    { id: 19, label: 'Flask' },
+    { id: 20, label: 'ASP.NET' },
+    { id: 21, label: 'SQL' },
+    { id: 22, label: 'NoSQL' },
+    { id: 23, label: 'MySQL' },
+    { id: 24, label: 'PostgreSQL' },
+    { id: 25, label: 'MongoDB' },
+    { id: 26, label: 'Redis' },
+    { id: 27, label: 'SQLite' },
+    { id: 28, label: 'Oracle DB' },
+    { id: 29, label: 'Docker' },
+    { id: 30, label: 'Kubernetes' },
+    { id: 31, label: 'Jenkins' },
+    { id: 32, label: 'Git' },
+    { id: 33, label: 'AWS' },
+    { id: 34, label: 'Azure' },
+    { id: 35, label: 'Google Cloud Platform (GCP)' },
+    { id: 36, label: 'Terraform' },
+    { id: 37, label: 'Ansible' },
+    { id: 38, label: 'iOS Development' },
+    { id: 39, label: 'Android Development' },
+    { id: 40, label: 'React Native' },
+    { id: 41, label: 'Flutter' },
+    { id: 42, label: 'Agile' },
+    { id: 43, label: 'Scrum' },
+    { id: 44, label: 'Test-Driven Development (TDD)' },
+    { id: 45, label: 'Continuous Integration/Continuous Deployment (CI/CD)' },
+    { id: 46, label: 'Network Security' },
+    { id: 47, label: 'Application Security' },
+    { id: 48, label: 'Ethical Hacking' },
+    { id: 49, label: 'Cryptography' },
+    { id: 50, label: 'Pandas' },
+    { id: 51, label: 'NumPy' },
+    { id: 52, label: 'Scikit-learn' },
+    { id: 53, label: 'TensorFlow' },
+    { id: 54, label: 'PyTorch' },
+    { id: 55, label: 'Data Visualization' },
+    { id: 56, label: 'Data Analysis' },
+    { id: 57, label: 'API Development' },
+    { id: 58, label: 'Microservices' },
+    { id: 59, label: 'RESTful Services' },
+    { id: 60, label: 'GraphQL' },
+    { id: 61, label: 'Software Architecture' },
+    { id: 62, label: 'Design Patterns' },
+    { id: 63, label: 'Performance Optimization' },
+    { id: 64, label: 'Code Review' }
 ];

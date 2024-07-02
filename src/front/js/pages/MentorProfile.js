@@ -4,7 +4,11 @@ import { Context } from "../store/appContext";
 import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { colourOptions, daysOfTheWeek } from "../store/data";
+import { skillsList, daysOfTheWeek } from "../store/data";
+
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import { parsePhoneNumber } from 'libphonenumber-js';
 
 
 export const MentorProfile = () => {
@@ -46,7 +50,7 @@ export const MentorProfile = () => {
 	};
 
 	const handleSelectChange = (selectedOptions, { name }) => {
-		const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+		const values = selectedOptions ? selectedOptions.map(option => option.label) : [];
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			[name]: values
@@ -106,6 +110,18 @@ export const MentorProfile = () => {
 			alert('Failed to reactivate account');
 		}
 	}
+
+	const handlePhoneChange = (value) => {
+		setMentor(prevMentorInfo => ({
+			...prevMentorInfo,
+			phone: value
+		}));
+	};
+
+	const formatPhoneNumber = (phone) => {
+		const phoneNumber = parsePhoneNumber(phone);
+		return phoneNumber ? phoneNumber.formatInternational() : phone;
+	};
 
 	// const customStyles = {
 	// 	option: (provided, state) => ({
@@ -195,9 +211,14 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Phone:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="phone" value={mentor.phone} onChange={handleChange} className="form-control" />
+								<PhoneInput
+									country={'us'}
+									value={mentor.phone}
+									onChange={handlePhoneChange}
+									inputClass="form-control"
+								/>
 							) : (
-								mentor.phone
+								formatPhoneNumber(`+${mentor.phone}`)
 							)}
 						</dd>
 
@@ -245,7 +266,7 @@ export const MentorProfile = () => {
 									name="skills"
 									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
 									onChange={handleSelectChange}
-									options={colourOptions}
+									options={skillsList}
 									isDisabled={!editMode}
 								// styles={customStyles}
 								/>
@@ -273,9 +294,19 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Price:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="number" name="price" value={mentor.price} onChange={handleChange} className="form-control" />
+								<div className="input-group">
+									<span className="input-group-text">$</span>
+									<input
+										type="number"
+										name="price"
+										value={mentor.price}
+										onChange={handleChange}
+										className="form-control"
+									/>
+									<span className="input-group-text">/hr</span>
+								</div>
 							) : (
-								mentor.price
+								`$${mentor.price}/hr`
 							)}
 						</dd>
 
