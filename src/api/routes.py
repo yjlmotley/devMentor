@@ -183,6 +183,20 @@ def deactivate_mentor():
     else:
         return jsonify({"msg": "Mentor not found"}), 404
 
+@api.route('/mentor/reactivate', methods=['PUT'])
+def reactivate_mentor():
+    token = request.headers.get('Authorization').split()[1]
+    mentor_id = get_mentor_id_from_token(token)
+    if not mentor_id: 
+        return jsonify({"msg": "invalid token"}), 401
+    mentor = Mentor.query.get(mentor_id)
+    if mentor:
+        mentor.is_active = True
+        db.session.commit()
+        return jsonify({"msg": "Account reactivated successfully"}), 200
+    else:
+        return jsonify({"msg": "Mentor not found"}), 404
+    
 # except Exception as e:
 #         print(f"Error: {e}")
 #         return jsonify({"msg": "Internal server error"}), 500

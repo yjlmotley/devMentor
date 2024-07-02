@@ -86,6 +86,27 @@ export const MentorProfile = () => {
 		}
 	}
 
+	const handleReactivate = async () => {
+		const token = sessionStorage.getItem('token');
+		if (!token) {
+			alert('No token found');
+			return;
+		}
+		setMentor((prevMentor) => ({ ...prevMentor, is_active: true }));
+		const response = await fetch(process.env.BACKEND_URL + "/api/mentor/reactivate", {
+			method: 'PUT',
+			headers: {
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json'
+			}
+		});
+		if (response.ok) {
+			alert('Account reactivated successfully');
+		} else {
+			alert('Failed to reactivate account');
+		}
+	}
+
 	// const customStyles = {
 	// 	option: (provided, state) => ({
 	// 		...provided,
@@ -121,6 +142,11 @@ export const MentorProfile = () => {
 	return (
 		<div className="container mt-5">
 			<h2 className="mb-4">Mentor Profile</h2>
+			{!mentor.is_active && (
+				<div className="alert alert-warning" role="alert">
+					Your account is currently deactivated, please reactivate your account if you would like to continue to offer your services.
+				</div>
+			)}
 			{editMode == false ? (<button onClick={() => setEditMode(true)}>Edit Profile</button>) : ''}
 			<div className="row">
 				<div className="col-md-4 mb-4">
@@ -278,7 +304,11 @@ export const MentorProfile = () => {
 				</div>
 			)} */}
 			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
-			<button onClick={handleDeactivate}>Deactivate Account</button>
+			{mentor.is_active ? (
+				<button onClick={handleDeactivate}>Deactivate Account</button>
+			) : (
+				<button onClick={handleReactivate}>Reactivate Account</button>
+			)}
 		</div>
 	);
 };
