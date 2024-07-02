@@ -4,7 +4,7 @@ import { Context } from "../store/appContext";
 import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { skillsList, daysOfTheWeek } from "../store/data";
+import { skillsList, daysOfTheWeek, stateOptions } from "../store/data";
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -54,6 +54,13 @@ export const MentorProfile = () => {
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			[name]: values
+		}));
+	};
+
+	const handleStateChange = (selectedOption) => {
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
+			what_state: selectedOption ? selectedOption.label : '',
 		}));
 	};
 
@@ -234,7 +241,18 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">State:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="what_state" value={mentor.what_state} onChange={handleChange} className="form-control" />
+								<Select
+									name="what_state"
+									options={stateOptions}
+									className="basic-single-select"
+									classNamePrefix="select"
+									onChange={handleStateChange}
+								// value={
+								// 	mentor.what_state
+								// 		? { value: mentor.what_state, label: mentor.what_state }
+								// 		: ''
+								// }
+								/>
 							) : (
 								mentor.what_state
 							)}
