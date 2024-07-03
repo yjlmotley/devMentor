@@ -4,7 +4,7 @@ import { Context } from "../store/appContext";
 import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { skillsList, daysOfTheWeek, stateOptions } from "../store/data";
+import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -61,6 +61,13 @@ export const MentorProfile = () => {
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			what_state: selectedOption ? selectedOption.label : '',
+		}));
+	};
+
+	const handleCountryChange = (selectedOption) => {
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
+			country: selectedOption ? selectedOption.label : '',
 		}));
 	};
 
@@ -229,12 +236,18 @@ export const MentorProfile = () => {
 							)}
 						</dd>
 
-						<dt className="col-sm-4">City:</dt>
+						<dt className="col-sm-4">Country:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="city" value={mentor.city} onChange={handleChange} className="form-control" />
+								<Select
+									name="country"
+									options={countryOptions}
+									className="basic-single-select"
+									classNamePrefix="select"
+									onChange={handleCountryChange}
+								/>
 							) : (
-								mentor.city
+								mentor.country
 							)}
 						</dd>
 
@@ -258,12 +271,12 @@ export const MentorProfile = () => {
 							)}
 						</dd>
 
-						<dt className="col-sm-4">Country:</dt>
+						<dt className="col-sm-4">City:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="country" value={mentor.country} onChange={handleChange} className="form-control" />
+								<input type="text" name="city" value={mentor.city} onChange={handleChange} className="form-control" />
 							) : (
-								mentor.country
+								mentor.city
 							)}
 						</dd>
 
