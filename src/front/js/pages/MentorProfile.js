@@ -372,6 +372,7 @@ export const MentorProfile = () => {
 					</div>
 				</div>
 			)} */}
+			{/* {editMode ? (<button onClick={(e) => setEditMode(false)}>Cancel Changes</button>) : ''} */}
 			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
 			{mentor.is_active ? (
 				<button onClick={handleDeactivate}>Deactivate Account</button>
