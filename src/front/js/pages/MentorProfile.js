@@ -240,31 +240,38 @@ export const MentorProfile = () => {
 						<dd className="col-sm-8">
 							{editMode ? (
 								<Select
+									isClearable
 									name="country"
 									options={countryOptions}
 									className="basic-single-select"
 									classNamePrefix="select"
 									onChange={handleCountryChange}
+									defaultValue={countryOptions[195]}
+									value={
+										mentor.country
+											? { value: mentor.country, label: mentor.country } : ''
+									}
 								/>
 							) : (
 								mentor.country
 							)}
 						</dd>
 
-						<dt className="col-sm-4">State:</dt>
+						<dt className="col-sm-4">Region/ State:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<Select
+								<CreatableSelect
+									isClearable
 									name="what_state"
-									options={stateOptions}
+									options={mentor.country === "United States of America" ? stateOptions : []}
 									className="basic-single-select"
 									classNamePrefix="select"
 									onChange={handleStateChange}
-								// value={
-								// 	mentor.what_state
-								// 		? { value: mentor.what_state, label: mentor.what_state }
-								// 		: ''
-								// }
+									value={
+										mentor.what_state
+											? { value: mentor.what_state, label: mentor.what_state }
+											: ''
+									}
 								/>
 							) : (
 								mentor.what_state
@@ -330,14 +337,14 @@ export const MentorProfile = () => {
 									<input
 										type="number"
 										name="price"
-										value={mentor.price}
+										value={mentor.price || ''}
 										onChange={handleChange}
 										className="form-control"
 									/>
 									<span className="input-group-text">/hr</span>
 								</div>
 							) : (
-								`$${mentor.price}/hr`
+								mentor.price ? `$${mentor.price} /hr` : ''
 							)}
 						</dd>
 
