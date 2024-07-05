@@ -38,12 +38,13 @@ class Customer(db.Model):
 class Mentor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
     last_active = db.Column(db.Boolean(), unique=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
     nick_name = db.Column(db.String(30), unique=False)
-    phone = db.Column(db.String(30), unique=True, nullable=False)
+    phone = db.Column(db.String(30), nullable=False)
     city = db.Column(db.String(30), unique=False, nullable=False)
     what_state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
@@ -70,6 +71,7 @@ class Mentor(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            "is_active": self.is_active,
             "last_active": self.last_active,
             "first_name": self.first_name,
             "last_name": self.last_name,

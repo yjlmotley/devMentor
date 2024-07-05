@@ -54,7 +54,7 @@ export const ValidateAddress = (address, setInvalidItems) => {
 };
 
 export const ValidateCity = (city, setInvalidItems) => {
-    if (city.trim() === "" || city.length <= 6 || city.length > 80) {
+    if (city.trim() === "" || city.length <= 2 || city.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "city"]);
         return false;
     }
@@ -62,7 +62,7 @@ export const ValidateCity = (city, setInvalidItems) => {
 };
 
 export const ValidateWhatState = (whatState, setInvalidItems) => {
-    if (whatState.trim() === "" || whatState.length <= 6 || whatState.length > 80) {
+    if (whatState.trim() === "" || whatState.length < 2 || whatState.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "whatState"]);
         return false;
     }
@@ -70,7 +70,7 @@ export const ValidateWhatState = (whatState, setInvalidItems) => {
 };
 
 export const ValidateCountry = (country, setInvalidItems) => {
-    if (country.trim() === "" || country.length <= 6 || country.length > 80) {
+    if (country.trim() === "" || country.length < 3 || country.length > 80) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "country"]);
         return false;
     }
@@ -132,7 +132,7 @@ export const ValidateColor = (color, setInvalidItems) => {
 };
 
 export const ValidateImages = (uploadedImages, setInvalidItems) => {
-    if (uploadedImages.length === 0 ) {
+    if (uploadedImages.length === 0) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "uploadedImages"]);
         return false;
     }
@@ -155,14 +155,14 @@ export const ValidateComments = (comments, setInvalidItems) => {
     return true;
 };
 
-export function ValidateEstCompletion (est_completion, setInvalidItems) {
+export function ValidateEstCompletion(est_completion, setInvalidItems) {
     console.log(est_completion)
     var currentDate = new Date();
     let formattedCurrentDate = new Date(est_completion)
     console.log(currentDate)
     console.log(formattedCurrentDate)
 
-    if (formattedCurrentDate <= currentDate || est_completion.trim() === "" || est_completion.length <= 6 || est_completion.length > 20 ) {
+    if (formattedCurrentDate <= currentDate || est_completion.trim() === "" || est_completion.length <= 6 || est_completion.length > 20) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "est_completion"]);
         return false;
     }

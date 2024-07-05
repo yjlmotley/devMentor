@@ -1,12 +1,13 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from api.models import db, Mentor, Customer, Session
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.decorators import mentor_required, customer_required
+import jwt
 
 api = Blueprint('api', __name__)
 
@@ -53,8 +54,10 @@ def mentor_login():
 
 
 
-@api.route('/mentor/<int:mentor_id>', methods=['GET'])
-def mentor_by_id(mentor_id):
+@api.route('/mentor', methods=['GET'])
+@mentor_required
+def mentor_by_id():
+    mentor_id = get_jwt_identity()
     mentor = Mentor.query.get(mentor_id)
     if mentor is None:
         return jsonify({"msg": "No mentor found"}), 404
@@ -91,11 +94,19 @@ def mentor_signup():
 @mentor_required
 def mentor_edit_self():
     email = request.json.get("email")
+    is_active = request.json.get("is_active")
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
+    nick_name = request.json.get("nick_name")
+    phone = request.json.get("phone")
     city = request.json.get("city")
     what_state = request.json.get("what_state")
     country = request.json.get("country")
+    years_exp = request.json.get("years_exp")
+    skills = request.json.get("skills")
+    days = request.json.get("days")
+    price = request.json.get("price")
+    about_me = request.json.get("about_me")
     
     if email is None or first_name is None or last_name is None or city is None or what_state is None or country is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
@@ -105,11 +116,19 @@ def mentor_edit_self():
         return jsonify({"msg": "No mentor found"}), 404
     
     mentor.email=email
+    mentor.is_active=is_active
     mentor.first_name=first_name
     mentor.last_name=last_name
+    mentor.nick_name=nick_name
+    mentor.phone=phone
     mentor.city=city    
     mentor.what_state=what_state
     mentor.country=country
+    mentor.years_exp=years_exp
+    mentor.skills=skills
+    mentor.days=days
+    mentor.price=price
+    mentor.about_me=about_me
     db.session.commit()
     db.session.refresh(mentor)
 
@@ -134,6 +153,53 @@ def delete_mentor(cust_id):
     db.session.commit()
     return jsonify({"msg": "mentor successfully deleted"}), 200
 
+
+def get_mentor_id_from_token(token):
+    try: 
+        payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms = ['HS256'])
+        print(f"Token payload: {payload}")
+        return payload.get("mentor_id") or payload['sub']
+    except jwt.ExpiredSignatureError:
+        print("Token expired")
+        return None
+    except jwt.InvalidTokenError as e:
+        print(f"Invalid Token: {e}")
+        return None
+    except KeyError: 
+        print("mentor_id key not found")
+        return None
+
+@api.route('/mentor/deactivate', methods=['PUT'])
+def deactivate_mentor():
+    token = request.headers.get('Authorization').split()[1]
+    mentor_id = get_mentor_id_from_token(token)
+    if not mentor_id: 
+        return jsonify({"msg": "invalid token"}), 401
+    mentor = Mentor.query.get(mentor_id)
+    if mentor:
+        mentor.is_active = False
+        db.session.commit()
+        return jsonify({"msg": "Account deactivated successfully"}), 200
+    else:
+        return jsonify({"msg": "Mentor not found"}), 404
+
+@api.route('/mentor/reactivate', methods=['PUT'])
+def reactivate_mentor():
+    token = request.headers.get('Authorization').split()[1]
+    mentor_id = get_mentor_id_from_token(token)
+    if not mentor_id: 
+        return jsonify({"msg": "invalid token"}), 401
+    mentor = Mentor.query.get(mentor_id)
+    if mentor:
+        mentor.is_active = True
+        db.session.commit()
+        return jsonify({"msg": "Account reactivated successfully"}), 200
+    else:
+        return jsonify({"msg": "Mentor not found"}), 404
+    
+# except Exception as e:
+#         print(f"Error: {e}")
+#         return jsonify({"msg": "Internal server error"}), 500
 
 
 # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start

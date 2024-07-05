@@ -20,6 +20,7 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = ""
 app.url_map.strict_slashes = False
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 7*24*60*60*52
 JWTManager(app)
 
 # database condiguration
