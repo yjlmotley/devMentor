@@ -8,12 +8,14 @@ import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../stor
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
 
+import "../../styles/mentorProfile.css";
 
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
 	const [editMode, setEditMode] = useState(false);
+	const [originalMentor, setOriginalMentor] = useState({});
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -30,6 +32,20 @@ export const MentorProfile = () => {
 		price: '',
 		about_me: '',
 	});
+	console.log(mentor);
+
+	// const [loading, setLoading] = useState(true);
+	// if (loading) {
+	// 	return <div>Loading...</div>;
+	// }
+	// if (!mentor) {
+	// 	return <div>Mentor not found</div>;
+	// }
+
+	const handleCancelChanges = () => {
+		setMentor(originalMentor);
+		setEditMode(false);
+	};
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -60,7 +76,7 @@ export const MentorProfile = () => {
 	const handleStateChange = (selectedOption) => {
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
-			what_state: selectedOption ? selectedOption.label : '',
+			what_state: selectedOption ? selectedOption.value : '',
 		}));
 	};
 
@@ -153,21 +169,14 @@ export const MentorProfile = () => {
 			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
 		})
 			.then(resp => resp.json())
-			.then(data => setMentor(data))
+			.then(data => {
+				setMentor(data);
+				setOriginalMentor(data);
+			})
 			.then(() => { setLoading(false) })
 			.catch(error => console.log(error))
 	}, []);
 
-
-	const [loading, setLoading] = useState(true);
-
-	if (loading) {
-		return <div>Loading...</div>;
-	}
-
-	if (!mentor) {
-		return <div>Mentor not found</div>;
-	}
 
 	return (
 		<div className="container mt-5">
@@ -230,9 +239,30 @@ export const MentorProfile = () => {
 									value={mentor.phone}
 									onChange={handlePhoneChange}
 									inputClass="form-control"
+									inputStyle={{
+										width: '100%'
+									}}
 								/>
 							) : (
-								formatPhoneNumber(`+${mentor.phone}`)
+								// mentor.phone && formatPhoneNumber(`+${mentor.phone}`)
+								<PhoneInput
+									disabled
+									country={'us'}
+									value={mentor.phone}
+									onChange={handlePhoneChange}
+									inputClass="form-control disabled border-0"
+									inputStyle={{
+										height: '25px',
+										fontSize: '14px',
+										padding: '0px',
+										margin: '0px',
+										lineHeight: 'auto',
+										width: '100%'
+									}}
+									buttonStyle={{
+										display: 'none'
+									}}
+								/>
 							)}
 						</dd>
 
@@ -323,6 +353,8 @@ export const MentorProfile = () => {
 									className="basic-multi-select"
 									classNamePrefix="select"
 									isDisable={!editMode}
+									value={mentor.days.map(day => ({ value: day, label: day }))}
+									onChange={handleSelectChange}
 								/>
 							) : (
 								mentor.days.join(", ")
@@ -372,7 +404,9 @@ export const MentorProfile = () => {
 					</div>
 				</div>
 			)} */}
-			{/* {editMode ? (<button onClick={(e) => setEditMode(false)}>Cancel Changes</button>) : ''} */}
+			{editMode ? (
+				<button onClick={handleCancelChanges}>Cancel Changes</button>
+			) : ''}
 			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
 			{mentor.is_active ? (
 				<button onClick={handleDeactivate}>Deactivate Account</button>
