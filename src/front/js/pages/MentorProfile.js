@@ -293,7 +293,7 @@ export const MentorProfile = () => {
 								<CreatableSelect
 									isClearable
 									name="what_state"
-									options={mentor.country === "United States of America" ? stateOptions : []}
+									options={mentor.country === "United States of America (USA)" ? stateOptions : []}
 									className="basic-single-select"
 									classNamePrefix="select"
 									onChange={handleStateChange}
@@ -335,6 +335,7 @@ export const MentorProfile = () => {
 									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
 									onChange={handleSelectChange}
 									options={skillsList}
+									closeMenuOnSelect={false}
 									isDisabled={!editMode}
 								// styles={customStyles}
 								/>
@@ -352,6 +353,7 @@ export const MentorProfile = () => {
 									options={daysOfTheWeek}
 									className="basic-multi-select"
 									classNamePrefix="select"
+									closeMenuOnSelect={false}
 									isDisable={!editMode}
 									value={mentor.days.map(day => ({ value: day, label: day }))}
 									onChange={handleSelectChange}
