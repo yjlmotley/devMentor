@@ -129,11 +129,13 @@ def mentor_edit_self():
     mentor.days=days
     mentor.price=price
     mentor.about_me=about_me
+
     db.session.commit()
     db.session.refresh(mentor)
 
     response_body = {"msg": "Mentor Account sucessfully edited",
-    "mentor":mentor.serialize()}
+    "mentor":mentor.serialize()
+    }
     return jsonify(response_body, 201)
 
 @api.route('/mentor/delete/<int:cust_id>', methods =['DELETE'])

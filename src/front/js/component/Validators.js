@@ -169,3 +169,12 @@ export function ValidateEstCompletion(est_completion, setInvalidItems) {
 
     return true;
 }
+
+export const ValidatePrice = (price, setInvalidItems) => {
+    const priceRegex = /^\d+(\.\d{2})?$/;
+    if (!priceRegex.test(price) || price === "") {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "price"]);
+        return false;
+    }
+    return true;
+};

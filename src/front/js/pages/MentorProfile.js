@@ -5,6 +5,8 @@ import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
+import { ValidatePrice } from "../component/Validators";
+
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -16,6 +18,7 @@ export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
 	const [editMode, setEditMode] = useState(false);
 	const [originalMentor, setOriginalMentor] = useState({});
+	const [invalidItems, setInvalidItems] = useState([]);
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -89,12 +92,18 @@ export const MentorProfile = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const success = await actions.editMentor(mentor);
-		if (success) {
-			alert('Mentor information updated sucessfully')
-			setEditMode(false)
+		setInvalidItems([]);
+		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems);
+		if (isPriceValid) {
+			const success = await actions.editMentor(mentor);
+			if (success) {
+				alert('Mentor information updated sucessfully')
+				setEditMode(false)
+			} else {
+				alert('Failed to update mentor information')
+			}
 		} else {
-			alert('Failed to update mentor information')
+			console.log("Invalid inputs:", invalidItems);
 		}
 	}
 
@@ -369,7 +378,7 @@ export const MentorProfile = () => {
 								<div className="input-group">
 									<span className="input-group-text">$</span>
 									<input
-										type="number"
+										type="text"
 										name="price"
 										value={mentor.price || ''}
 										onChange={handleChange}
@@ -380,6 +389,7 @@ export const MentorProfile = () => {
 							) : (
 								mentor.price ? `$${mentor.price} /hr` : ''
 							)}
+							{invalidItems.includes("price") && <label className="error-label alert alert-danger">Invalid price value. (e.g.: 20.00)</label>}
 						</dd>
 
 						<dt className="col-sm-4">About Me:</dt>
