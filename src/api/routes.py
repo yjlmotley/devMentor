@@ -2,12 +2,16 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-from api.models import db, Mentor, Customer, Session
+from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.decorators import mentor_required, customer_required
 import jwt
+
+import cloudinary.uploader as uploader
+from cloudinary.uploader import destroy
+from cloudinary.api import delete_resources_by_tag
 
 api = Blueprint('api', __name__)
 
@@ -135,6 +139,49 @@ def mentor_edit_self():
     response_body = {"msg": "Mentor Account sucessfully edited",
     "mentor":mentor.serialize()}
     return jsonify(response_body, 201)
+
+@api.route('/mentor/upload-photo', methods =['POST'])
+@mentor_required
+def mentor_upload_photo():
+
+    mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+    images = request.files.getlist("file")
+    for image_file in images:
+        if len(MentorImage.query.filter_by(mentor_id=mentor.id).all()) > 0:
+            break
+        response = uploader.upload(image_file)
+        print(f"{response.items()}")
+        new_image = MentorImage(public_id=response["public_id"], image_url=response["secure_url"],mentor_id=mentor.id)
+        db.session.add(new_image)
+        db.session.commit()
+        db.session.refresh(mentor)
+
+    return jsonify ({"Msg": "Image Sucessfully Uploaded"})
+
+@api.route('/mentor/upload-portfolio-image', methods =['POST'])
+@mentor_required
+def mentor_upload_portfolio():
+
+    mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+    images = request.files.getlist("file")
+    print(images)
+    for image_file in images:
+        response = uploader.upload(image_file)
+        if response["secure_url"] is None:
+            return jsonify({"Msg": "An error occured while uploading 1 or more images"}), 500
+        print(f"{response.items()}")
+        new_image = PortfolioPhoto(public_id=response["public_id"], image_url=response["secure_url"],mentor_id=mentor.id)
+        db.session.add(new_image)
+        db.session.commit()
+        db.session.refresh(mentor)
+
+    return jsonify ({"Msg": "Image Sucessfully Uploaded"})
 
 @api.route('/mentor/delete/<int:cust_id>', methods =['DELETE'])
 def delete_mentor(cust_id):

@@ -84,7 +84,7 @@ class Mentor(db.Model):
             "skills": [skill for skill in self.skills],
             "past_sessions": [past_session for past_session in self.past_sessions],
             "days": [day for day in self.days],
-            "profile_photo": self.profile_photos[0].serialize() if self.profile_photo else None,
+            "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "portfolio_photos": [portfolio_photo.serialize() for portfolio_photo in self.portfolio_photos],
             "about_me": self.about_me,
             "price": self.price
@@ -120,7 +120,7 @@ class MentorImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(500), nullable=False, unique=True)
     image_url = db.Column(db.String(500), nullable=False, unique=True)
-    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False, unique=True)
     mentor = db.relationship("Mentor", back_populates="profile_photo", uselist=False)
 
     def __init__(self, public_id, image_url, mentor_id):
