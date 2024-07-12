@@ -172,9 +172,17 @@ export function ValidateEstCompletion(est_completion, setInvalidItems) {
 
 export const ValidatePrice = (price, setInvalidItems) => {
     const priceRegex = /^\d+(\.\d{2})?$/;
-    if (!priceRegex.test(price) || price === "") {
+    if (!priceRegex.test(price) || price.trim() === "") {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "price"]);
         return false;
     }
     return true;
 };
+
+export const ValidateNumber = (years_exp, setInvalidItems) => {
+    if (isNaN(years_exp)) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "years_exp"]);
+        return false;
+    }
+    return true;
+}

@@ -5,7 +5,7 @@ import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
-import { ValidatePrice } from "../component/Validators";
+import { ValidatePrice, ValidateNumber } from "../component/Validators";
 
 
 import PhoneInput from 'react-phone-input-2'
@@ -35,7 +35,6 @@ export const MentorProfile = () => {
 		price: '',
 		about_me: '',
 	});
-	console.log(mentor);
 
 	// const [loading, setLoading] = useState(true);
 	// if (loading) {
@@ -94,7 +93,8 @@ export const MentorProfile = () => {
 		e.preventDefault();
 		setInvalidItems([]);
 		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems);
-		if (isPriceValid) {
+		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
+		if (isPriceValid && isYearValid) {
 			const success = await actions.editMentor(mentor);
 			if (success) {
 				alert('Mentor information updated sucessfully')
@@ -182,7 +182,7 @@ export const MentorProfile = () => {
 				setMentor(data);
 				setOriginalMentor(data);
 			})
-			.then(() => { setLoading(false) })
+			// .then(() => { setLoading(false) })
 			.catch(error => console.log(error))
 	}, []);
 
@@ -207,7 +207,7 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" />
+								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled/>
 							) : (
 								mentor.email
 							)}
@@ -333,6 +333,20 @@ export const MentorProfile = () => {
 							) : (
 								mentor.years_exp
 							)}
+							{invalidItems.includes("years_exp") &&
+								<label className="error-label alert alert-danger" role="alert" style={{
+									padding: '0.5rem',
+									fontSize: '0.875rem',
+									lineHeight: '1.2',
+									width: '100%',
+									marginTop: '0.25rem',
+									marginBottom: '0'
+								}}>
+									<svg xmlns="http://www.w3.org/2000/svg" className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Danger:" style={{ width: '1em', height: '1em', verticalAlign: 'middle', fill: 'currentColor' }}>
+										<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+									</svg>
+									Must be a number (ex. 2)
+								</label>}
 						</dd>
 
 						<dt className="col-sm-4">Skills:</dt>
@@ -343,9 +357,8 @@ export const MentorProfile = () => {
 									name="skills"
 									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
 									onChange={handleSelectChange}
-									options={skillsList}
+									options={skillsList.filter(skill => !mentor.skills.includes(skill.label))}
 									closeMenuOnSelect={false}
-									isDisabled={!editMode}
 								// styles={customStyles}
 								/>
 							) : (
@@ -359,12 +372,11 @@ export const MentorProfile = () => {
 								<Select
 									isMulti
 									name="days"
-									options={daysOfTheWeek}
+									options={daysOfTheWeek.filter(day => !mentor.days.includes(day.label))}
 									className="basic-multi-select"
 									classNamePrefix="select"
 									closeMenuOnSelect={false}
-									isDisable={!editMode}
-									value={mentor.days.map(day => ({ value: day, label: day }))}
+									defaultValue={mentor.days.map(day => ({ value: day, label: day }))}
 									onChange={handleSelectChange}
 								/>
 							) : (
@@ -389,7 +401,20 @@ export const MentorProfile = () => {
 							) : (
 								mentor.price ? `$${mentor.price} /hr` : ''
 							)}
-							{invalidItems.includes("price") && <label className="error-label alert alert-danger">Invalid price value. (e.g.: 20.00)</label>}
+							{invalidItems.includes("price") &&
+								<label className="error-label alert alert-danger" role="alert" style={{
+									padding: '0.5rem',
+									fontSize: '0.875rem',
+									lineHeight: '1.2',
+									width: '100%',
+									marginTop: '0.25rem',
+									marginBottom: '0'
+								}}>
+									<svg xmlns="http://www.w3.org/2000/svg" className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Danger:" style={{ width: '1em', height: '1em', verticalAlign: 'middle', fill: 'currentColor' }}>
+										<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+									</svg>
+									Invalid price value (ex. 20.00)
+								</label>}
 						</dd>
 
 						<dt className="col-sm-4">About Me:</dt>
