@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Context } from "../store/appContext";
 
-const ProfilePhoto = ({url}) => {
+const ProfilePhoto = ({url, setMentor}) => {
     const { store, actions } = useContext(Context);
     const [imageSizeError, setImageSizeError] = useState(false)
     const [uploadedImages, setUploadedImages] = useState([]);
@@ -27,8 +27,16 @@ const ProfilePhoto = ({url}) => {
         }
       };
 
-      const handleNewImage = async (event) => {
+      const handleNewImage = async () => {
         const success = await actions.addMentorImage(uploadedImages);
+        if(success){
+          fetch(process.env.BACKEND_URL + "/api/mentor", {
+            headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
+          })
+            .then(resp => resp.json())
+            .then(data => setMentor(data))
+            .catch(error => console.log(error))
+        }
       }
 
 

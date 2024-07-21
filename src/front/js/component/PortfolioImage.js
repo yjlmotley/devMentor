@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Context } from "../store/appContext";
 
-const PortfolioImage = ({ portfolioImgs }) => {
+const PortfolioImage = ({ portfolioImgs, setMentor }) => {
   const { store, actions } = useContext(Context);
   const [imageSizeError, setImageSizeError] = useState(false)
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -27,11 +27,20 @@ const PortfolioImage = ({ portfolioImgs }) => {
     }
   };
 
-  const handleNewImage = async (event) => {
+ const handleNewImage = async () => {
     const success = await actions.addPortfolioImages(uploadedImages);
+    if(success){
+      fetch(process.env.BACKEND_URL + "/api/mentor", {
+        headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
+      })
+        .then(resp => resp.json())
+        .then(data => setMentor(data))
+        .catch(error => console.log(error))
+    }
   }
 
-  console.log(portfolioImgs)
+
+  console.log(`from portfolio Image.js: ${portfolioImgs}`)
 
 
   return (
@@ -95,8 +104,8 @@ const PortfolioImage = ({ portfolioImgs }) => {
             <div style={{ display: "flex" }}>
               {portfolioImgs && portfolioImgs.map((image, index) => {
                 return <img
-                  key={image.id}
-                  src={image.image_url}
+                  key={index}
+                  src={image.image_url || image }
                   alt="Random"
                   style={{
                     maxHeight: "500px",
