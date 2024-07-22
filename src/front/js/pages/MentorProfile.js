@@ -189,7 +189,7 @@ export const MentorProfile = () => {
 			{editMode == false ? (<button onClick={() => setEditMode(true)}>Edit Profile</button>) : ''}
 			<div className="row">
 				<div className="col-6 mb-4">
-					<ProfilePhoto url={profileImageUrl} />
+					<ProfilePhoto url={profileImageUrl} setMentor={setMentor} />
 				</div>
 				<div className="col-6 mb-4">
 				</div>
@@ -390,7 +390,7 @@ export const MentorProfile = () => {
 			)}
 
 			<div className="col-12 mb-4">
-				<PortfolioImage portfolioImgs={portfolioImageUrls} />
+				<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} />
 			</div>
 			
 		</div>

@@ -143,7 +143,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     },
                     body: formData
                 })
-                if (response.status !== 201) return false;
+                if (response.status !== 200) return false;
                 const responseBody = await response.json();
                 console.log(responseBody)
                 console.log("This is the Response Body")
@@ -167,7 +167,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     },
                     body: formData
                 })
-                if (response.status !== 201) return false;
+                if (response.status !== 200) return false;
                 const responseBody = await response.json();
                 console.log(responseBody)
                 console.log("This is the Response Body")
