@@ -2,7 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
-import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState, ValidatePhone } from "../component/Validators";
+// import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState, ValidatePhone } from "../component/Validators";
+import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
@@ -29,8 +30,9 @@ export const MentorSignup = () => {
         let isPasswordValid = ValidatePassword(password, setInvalidItems);
         let isCityValid = ValidateCity(city, setInvalidItems);
         let isWhat_stateValid = ValidateWhatState(what_state, setInvalidItems);
-        let isPhoneValid = ValidatePhone(phone, setInvalidItems);
-        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isPhoneValid) {
+        // let isPhoneValid = ValidatePhone(phone, setInvalidItems);
+        // if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isPhoneValid) {
+        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid) {
             const success = await actions.signUpMentor({
                 email: email,
                 password: password,
@@ -203,29 +205,29 @@ export const MentorSignup = () => {
                             </div> */}
                             <div style={{ marginBottom: '20px' }}>
                                 <CreatableSelect
-									isClearable
-									name="what_state"
+                                    isClearable
+                                    name="what_state"
                                     styles={{
                                         menu: (baseStyles, state) => ({
                                             ...baseStyles,
                                             color: 'black',
                                         }),
                                     }}
-									options={country === "United States of America (USA)" ? stateOptions : []}
-									className="basic-single-select"
-									classNamePrefix="select"
-									onChange={handleStateChange}
-									value={
-										what_state
-											? { value: what_state, label: what_state }
-											: ''
-									}
+                                    options={country === "United States of America (USA)" ? stateOptions : []}
+                                    className="basic-single-select"
+                                    classNamePrefix="select"
+                                    onChange={handleStateChange}
+                                    value={
+                                        what_state
+                                            ? { value: what_state, label: what_state }
+                                            : ''
+                                    }
                                     placeholder="Select or Type a State/ Providence..."
-								/>
+                                />
                                 {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
                             </div>
 
-                                
+
 
                             <div style={{ marginBottom: '20px' }}>
                                 <input

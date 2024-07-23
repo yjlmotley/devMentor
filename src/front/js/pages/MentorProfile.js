@@ -5,7 +5,7 @@ import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
-import { ValidatePrice, ValidateNumber } from "../component/Validators";
+import { ValidatePrice, ValidateNumber, ValidatePhoneNumber } from "../component/Validators";
 
 
 import PhoneInput from 'react-phone-input-2'
@@ -13,12 +13,15 @@ import 'react-phone-input-2/lib/style.css'
 import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
 
 import "../../styles/mentorProfile.css";
+import { useAsync } from "react-select/async";
+
 
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
 	const [editMode, setEditMode] = useState(false);
 	const [originalMentor, setOriginalMentor] = useState({});
 	const [invalidItems, setInvalidItems] = useState([]);
+	const [ phoneError, setPhoneError ] = useState('');
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -49,6 +52,7 @@ export const MentorProfile = () => {
 		setEditMode(false);
 	};
 
+	const [ CharacterCount, setCharacterCount ] = useState(0);
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		let x = value
@@ -61,11 +65,16 @@ export const MentorProfile = () => {
 				x = array
 			}
 		}
+		if (name === "about_me") {
+			setCharacterCount(value.length);
+		}
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			[name]: x
 		}));
 	};
+
+
 
 	const handleSelectChange = (selectedOptions, { name }) => {
 		const values = selectedOptions ? selectedOptions.map(option => option.label) : [];
@@ -94,7 +103,8 @@ export const MentorProfile = () => {
 		setInvalidItems([]);
 		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems);
 		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
-		if (isPriceValid && isYearValid) {
+		const phoneValidation = ValidatePhoneNumber(mentor.phone, selectedCountry);
+		if (isPriceValid && isYearValid && phoneValidation.isValid) {
 			const success = await actions.editMentor(mentor);
 			if (success) {
 				alert('Mentor information updated sucessfully')
@@ -103,9 +113,13 @@ export const MentorProfile = () => {
 				alert('Failed to update mentor information')
 			}
 		} else {
+			if (!phoneValidation.isValid) {
+				setPhoneError(phoneValidation.message);
+			}
 			console.log("Invalid inputs:", invalidItems);
+			console.log(mentor.phone);
 		}
-	}
+	};
 
 	const handleDeactivate = async () => {
 		const token = sessionStorage.getItem('token');
@@ -150,16 +164,22 @@ export const MentorProfile = () => {
 		}
 	}
 
-	const handlePhoneChange = (value) => {
+
+	const [ selectedCountry, setSelectedCountry ] = useState();
+
+	const handlePhoneChange = (value, countryData) => {
+		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
+		setSelectedCountry(countryData.countryCode);
+		if (phoneValidation.isValid) {
+			setPhoneError('');
+		} else {
+			setPhoneError(phoneValidation.message);
+		}
+		console.log(value);
 		setMentor(prevMentorInfo => ({
 			...prevMentorInfo,
 			phone: value
 		}));
-	};
-
-	const formatPhoneNumber = (phone) => {
-		const phoneNumber = parsePhoneNumber(phone);
-		return phoneNumber ? phoneNumber.formatInternational() : phone;
 	};
 
 	// const customStyles = {
@@ -186,6 +206,7 @@ export const MentorProfile = () => {
 			.catch(error => console.log(error))
 	}, []);
 
+	
 
 	return (
 		<div className="container mt-5">
@@ -207,7 +228,7 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled/>
+								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled />
 							) : (
 								mentor.email
 							)}
@@ -243,15 +264,23 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Phone:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<PhoneInput
-									country={'us'}
-									value={mentor.phone}
-									onChange={handlePhoneChange}
-									inputClass="form-control"
-									inputStyle={{
-										width: '100%'
-									}}
-								/>
+								<>
+									<PhoneInput
+										country={'us'}
+										value={mentor.phone}
+										onChange={handlePhoneChange}
+										inputClass="form-control"
+										inputStyle={{
+											width: '100%'
+										}}
+										inputProps={{
+											name: 'phone',
+											required: true,
+											autoFocus: true
+										}}
+									/>
+									{phoneError && <div className="text-danger">{phoneError}</div>}
+								</>
 							) : (
 								// mentor.phone && formatPhoneNumber(`+${mentor.phone}`)
 								<PhoneInput
@@ -420,7 +449,10 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">About Me:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control"></textarea>
+								<>
+									<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control" rows=""></textarea>
+									{CharacterCount}
+								</>
 							) : (
 								mentor.about_me
 							)}
