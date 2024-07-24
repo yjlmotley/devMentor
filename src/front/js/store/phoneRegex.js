@@ -1,187 +1,109 @@
-// const phoneRegex = {
-//   'am-AM': /^(\+?374|0)((10|[9|7][0-9])\d{6}$|[2-4]\d{7}$)/,
-//   'ar-AE': /^((\+?971)|0)?5[024568]\d{7}$/,
-//   'ar-BH': /^(\+?973)?(3|6)\d{7}$/,
-//   'ar-DZ': /^(\+?213|0)(5|6|7)\d{8}$/,
-//   'ar-EG': /^((\+?20)|0)?1[0125]\d{8}$/,
-//   'ar-IQ': /^(\+?964|0)?7[0-9]\d{8}$/,
-//   'ar-JO': /^(\+?962|0)?7[789]\d{7}$/,
-//   'ar-KW': /^(\+?965)[569]\d{7}$/,
-//   'ar-SA': /^(!?(\+?966)|0)?5\d{8}$/,
-//   'ar-SY': /^(!?(\+?963)|0)?9\d{8}$/,
-//   'ar-TN': /^(\+?216)?[2459]\d{7}$/,
-//   'be-BY': /^(\+?375)?(24|25|29|33|44)\d{7}$/,
-//   'bg-BG': /^(\+?359|0)?8[789]\d{7}$/,
-//   'bn-BD': /^(\+?880|0)1[13456789][0-9]{8}$/,
-//   'cs-CZ': /^(\+?420)? ?[1-9][0-9]{2} ?[0-9]{3} ?[0-9]{3}$/,
-//   'da-DK': /^(\+?45)?\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/,
-//   'de-DE': /^(\+49)?0?1(5[0-25-9]\d|6([23]|0\d?)|7([0-57-9]|6\d))\d{7}$/,
-//   'de-AT': /^(\+43|0)\d{1,4}\d{3,12}$/,
-//   'el-GR': /^(\+?30|0)?(69\d{8})$/,
-//   'en-AU': /^(\+?61|0)4\d{8}$/,
-//   'en-GB': /^(\+?44|0)7\d{9}$/,
-//   'en-GG': /^(\+?44|0)1481\d{6}$/,
-//   'en-GH': /^(\+233|0)(20|50|24|54|27|57|26|56|23|28)\d{7}$/,
-//   'en-HK': /^(\+?852[-\s]?)?[456789]\d{3}[-\s]?\d{4}$/,
-//   'en-MO': /^(\+?853[-\s]?)?[6]\d{3}[-\s]?\d{4}$/,
-//   'en-IE': /^(\+?353|0)8[356789]\d{7}$/,
-//   'en-IN': /^(\+?91|0)?[6789]\d{9}$/,
-//   'en-KE': /^(\+?254|0)(7|1)\d{8}$/,
-//   'en-MT': /^(\+?356|0)?(99|79|77|21|27|22|25)[0-9]{6}$/,
-//   'en-MU': /^(\+?230|0)?\d{8}$/,
-//   'en-NG': /^(\+?234|0)?[789]\d{9}$/,
-//   'en-NZ': /^(\+?64|0)[28]\d{7,9}$/,
-//   'en-PK': /^((\+92)|(0092))-{0,1}\d{3}-{0,1}\d{7}$|^\d{11}$|^\d{4}-\d{7}$/,
-//   'en-RW': /^(\+?250|0)?[7]\d{8}$/,
-//   'en-SG': /^(\+65)?[89]\d{7}$/,
-//   'en-SL': /^(?:0|94|\+94)?(7(0|1|2|5|6|7|8)( |-)?\d)\d{6}$/,
-//   'en-TZ': /^(\+?255|0)?[67]\d{8}$/,
-//   'en-UG': /^(\+?256|0)?[7]\d{8}$/,
-//   'en-US': /^((\+1|1)?( |-)?)?(\([2-9][0-9]{2}\)|[2-9][0-9]{2})( |-)?([2-9][0-9]{2}( |-)?[0-9]{4})$/,
-//   'en-ZA': /^(\+?27|0)\d{9}$/,
-//   'en-ZM': /^(\+?26)?09[567]\d{7}$/,
-//   'es-CL': /^(\+?56|0)[2-9]\d{1}\d{7}$/,
-//   'es-EC': /^(\+?593|0)([2-7]|9[2-9])\d{7}$/,
-//   'es-ES': /^(\+?34)?(6\d{1}|7[1234])\d{7}$/,
-//   'es-MX': /^(\+?52)?(1|01)?\d{10,11}$/,
-//   'es-PA': /^(\+?507)\d{7,8}$/,
-//   'es-PY': /^(\+?595|0)9[9876]\d{7}$/,
-//   'es-UY': /^(\+598|0)9[1-9][\d]{6}$/,
-//   'et-EE': /^(\+?372)?\s?(5|8[1-4])\s?([0-9]\s?){6,7}$/,
-//   'fa-IR': /^(\+?98[\-\s]?|0)9[0-39]\d[\-\s]?\d{3}[\-\s]?\d{4}$/,
-//   'fi-FI': /^(\+?358|0)\s?(4(0|1|2|4|5|6)?|50)\s?(\d\s?){4,8}\d$/,
-//   'fj-FJ': /^(\+?679)?\s?\d{3}\s?\d{4}$/,
-//   'fo-FO': /^(\+?298)?\s?\d{2}\s?\d{2}\s?\d{2}$/,
-//   'fr-FR': /^(\+?33|0)[67]\d{8}$/,
-//   'fr-GF': /^(\+?594|0|00594)[67]\d{8}$/,
-//   'fr-GP': /^(\+?590|0|00590)[67]\d{8}$/,
-//   'fr-MQ': /^(\+?596|0|00596)[67]\d{8}$/,
-//   'fr-RE': /^(\+?262|0|00262)[67]\d{8}$/,
-//   'he-IL': /^(\+972|0)([23489]|5[012345689]|77)[1-9]\d{6}$/,
-//   'hu-HU': /^(\+?36)(20|30|70)\d{7}$/,
-//   'id-ID': /^(\+?62|0)8(1[123456789]|2[1238]|3[1238]|5[12356789]|7[78]|9[56789]|8[123456789])([\s?|\d]{5,11})$/,
-//   'it-IT': /^(\+?39)?\s?3\d{2} ?\d{6,7}$/,
-//   'ja-JP': /^(\+81[ \-]?(\(0\))?|0)[6789]0[ \-]?\d{4}[ \-]?\d{4}$/,
-//   'kk-KZ': /^(\+?7|8)?7\d{9}$/,
-//   'kl-GL': /^(\+?299)?\s?\d{2}\s?\d{2}\s?\d{2}$/,
-//   'ko-KR': /^((\+?82)[ \-]?)?0?1([0|1|6|7|8|9]{1})[ \-]?\d{3,4}[ \-]?\d{4}$/,
-//   'lt-LT': /^(\+370|8)\d{8}$/,
-//   'ms-MY': /^(\+?6?01){1}(([0145]{1}(\-|\s)?\d{7,8})|([236789]{1}(\s|\-)?\d{7}))$/,
-//   'nb-NO': /^(\+?47)?[49]\d{7}$/,
-//   'ne-NP': /^(\+?977)?9[78]\d{8}$/,
-//   'nl-BE': /^(\+?32|0)4?\d{8}$/,
-//   'nl-NL': /^(\+?31|0)6?\d{8}$/,
-//   'nn-NO': /^(\+?47)?[49]\d{7}$/,
-//   'pl-PL': /^(\+?48)? ?[5-8]\d ?\d{3} ?\d{2} ?\d{2}$/,
-//   'pt-BR': /(?=^(\+?5{2}\-?|0)[1-9]{2}\-?\d{4}\-?\d{4}$)(^(\+?5{2}\-?|0)[1-9]{2}\-?[6-9]{1}\d{3}\-?\d{4}$)|(^(\+?5{2}\-?|0)[1-9]{2}\-?9[6-9]{1}\d{3}\-?\d{4}$)/,
-//   'pt-PT': /^(\+?351)?9[1236]\d{7}$/,
-//   'ro-RO': /^(\+?4?0)\s?7\d{2}(\/|\s|\.|\-)?\d{3}(\s|\.|\-)?\d{3}$/,
-//   'ru-RU': /^(\+?7|8)?9\d{9}$/,
-//   'sl-SI': /^(\+386\s?|0)(\d{1}\s?\d{3}\s?\d{2}\s?\d{2}|\d{2}\s?\d{3}\s?\d{3})$/,
-//   'sk-SK': /^(\+?421)? ?[1-9][0-9]{2} ?[0-9]{3} ?[0-9]{3}$/,
-//   'sr-RS': /^(\+3816|06)[- \d]{5,9}$/,
-//   'sv-SE': /^(\+?46|0)[\s\-]?7[\s\-]?[02369]([\s\-]?\d){7}$/,
-//   'th-TH': /^(\+66|66|0)\d{9}$/,
-//   'tr-TR': /^(\+?90|0)?5\d{9}$/,
-//   'uk-UA': /^(\+?38|8)?0\d{9}$/,
-//   'vi-VN': /^(\+?84|0)((3([2-9]))|(5([2689]))|(7([0|6-9]))|(8([1-6|89]))|(9([0-9])))([0-9]{7})$/,
-//   'zh-CN': /^((\+|00)86)?1([358][0-9]|4[579]|6[67]|7[01235678]|9[189])[0-9]{8}$/,
-//   'zh-TW': /^(\+?886\-?|0)?9\d{8}$/,
-// };
-
-// export default phoneRegex;
-
 const phoneRegex = {
-    'am-AM': /^(\+?374|0)(10|[9|7][0-9]\d{6}|[2-4]\d{7})$/,
-    'ar-AE': /^((\+?971)|0)?5[024568]\d{7}$/,
-    'ar-BH': /^(\+?973)?(3|6)\d{7}$/,
-    'ar-DZ': /^(\+?213|0)(5|6|7)\d{8}$/,
-    'ar-EG': /^((\+?20)|0)?1[0125]\d{8}$/,
-    'ar-IQ': /^(\+?964|0)?7[0-9]\d{8}$/,
-    'ar-JO': /^(\+?962|0)?7[789]\d{7}$/,
-    'ar-KW': /^(\+?965)[569]\d{7}$/,
-    'ar-SA': /^(\+?966|0)?5\d{8}$/,
-    'ar-SY': /^(\+?963|0)?9\d{8}$/,
-    'ar-TN': /^(\+?216)?[2459]\d{7}$/,
-    'be-BY': /^(\+?375)?(24|25|29|33|44)\d{7}$/,
-    'bg-BG': /^(\+?359|0)?8[789]\d{7}$/,
-    'bn-BD': /^(\+?880|0)1[13456789]\d{8}$/,
-    'cs-CZ': /^(\+?420)?[1-9]\d{2}\d{3}\d{3}$/,
-    'da-DK': /^(\+?45)?\d{8}$/,
-    'de-DE': /^(\+49)?0?1(5[0-25-9]\d|6([23]|0\d?)|7([0-57-9]|6\d))\d{7}$/,
-    'de-AT': /^(\+43|0)\d{1,4}\d{3,12}$/,
-    'el-GR': /^(\+?30|0)?69\d{8}$/,
-    'en-AU': /^(\+?61|0)4\d{8}$/,
-    'en-GB': /^(\+?44|0)7\d{9}$/,
-    'en-GG': /^(\+?44|0)1481\d{6}$/,
-    'en-GH': /^(\+233|0)(20|50|24|54|27|57|26|56|23|28)\d{7}$/,
-    'en-HK': /^(\+?852)?[456789]\d{3}\d{4}$/,
-    'en-MO': /^(\+?853)?[6]\d{3}\d{4}$/,
-    'en-IE': /^(\+?353|0)8[356789]\d{7}$/,
-    'en-IN': /^(\+?91|0)?[6789]\d{9}$/,
-    'en-KE': /^(\+?254|0)(7|1)\d{8}$/,
-    'en-MT': /^(\+?356|0)?(99|79|77|21|27|22|25)\d{6}$/,
-    'en-MU': /^(\+?230|0)\d{8}$/,
-    'en-NG': /^(\+?234|0)?[789]\d{9}$/,
-    'en-NZ': /^(\+?64|0)[28]\d{7,9}$/,
-    'en-PK': /^(\+92|0092)?\d{3}\d{7}$/,
-    'en-RW': /^(\+?250|0)?7\d{8}$/,
-    'en-SG': /^(\+65)?[89]\d{7}$/,
-    'en-SL': /^(\+?94)?7[0-9]\d{6}$/,
-    'en-TZ': /^(\+?255|0)?[67]\d{8}$/,
-    'en-UG': /^(\+?256|0)?7\d{8}$/,
-    // 'us': /^(\+1)?[2-9]\d{2}[2-9]\d{2}\d{4}$/,
-    'us': /^\d{11}$/,
-    'en-ZA': /^(\+?27|0)\d{9}$/,
-    'en-ZM': /^(\+?26)?09[567]\d{7}$/,
-    'es-CL': /^(\+?56|0)[2-9]\d{8}$/,
-    'es-EC': /^(\+?593|0)([2-7]|9[2-9])\d{7}$/,
-    'es-ES': /^(\+?34)?[67]\d{8}$/,
-    'es-MX': /^(\+?52)?[1]?\d{10,11}$/,
-    'es-PA': /^(\+?507)\d{7,8}$/,
-    'es-PY': /^(\+?595|0)9\d{8}$/,
-    'es-UY': /^(\+598|0)9[1-9]\d{6}$/,
-    'et-EE': /^(\+?372)?[58]\d{6,7}$/,
-    'fa-IR': /^(\+?98)?9[0-39]\d{8}$/,
-    'fi-FI': /^(\+?358|0)4[0-6]\d{6,8}$/,
-    'fj-FJ': /^(\+?679)?\d{7}$/,
-    'fo-FO': /^(\+?298)?\d{8}$/,
-    'fr-FR': /^(\+?33|0)6\d{8}$/,
-    'fr-GF': /^(\+?594|0)\d{8}$/,
-    'fr-GP': /^(\+?590|0)\d{8}$/,
-    'fr-MQ': /^(\+?596|0)\d{8}$/,
-    'fr-RE': /^(\+?262|0)\d{8}$/,
-    'he-IL': /^(\+972|0)([23489]|5[012345689]|77)\d{7}$/,
-    'hu-HU': /^(\+?36)(20|30|70)\d{7}$/,
-    'id-ID': /^(\+?62|0)8\d{8,11}$/,
-    'it-IT': /^(\+?39)?3\d{9,10}$/,
-    'ja-JP': /^(\+81|0)0[6789]0\d{8}$/,
-    'kk-KZ': /^(\+?7|8)?7\d{9}$/,
-    'kl-GL': /^(\+?299)?\d{6}$/,
-    'ko-KR': /^(\+82|0)1[0-9]{8,9}$/,
-    'lt-LT': /^(\+370|8)\d{8}$/,
-    'ms-MY': /^(\+?6?01)[0145]\d{7,8}$/,
-    'nb-NO': /^(\+?47)?[49]\d{7}$/,
-    'ne-NP': /^(\+?977)?9[78]\d{8}$/,
-    'nl-BE': /^(\+?32|0)4?\d{8}$/,
-    'nl-NL': /^(\+?31|0)6\d{8}$/,
-    'nn-NO': /^(\+?47)?[49]\d{7}$/,
-    'pl-PL': /^(\+?48)?[5-8]\d{9}$/,
-    'pt-BR': /^(\+?55)?\d{2}\d{4}\d{4}$/,
-    'pt-PT': /^(\+?351)?9[1236]\d{7}$/,
-    'ro-RO': /^(\+?40)?7\d{8}$/,
-    'ru-RU': /^(\+?7|8)?9\d{9}$/,
-    'sl-SI': /^(\+386|0)?[1-9]\d{8}$/,
-    'sk-SK': /^(\+?421)?[1-9]\d{8}$/,
-    'sr-RS': /^(\+3816|06)\d{5,9}$/,
-    'sv-SE': /^(\+?46|0)7[02369]\d{7}$/,
-    'th-TH': /^(\+66|0)\d{9}$/,
-    'tr-TR': /^(\+?90|0)?5\d{9}$/,
-    'uk-UA': /^(\+?38|8)?0\d{9}$/,
-    'vi-VN': /^(\+84|0)\d{9}$/,
-    'zh-CN': /^(\+86)?1\d{10}$/,
-    'zh-TW': /^(\+886|0)?9\d{8}$/,
-  };
-  
-  export default phoneRegex;
-  
+    'am': /^374\d{8}$/,          // Armenia: 8 digits after country code 374
+    'ae': /^971\d{9}$/,          // UAE: 9 digits after country code 971
+    'bh': /^973\d{8}$/,          // Bahrain: 8 digits after country code 973
+    'dz': /^213\d{9}$/,          // Algeria: 9 digits after country code 213
+    'eg': /^20\d{10}$/,          // Egypt: 10 digits after country code 20
+    'iq': /^964\d{10}$/,         // Iraq: 10 digits after country code 964
+    'jo': /^962\d{9}$/,          // Jordan: 9 digits after country code 962
+    'kw': /^965\d{8}$/,          // Kuwait: 8 digits after country code 965
+    'sa': /^966\d{9}$/,          // Saudi Arabia: 9 digits after country code 966
+    'sy': /^963\d{9}$/,          // Syria: 9 digits after country code 963
+    'tn': /^216\d{8}$/,          // Tunisia: 8 digits after country code 216
+    'by': /^375\d{9}$/,          // Belarus: 9 digits after country code 375
+    'bg': /^359\d{9}$/,          // Bulgaria: 9 digits after country code 359
+    'bd': /^880\d{10}$/,         // Bangladesh: 10 digits after country code 880
+    'cz': /^420\d{9}$/,          // Czech Republic: 9 digits after country code 420
+    'dk': /^45\d{8}$/,           // Denmark: 8 digits after country code 45
+    'de': /^49\d{11}$/,          // Germany: 11 digits after country code 49
+    'at': /^43\d{10,15}$/,       // Austria: 10 to 15 digits after country code 43
+    'gr': /^30\d{10}$/,          // Greece: 10 digits after country code 30
+    'au': /^61\d{9}$/,           // Australia: 9 digits after country code 61
+    'gb': /^44\d{10}$/,          // UK: 10 digits after country code 44
+    'gg': /^44\d{10}$/,          // Guernsey: 10 digits after country code 44
+    'gh': /^233\d{9}$/,          // Ghana: 9 digits after country code 233
+    'hk': /^852\d{8}$/,          // Hong Kong: 8 digits after country code 852
+    'mo': /^853\d{8}$/,          // Macau: 8 digits after country code 853
+    'ie': /^353\d{9}$/,          // Ireland: 9 digits after country code 353
+    'in': /^91\d{10}$/,          // India: 10 digits after country code 91
+    'ke': /^254\d{10}$/,         // Kenya: 10 digits after country code 254
+    'mt': /^356\d{8}$/,          // Malta: 8 digits after country code 356
+    'mu': /^230\d{8}$/,          // Mauritius: 8 digits after country code 230
+    'ng': /^234\d{10}$/,         // Nigeria: 10 digits after country code 234
+    'nz': /^64\d{9,10}$/,        // New Zealand: 9 or 10 digits after country code 64
+    'pk': /^92\d{10}$/,          // Pakistan: 10 digits after country code 92
+    'rw': /^250\d{9}$/,          // Rwanda: 9 digits after country code 250
+    'sg': /^65\d{8}$/,           // Singapore: 8 digits after country code 65
+    'sl': /^94\d{7}$/,           // Sri Lanka: 7 digits after country code 94
+    'tz': /^255\d{9}$/,          // Tanzania: 9 digits after country code 255
+    'ug': /^256\d{9}$/,          // Uganda: 9 digits after country code 256
+    'us': /^1\d{10}$/,           // US: 10 digits after country code 1
+    'za': /^27\d{9}$/,           // South Africa: 9 digits after country code 27
+    'zm': /^260\d{9}$/,          // Zambia: 9 digits after country code 260
+    'cl': /^56\d{9}$/,           // Chile: 9 digits after country code 56
+    'ec': /^593\d{9}$/,          // Ecuador: 9 digits after country code 593
+    'es': /^34\d{9}$/,           // Spain: 9 digits after country code 34
+    'mx': /^52\d{10,11}$/,       // Mexico: 10 or 11 digits after country code 52
+    'pa': /^507\d{7,8}$/,        // Panama: 7 or 8 digits after country code 507
+    'py': /^595\d{9}$/,          // Paraguay: 9 digits after country code 595
+    'uy': /^598\d{8}$/,          // Uruguay: 8 digits after country code 598
+    'ee': /^372\d{7,8}$/,        // Estonia: 7 or 8 digits after country code 372
+    'ir': /^98\d{10}$/,          // Iran: 10 digits after country code 98
+    'fi': /^358\d{8,10}$/,       // Finland: 8 to 10 digits after country code 358
+    'fj': /^679\d{7}$/,          // Fiji: 7 digits after country code 679
+    'fo': /^298\d{8}$/,          // Faroe Islands: 8 digits after country code 298
+    'fr': /^33\d{9}$/,           // France: 9 digits after country code 33
+    'gf': /^594\d{9}$/,          // French Guiana: 9 digits after country code 594
+    'gp': /^590\d{9}$/,          // Guadeloupe: 9 digits after country code 590
+    'mq': /^596\d{9}$/,          // Martinique: 9 digits after country code 596
+    're': /^262\d{9}$/,          // Réunion: 9 digits after country code 262
+    'il': /^972\d{9}$/,          // Israel: 9 digits after country code 972
+    'hu': /^36\d{9}$/,           // Hungary: 9 digits after country code 36
+    'id': /^62\d{9,12}$/,        // Indonesia: 9 to 12 digits after country code 62
+    'it': /^39\d{9,10}$/,        // Italy: 9 or 10 digits after country code 39
+    'jp': /^81\d{10}$/,          // Japan: 10 digits after country code 81
+    'kz': /^7\d{10}$/,           // Kazakhstan: 10 digits after country code 7
+    'gl': /^299\d{6}$/,          // Greenland: 6 digits after country code 299
+    'kr': /^82\d{9,10}$/,        // South Korea: 9 or 10 digits after country code 82
+    'lt': /^370\d{8}$/,          // Lithuania: 8 digits after country code 370
+    'my': /^60\d{7,8}$/,         // Malaysia: 7 or 8 digits after country code 60
+    'no': /^47\d{8}$/,           // Norway: 8 digits after country code 47
+    'np': /^977\d{10}$/,         // Nepal: 10 digits after country code 977
+    'be': /^32\d{9}$/,           // Belgium: 9 digits after country code 32
+    'nl': /^31\d{9}$/,           // Netherlands: 9 digits after country code 31
+    'pl': /^48\d{9}$/,           // Poland: 9 digits after country code 48
+    'br': /^55\d{10}$/,          // Brazil: 10 digits after country code 55
+    'pt': /^351\d{9}$/,          // Portugal: 9 digits after country code 351
+    'ro': /^40\d{8}$/,           // Romania: 8 digits after country code 40
+    'ru': /^7\d{10}$/,           // Russia: 10 digits after country code 7
+    'si': /^386\d{8}$/,          // Slovenia: 8 digits after country code 386
+    'sk': /^421\d{9}$/,          // Slovakia: 9 digits after country code 421
+    'rs': /^381\d{9}$/,          // Serbia: 9 digits after country code 381
+    'se': /^46\d{9}$/,           // Sweden: 9 digits after country code 46
+    'ch': /^41\d{9}$/,           // Switzerland: 9 digits after country code 41
+    'ua': /^380\d{9}$/,          // Ukraine: 9 digits after country code 380
+    'ad': /^376\d{6}$/,          // Andorra: 6 digits after country code 376
+    'ar': /^54\d{10}$/,          // Argentina: 10 digits after country code 54
+    'as': /^1684\d{7}$/,         // American Samoa: 7 digits after country code 1684
+    'bb': /^1246\d{7}$/,         // Barbados: 7 digits after country code 1246
+    'bf': /^226\d{8}$/,          // Burkina Faso: 8 digits after country code 226
+    'bi': /^257\d{8}$/,          // Burundi: 8 digits after country code 257
+    'cv': /^238\d{7}$/,          // Cape Verde: 7 digits after country code 238
+    'cy': /^357\d{8}$/,          // Cyprus: 8 digits after country code 357
+    'dm': /^1767\d{7}$/,         // Dominica: 7 digits after country code 1767
+    'do': /^1809\d{7,8}$/,       // Dominican Republic: 7 or 8 digits after country code 1809
+    'ht': /^509\d{8}$/,          // Haiti: 8 digits after country code 509
+    'kn': /^1869\d{7}$/,         // Saint Kitts and Nevis: 7 digits after country code 1869
+    'lc': /^1758\d{7}$/,         // Saint Lucia: 7 digits after country code 1758
+    'vc': /^1784\d{7}$/,         // Saint Vincent and the Grenadines: 7 digits after country code 1784
+    'ws': /^685\d{5}$/,          // Samoa: 5 digits after country code 685
+    'st': /^239\d{7}$/,          // São Tomé and Príncipe: 7 digits after country code 239
+    'sh': /^290\d{4}$/,          // Saint Helena: 4 digits after country code 290
+    'tl': /^670\d{7}$/,          // Timor-Leste: 7 digits after country code 670
+    'to': /^676\d{4}$/,          // Tonga: 4 digits after country code 676
+    'tv': /^688\d{4}$/,          // Tuvalu: 4 digits after country code 688
+    'vg': /^1284\d{7}$/,         // British Virgin Islands: 7 digits after country code 1284
+    'wf': /^681\d{5}$/,          // Wallis and Futuna: 5 digits after country code 681
+    'yt': /^262\d{9}$/,          // Mayotte: 9 digits after country code 262
+    'zw': /^263\d{9}$/,          // Zimbabwe: 9 digits after country code 263
+};
