@@ -19,6 +19,7 @@ export const Navbar = () => {
 					</button>
 					<ul className="dropdown-menu dropdown-menu-end">
 						<Link to="/mentor-dashboard" className="dropdown-item bold-text text-end">Mentor Dashboard</Link>
+						<Link to="/mentor-signup" className="dropdown-item bold-text text-end">Mentor Signup</Link>
 						<Link to="/mentor-profile" className="dropdown-item bold-text text-end">Mentor Profile</Link>
 						<Link to="/mentor-session-board" className="dropdown-item bold-text text-end">Mentor Session Board</Link>
 						<Link to="/customer-dashboard" className="dropdown-item bold-text text-end">Customer Dashboard</Link>

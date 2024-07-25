@@ -10,8 +10,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             // message: null,
             token: sessionStorage.getItem("token"),
             sessionStorageChecked: !!sessionStorage.getItem("token")
-
         },
+
         actions: {
             logInMentor: async (mentor) => {
                 const response = await fetch(
@@ -126,10 +126,57 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ ...getStore(), mentor: responseBody })
                 console.log(responseBody)
                 return true;
-            }
+            },
 
+            addMentorImage: async (images) => {
+           
+                let formData = new FormData();
+                console.log(">>> 🍎 images:", images);
+                console.log(">>> 🍎 images:", images.images);
+                formData.append("file", images[0]);
+            
 
+                const response = await fetch(process.env.BACKEND_URL + "/api/mentor/upload-photo", {
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + sessionStorage.getItem("token")
+                    },
+                    body: formData
+                })
+                if (response.status !== 200) return false;
+                const responseBody = await response.json();
+                console.log(responseBody)
+                console.log("This is the Response Body")
+                return true;
+            },
 
+            addPortfolioImages: async (images) => {
+           
+                let formData = new FormData();
+                console.log(">>> 🍎 images:", images);
+                
+                for (let i = 0; i < images.length; i++) {
+                    formData.append("file", images[i]);
+                }
+            
+
+                const response = await fetch(process.env.BACKEND_URL + "/api/mentor/upload-portfolio-image", {
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + sessionStorage.getItem("token")
+                    },
+                    body: formData
+                })
+                if (response.status !== 200) return false;
+                const responseBody = await response.json();
+                console.log(responseBody)
+                console.log("This is the Response Body")
+                return true;
+            },
+
+            
+            
+            
 
         }
     };

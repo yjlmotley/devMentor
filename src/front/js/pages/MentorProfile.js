@@ -15,6 +15,9 @@ import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
 import "../../styles/mentorProfile.css";
 import { useAsync } from "react-select/async";
 
+import ProfilePhoto from "../component/ProfilePhoto";
+import PortfolioImage from "../component/PortfolioImage";
+
 
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
@@ -38,6 +41,10 @@ export const MentorProfile = () => {
 		price: '',
 		about_me: '',
 	});
+	const placeholderImage = 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg'; // Path to your placeholder image
+	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg']
+	const profileImageUrl = mentor.profile_photo?.image_url || placeholderImage;
+	const portfolioImageUrls = mentor?.portfolio_photos?.length > 0? mentor.portfolio_photos : placeholderImages;
 
 	// const [loading, setLoading] = useState(true);
 	// if (loading) {
@@ -209,6 +216,8 @@ export const MentorProfile = () => {
 
 
 	return (
+
+		
 		<div className="container mt-5">
 			<h2 className="mb-4">Mentor Profile</h2>
 			{!mentor.is_active && (
@@ -218,10 +227,10 @@ export const MentorProfile = () => {
 			)}
 			{editMode == false ? (<button onClick={() => setEditMode(true)}>Edit Profile</button>) : ''}
 			<div className="row">
-				<div className="col-md-4 mb-4">
-					{mentor.profile_photo && (
-						<img src={mentor.profile_photo.url} alt="Profile" className="img-fluid rounded" />
-					)}
+				<div className="col-6 mb-4">
+					<ProfilePhoto url={profileImageUrl} setMentor={setMentor} />
+				</div>
+				<div className="col-6 mb-4">
 				</div>
 				<div className="col-md-8">
 					<dl className="row">
@@ -482,6 +491,13 @@ export const MentorProfile = () => {
 			) : (
 				<button onClick={handleReactivate}>Reactivate Account</button>
 			)}
+
+			<div className="col-12 mb-4">
+				<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} />
+			</div>
+			
 		</div>
+
+		
 	);
 };

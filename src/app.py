@@ -12,6 +12,10 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
 
+# #######################################################################
+import cloudinary.uploader as uploader
+# #######################################################################
+
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -22,6 +26,22 @@ app.config["JWT_SECRET_KEY"] = ""
 app.url_map.strict_slashes = False
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 7*24*60*60*52
 JWTManager(app)
+
+# Cloudinary 
+
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+app.config.from_mapping(
+    CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
+)
+
+          
+# cloudinary.config( 
+#   cloud_name = "dufs8hbca", 
+#   api_key = "442387455219856", 
+#   api_secret = "shYvKGsmGcMnNGftA-RK7Hy7eww" 
+# )
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
