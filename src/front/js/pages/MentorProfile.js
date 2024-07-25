@@ -21,7 +21,7 @@ export const MentorProfile = () => {
 	const [editMode, setEditMode] = useState(false);
 	const [originalMentor, setOriginalMentor] = useState({});
 	const [invalidItems, setInvalidItems] = useState([]);
-	const [ phoneError, setPhoneError ] = useState('');
+	const [phoneError, setPhoneError] = useState('');
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -52,7 +52,7 @@ export const MentorProfile = () => {
 		setEditMode(false);
 	};
 
-	const [ CharacterCount, setCharacterCount ] = useState(0);
+	const [CharacterCount, setCharacterCount] = useState(0);
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		let x = value
@@ -165,7 +165,7 @@ export const MentorProfile = () => {
 	}
 
 
-	const [ selectedCountry, setSelectedCountry ] = useState();
+	const [selectedCountry, setSelectedCountry] = useState();
 
 	const handlePhoneChange = (value, countryData) => {
 		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
@@ -206,7 +206,7 @@ export const MentorProfile = () => {
 			.catch(error => console.log(error))
 	}, []);
 
-	
+
 
 	return (
 		<div className="container mt-5">
@@ -384,14 +384,14 @@ export const MentorProfile = () => {
 								<CreatableSelect
 									isMulti
 									name="skills"
-									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
+									value={mentor.skills?.map(skill => ({ value: skill, label: skill }))}
 									onChange={handleSelectChange}
-									options={skillsList.filter(skill => !mentor.skills.includes(skill.label))}
+									options={skillsList.filter(skill => !mentor.skills?.includes(skill.label))}
 									closeMenuOnSelect={false}
 								// styles={customStyles}
 								/>
 							) : (
-								mentor.skills.join(", ")
+								mentor.skills?.join(", ")
 							)}
 						</dd>
 
@@ -401,15 +401,15 @@ export const MentorProfile = () => {
 								<Select
 									isMulti
 									name="days"
-									options={daysOfTheWeek.filter(day => !mentor.days.includes(day.label))}
+									options={daysOfTheWeek.filter(day => !mentor.days?.includes(day.label))}
 									className="basic-multi-select"
 									classNamePrefix="select"
 									closeMenuOnSelect={false}
-									defaultValue={mentor.days.map(day => ({ value: day, label: day }))}
+									defaultValue={mentor.days?.map(day => ({ value: day, label: day }))}
 									onChange={handleSelectChange}
 								/>
 							) : (
-								mentor.days.join(", ")
+								mentor.days?.join(", ")
 							)}
 						</dd>
 
@@ -450,8 +450,8 @@ export const MentorProfile = () => {
 						<dd className="col-sm-8">
 							{editMode ? (
 								<>
-									<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control" rows=""></textarea>
-									{CharacterCount}
+									<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control" rows="4"></textarea>
+									<p className={CharacterCount > 2500 ? "text-danger" :  ''} >{CharacterCount}</p>
 								</>
 							) : (
 								mentor.about_me
