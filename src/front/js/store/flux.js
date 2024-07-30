@@ -174,6 +174,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                 return true;
             },
 
+            createSession: async (session) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/session/create", {
+                    method: "POST",
+                    body: JSON.stringify({ title: session.title, details: session.details, skills: session.skills, hours_needed: session.hours_needed, days: session.days }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+                );
+                if (response.status !== 201) return false;
+                const responseBody = await response.json();
+                console.log(responseBody)
+
+                return true;
+            },
+
             
             
             

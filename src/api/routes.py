@@ -396,6 +396,12 @@ def create_session():
 
     if title is None or details is None or skills is None or hours_needed is None or days is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
+
+    if not isinstance(skills, list):
+        return jsonify({"msg": "Skills must be a list"}), 400
+
+    if not isinstance(days, dict):
+        return jsonify({"msg": "Days must be a dictionary"}), 400
     
     session = Session(title=title, details=details, skills=skills, hours_needed=hours_needed, days=days)
     db.session.add(session)

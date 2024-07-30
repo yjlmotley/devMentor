@@ -8,6 +8,8 @@ export const CreateSession = () => {
 	const [title, setTitle] = useState("");
 	const [details, setDetails] = useState("");
 	const [selectedSkills, setSelectedSkills] = useState([]);
+	const [hours_needed, setHours_needed] = useState("");
+	const [days, setDays] = useState([]);
 
 
 	const handleSubmit = (event) => {
@@ -67,42 +69,52 @@ export const CreateSession = () => {
 
 
 				</div>
-				<div>
-					<div class="day-container">
-						<label for="monday">Monday:</label>
-						<input type="text" id="mondayStart" name="mondayStart" /> to
-						<input type="text" id="mondayEnd" name="mondayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="tuesday">Tuesday:</label>
-						<input type="time" id="tuesdayStart" name="tuesdayStart" /> to
-						<input type="time" id="tuesdayEnd" name="tuesdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="wednesday">Wednesday:</label>
-						<input type="time" id="wednesdayStart" name="wednesdayStart" /> to
-						<input type="time" id="wednesdayEnd" name="wednesdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="thursday">Thursday:</label>
-						<input type="time" id="thursdayStart" name="thursdayStart" /> to
-						<input type="time" id="thursdayEnd" name="thursdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="friday">Friday:</label>
-						<input type="time" id="fridayStart" name="fridayStart" /> to
-						<input type="time" id="fridayEnd" name="fridayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="saturday">Saturday:</label>
-						<input type="time" id="saturdayStart" name="saturdayStart" /> to
-						<input type="time" id="saturdayEnd" name="saturdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="sunday">Sunday:</label>
-						<input type="time" id="sundayStart" name="sundayStart" /> to
-						<input type="time" id="sundayEnd" name="sundayEnd" />
-					</div>
+				<div className="container mt-4">
+					<form onSubmit={handleSubmit}>
+						{Object.keys(formState).map((day) => (
+							<div className="form-group row" key={day}>
+								<div className="col-md-2">
+									<div className="form-check">
+										<input
+											className="form-check-input"
+											type="checkbox"
+											id={`${day}Checkbox`}
+											checked={formState[day].checked}
+											onChange={() => handleCheckboxChange(day)}
+										/>
+										<label className="form-check-label" htmlFor={`${day}Checkbox`}>
+											{day.charAt(0).toUpperCase() + day.slice(1)}:
+										</label>
+									</div>
+								</div>
+								<div className="col-md-4">
+									<input
+										type="time"
+										className="form-control"
+										id={`${day}Start`}
+										name={`${day}Start`}
+										value={formState[day].start}
+										onChange={(e) => handleTimeChange(day, 'start', e.target.value)}
+										disabled={!formState[day].checked}
+									/>
+								</div>
+								<div className="col-md-4">
+									<input
+										type="time"
+										className="form-control"
+										id={`${day}End`}
+										name={`${day}End`}
+										value={formState[day].end}
+										onChange={(e) => handleTimeChange(day, 'end', e.target.value)}
+										disabled={!formState[day].checked}
+									/>
+								</div>
+							</div>
+						))}
+						<button type="submit" className="btn btn-primary">
+							Submit
+						</button>
+					</form>
 				</div>
 				<button type="submit" className="btn btn-primary">
 					Create Session

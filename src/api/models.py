@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.types import ARRAY
+from sqlalchemy.ext.mutable import MutableList, MutableDict
+from sqlalchemy.types import ARRAY, JSON
 from sqlalchemy import DateTime
 
 import datetime
@@ -96,7 +96,7 @@ class Session(db.Model):
     details = db.Column(db.String(2500), unique=False, nullable=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     hours_needed = db.Column(db.Integer, unique=False, nullable=False)
-    days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
+    days = db.Column(MutableDict.as_mutable(JSON), default={})
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -108,7 +108,7 @@ class Session(db.Model):
             "details": self.details,
             "skills": [skill for skill in self.skills],
             "hours_needed": self.hours_needed,
-            "days": [day for day in self.days]
+            "days": self.days
         }
 
 class MentorImage(db.Model):
