@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-
-
+import phoneRegex from '../store/phoneRegex';
 
 
 export const ValidateEmail = (email, setInvalidItems) => {
@@ -13,12 +11,29 @@ export const ValidateEmail = (email, setInvalidItems) => {
     }
 };
 
-export const ValidatePhone = (phone, setInvalidItems) => {
-    if (phone.trim() === "" || phone.length < 10 || phone.length > 15) {
-        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "phone"]);
-        return false;
+// export const ValidatePhone = (phone, setInvalidItems) => {
+//     if (phone.trim() === "" || phone.length < 10 || phone.length > 15) {
+//         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "phone"]);
+//         return false;
+//     }
+//     return true;
+// };
+
+export const ValidatePhoneNumber = (phoneNumber, country) => {
+    console.log(country);
+    console.log(phoneNumber);
+    const regex = phoneRegex[country];
+    console.log("regex:", regex);
+    // if (regex && regex.test(phoneNumber)) {
+    //     return { isValid: true, message: '' };
+    // } else {
+    //     return { isValid: false, message: 'Invalid phone number' };
+    // }
+    if (regex.test(phoneNumber)) {
+        return { isValid: true, message: '' };
+    } else {
+        return { isValid: false, message: 'Invalid phone number' };
     }
-    return true;
 };
 
 export const ValidateFirstName = (first_name, setInvalidItems) => {
@@ -167,5 +182,22 @@ export function ValidateEstCompletion(est_completion, setInvalidItems) {
         return false;
     }
 
+    return true;
+}
+
+export const ValidatePrice = (price, setInvalidItems) => {
+    const priceRegex = /^\d+(\.\d{2})?$/;
+    if (!priceRegex.test(price) || price.trim() === "") {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "price"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateNumber = (years_exp, setInvalidItems) => {
+    if (isNaN(years_exp)) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "years_exp"]);
+        return false;
+    }
     return true;
 }

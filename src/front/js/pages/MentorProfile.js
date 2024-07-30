@@ -5,10 +5,15 @@ import { arrayOf } from "prop-types";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
+import { ValidatePrice, ValidateNumber, ValidatePhoneNumber } from "../component/Validators";
+
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import { parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
+
+import "../../styles/mentorProfile.css";
+import { useAsync } from "react-select/async";
 
 import ProfilePhoto from "../component/ProfilePhoto";
 import PortfolioImage from "../component/PortfolioImage";
@@ -17,6 +22,9 @@ import PortfolioImage from "../component/PortfolioImage";
 export const MentorProfile = () => {
 	const { store, actions } = useContext(Context);
 	const [editMode, setEditMode] = useState(false);
+	const [originalMentor, setOriginalMentor] = useState({});
+	const [invalidItems, setInvalidItems] = useState([]);
+	const [phoneError, setPhoneError] = useState('');
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -38,6 +46,20 @@ export const MentorProfile = () => {
 	const profileImageUrl = mentor.profile_photo?.image_url || placeholderImage;
 	const portfolioImageUrls = mentor?.portfolio_photos?.length > 0? mentor.portfolio_photos : placeholderImages;
 
+	// const [loading, setLoading] = useState(true);
+	// if (loading) {
+	// 	return <div>Loading...</div>;
+	// }
+	// if (!mentor) {
+	// 	return <div>Mentor not found</div>;
+	// }
+
+	const handleCancelChanges = () => {
+		setMentor(originalMentor);
+		setEditMode(false);
+	};
+
+	const [CharacterCount, setCharacterCount] = useState(0);
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		let x = value
@@ -50,11 +72,16 @@ export const MentorProfile = () => {
 				x = array
 			}
 		}
+		if (name === "about_me") {
+			setCharacterCount(value.length);
+		}
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			[name]: x
 		}));
 	};
+
+
 
 	const handleSelectChange = (selectedOptions, { name }) => {
 		const values = selectedOptions ? selectedOptions.map(option => option.label) : [];
@@ -67,7 +94,7 @@ export const MentorProfile = () => {
 	const handleStateChange = (selectedOption) => {
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
-			what_state: selectedOption ? selectedOption.label : '',
+			what_state: selectedOption ? selectedOption.value : '',
 		}));
 	};
 
@@ -80,14 +107,26 @@ export const MentorProfile = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const success = await actions.editMentor(mentor);
-		if (success) {
-			alert('Mentor information updated sucessfully')
-			setEditMode(false)
+		setInvalidItems([]);
+		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems);
+		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
+		const phoneValidation = ValidatePhoneNumber(mentor.phone, selectedCountry);
+		if (isPriceValid && isYearValid && phoneValidation.isValid) {
+			const success = await actions.editMentor(mentor);
+			if (success) {
+				alert('Mentor information updated sucessfully')
+				setEditMode(false)
+			} else {
+				alert('Failed to update mentor information')
+			}
 		} else {
-			alert('Failed to update mentor information')
+			if (!phoneValidation.isValid) {
+				setPhoneError(phoneValidation.message);
+			}
+			console.log("Invalid inputs:", invalidItems);
+			console.log(mentor.phone);
 		}
-	}
+	};
 
 	const handleDeactivate = async () => {
 		const token = sessionStorage.getItem('token');
@@ -132,16 +171,22 @@ export const MentorProfile = () => {
 		}
 	}
 
-	const handlePhoneChange = (value) => {
+
+	const [selectedCountry, setSelectedCountry] = useState();
+
+	const handlePhoneChange = (value, countryData) => {
+		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
+		setSelectedCountry(countryData.countryCode);
+		if (phoneValidation.isValid) {
+			setPhoneError('');
+		} else {
+			setPhoneError(phoneValidation.message);
+		}
+		console.log(value);
 		setMentor(prevMentorInfo => ({
 			...prevMentorInfo,
 			phone: value
 		}));
-	};
-
-	const formatPhoneNumber = (phone) => {
-		const phoneNumber = parsePhoneNumber(phone);
-		return phoneNumber ? phoneNumber.formatInternational() : phone;
 	};
 
 	// const customStyles = {
@@ -160,21 +205,15 @@ export const MentorProfile = () => {
 			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
 		})
 			.then(resp => resp.json())
-			.then(data => setMentor(data))
-			.then(() => { setLoading(false) })
+			.then(data => {
+				setMentor(data);
+				setOriginalMentor(data);
+			})
+			// .then(() => { setLoading(false) })
 			.catch(error => console.log(error))
 	}, []);
 
 
-	const [loading, setLoading] = useState(true);
-
-	if (loading) {
-		return <div>Loading...</div>;
-	}
-
-	if (!mentor) {
-		return <div>Mentor not found</div>;
-	}
 
 	return (
 
@@ -198,7 +237,7 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" />
+								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled />
 							) : (
 								mentor.email
 							)}
@@ -234,14 +273,43 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">Phone:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
+								<>
+									<PhoneInput
+										country={'us'}
+										value={mentor.phone}
+										onChange={handlePhoneChange}
+										inputClass="form-control"
+										inputStyle={{
+											width: '100%'
+										}}
+										inputProps={{
+											name: 'phone',
+											required: true,
+											autoFocus: true
+										}}
+									/>
+									{phoneError && <div className="text-danger">{phoneError}</div>}
+								</>
+							) : (
+								// mentor.phone && formatPhoneNumber(`+${mentor.phone}`)
 								<PhoneInput
+									disabled
 									country={'us'}
 									value={mentor.phone}
 									onChange={handlePhoneChange}
-									inputClass="form-control"
+									inputClass="form-control disabled border-0"
+									inputStyle={{
+										height: '25px',
+										fontSize: '14px',
+										padding: '0px',
+										margin: '0px',
+										lineHeight: 'auto',
+										width: '100%'
+									}}
+									buttonStyle={{
+										display: 'none'
+									}}
 								/>
-							) : (
-								formatPhoneNumber(`+${mentor.phone}`)
 							)}
 						</dd>
 
@@ -272,7 +340,7 @@ export const MentorProfile = () => {
 								<CreatableSelect
 									isClearable
 									name="what_state"
-									options={mentor.country === "United States of America" ? stateOptions : []}
+									options={mentor.country === "United States of America (USA)" ? stateOptions : []}
 									className="basic-single-select"
 									classNamePrefix="select"
 									onChange={handleStateChange}
@@ -303,6 +371,20 @@ export const MentorProfile = () => {
 							) : (
 								mentor.years_exp
 							)}
+							{invalidItems.includes("years_exp") &&
+								<label className="error-label alert alert-danger" role="alert" style={{
+									padding: '0.5rem',
+									fontSize: '0.875rem',
+									lineHeight: '1.2',
+									width: '100%',
+									marginTop: '0.25rem',
+									marginBottom: '0'
+								}}>
+									<svg xmlns="http://www.w3.org/2000/svg" className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Danger:" style={{ width: '1em', height: '1em', verticalAlign: 'middle', fill: 'currentColor' }}>
+										<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+									</svg>
+									Must be a number (ex. 2)
+								</label>}
 						</dd>
 
 						<dt className="col-sm-4">Skills:</dt>
@@ -311,14 +393,14 @@ export const MentorProfile = () => {
 								<CreatableSelect
 									isMulti
 									name="skills"
-									value={mentor.skills.map(skill => ({ value: skill, label: skill }))}
+									value={mentor.skills?.map(skill => ({ value: skill, label: skill }))}
 									onChange={handleSelectChange}
-									options={skillsList}
-									isDisabled={!editMode}
+									options={skillsList.filter(skill => !mentor.skills?.includes(skill.label))}
+									closeMenuOnSelect={false}
 								// styles={customStyles}
 								/>
 							) : (
-								mentor.skills.join(", ")
+								mentor.skills?.join(", ")
 							)}
 						</dd>
 
@@ -328,13 +410,15 @@ export const MentorProfile = () => {
 								<Select
 									isMulti
 									name="days"
-									options={daysOfTheWeek}
+									options={daysOfTheWeek.filter(day => !mentor.days?.includes(day.label))}
 									className="basic-multi-select"
 									classNamePrefix="select"
-									isDisable={!editMode}
+									closeMenuOnSelect={false}
+									defaultValue={mentor.days?.map(day => ({ value: day, label: day }))}
+									onChange={handleSelectChange}
 								/>
 							) : (
-								mentor.days.join(", ")
+								mentor.days?.join(", ")
 							)}
 						</dd>
 
@@ -344,7 +428,7 @@ export const MentorProfile = () => {
 								<div className="input-group">
 									<span className="input-group-text">$</span>
 									<input
-										type="number"
+										type="text"
 										name="price"
 										value={mentor.price || ''}
 										onChange={handleChange}
@@ -355,12 +439,29 @@ export const MentorProfile = () => {
 							) : (
 								mentor.price ? `$${mentor.price} /hr` : ''
 							)}
+							{invalidItems.includes("price") &&
+								<label className="error-label alert alert-danger" role="alert" style={{
+									padding: '0.5rem',
+									fontSize: '0.875rem',
+									lineHeight: '1.2',
+									width: '100%',
+									marginTop: '0.25rem',
+									marginBottom: '0'
+								}}>
+									<svg xmlns="http://www.w3.org/2000/svg" className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Danger:" style={{ width: '1em', height: '1em', verticalAlign: 'middle', fill: 'currentColor' }}>
+										<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+									</svg>
+									Invalid price value (ex. 20.00)
+								</label>}
 						</dd>
 
 						<dt className="col-sm-4">About Me:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control"></textarea>
+								<>
+									<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control" rows="4"></textarea>
+									<p className={CharacterCount > 2500 ? "text-danger" :  ''} >{CharacterCount}</p>
+								</>
 							) : (
 								mentor.about_me
 							)}
@@ -381,7 +482,9 @@ export const MentorProfile = () => {
 					</div>
 				</div>
 			)} */}
-			{/* {editMode ? (<button onClick={(e) => setEditMode(false)}>Cancel Changes</button>) : ''} */}
+			{editMode ? (
+				<button onClick={handleCancelChanges}>Cancel Changes</button>
+			) : ''}
 			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
 			{mentor.is_active ? (
 				<button onClick={handleDeactivate}>Deactivate Account</button>
