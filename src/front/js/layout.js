@@ -45,7 +45,7 @@ const Layout = () => {
                         <Route element={<ForgotPassword />} path="/mentor-profile/forgot-password" />
                         <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" />
                         
-                        <Route element={<ResetPassword />} path="/reset-password/:token" />
+                        <Route element={<ResetPassword />} path="/reset-password"/>
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<MentorProfile />} path="/mentor-profile" />

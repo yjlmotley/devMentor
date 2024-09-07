@@ -110,7 +110,7 @@ def forgot_password():
     #     "exp": expiration_time,
     #     "current_time": datetime.datetime.now().isoformat()
     # }), os.getenv("FLASK_APP_KEY"))
-    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password/{token}"
+    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
     send_email(email, email_value, "Subject: Password recovery for devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
 

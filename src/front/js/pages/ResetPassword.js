@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 
 
 export const ResetPassword = () => {
     const [error, setErrMsg] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const { token } = useParams();
+    const [ searchParams, setSearchParams] = useSearchParams();
+    let token = searchParams.get("token");
     const navigate = useNavigate();
 
 
