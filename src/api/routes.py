@@ -2,12 +2,16 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
+import jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_cors import CORS
+
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta, timezone
+
 from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
 from api.utils import generate_sitemap, APIException
-from flask_cors import CORS
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.decorators import mentor_required, customer_required
-import jwt
 
 import cloudinary.uploader as uploader
 from cloudinary.uploader import destroy
@@ -19,54 +23,10 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 
-# @api.route('/hello', methods=['POST', 'GET'])
-# def handle_hello():
-
-#     response_body = {
-#         "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-#     }
-
-#     return jsonify(response_body), 200
-
-# Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 
-@api.route('/mentors', methods=['GET'])
-def all_mentors():
-   mentors = Mentor.query.all()
-   return jsonify([mentor.serialize() for mentor in mentors]), 200
-
-@api.route('/mentor/login', methods=['POST'])
-def mentor_login():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    if email is None or password is None:
-        return jsonify({"msg": "No email or password"}), 400
-    mentor = Mentor.query.filter_by(email=email).one_or_none()
-    if mentor is None:
-        return jsonify({"msg": "no such user"}), 404
-    if mentor.password != password:
-        return jsonify({"msg": "Bad email or password"}), 401
-
-    access_token = create_access_token(
-        identity=mentor.id,
-        additional_claims = {"role": "mentor"} 
-        )
-    return jsonify(access_token=access_token), 201
-
-
-
-@api.route('/mentor', methods=['GET'])
-@mentor_required
-def mentor_by_id():
-    mentor_id = get_jwt_identity()
-    mentor = Mentor.query.get(mentor_id)
-    if mentor is None:
-        return jsonify({"msg": "No mentor found"}), 404
-
-    return jsonify(mentor.serialize()), 200
 
 @api.route('/mentor/signup', methods=['POST'])
 def mentor_signup():
@@ -80,19 +40,72 @@ def mentor_signup():
     country = request.json.get("country", None)
     phone = request.json.get("phone", "None")
 
-
     if email is None or password is None or first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     mentor = Mentor.query.filter_by(email=email).one_or_none()
     if mentor:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
-    mentor = Mentor(email=email, password=password, first_name=first_name, last_name=last_name, city=city, what_state=what_state, country=country, phone=phone)
+    mentor = Mentor(
+        email=email, 
+        password=generate_password_hash(password), 
+        first_name=first_name, 
+        last_name=last_name, 
+        city=city, 
+        what_state=what_state, 
+        country=country, 
+        phone=phone
+    )
     db.session.add(mentor)
     db.session.commit()
     db.session.refresh(mentor)
-    response_body = {"msg": "Mentor Account successfully created!",
-    "mentor":mentor.serialize()}
+    response_body = {
+        "msg": "Mentor Account successfully created!",
+        "mentor":mentor.serialize()
+    }
     return jsonify(response_body), 201
+
+@api.route('/mentor/login', methods=['POST'])
+def mentor_login():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if email is None or password is None:
+        return jsonify({"msg": "Email and password are required."}), 400
+    
+    mentor = Mentor.query.filter_by(email=email).one_or_none()
+    if mentor is None:
+        return jsonify({"msg": "No user with this email exists."}), 404
+    
+    if not check_password_hash(mentor.password, password):
+        return jsonify({"msg": "Incorrect password, please try again."}), 401
+
+    # token = jwt.encode({
+    #     'identity': mentor.id,
+    #     'role': 'mentor',
+    #     'exp': datetime.now(timezone.utc) + timedelta(hours=3)
+    # }, current_app.config['SECRET_KEY'], algorithm='HS256')
+    
+    access_token = create_access_token(
+        identity=mentor.id, 
+        additional_claims={"role": "mentor"}
+    )
+    return jsonify(access_token=access_token), 200
+
+
+@api.route('/mentors', methods=['GET'])
+def all_mentors():
+   mentors = Mentor.query.all()
+   return jsonify([mentor.serialize() for mentor in mentors]), 200
+
+@api.route('/mentor', methods=['GET'])
+@mentor_required
+def mentor_by_id():
+    mentor_id = get_jwt_identity()
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+    return jsonify(mentor.serialize()), 200
 
 @api.route('/mentor/edit-self', methods={'PUT'})
 @mentor_required
@@ -146,22 +159,40 @@ def mentor_edit_self():
 @mentor_required
 def mentor_upload_photo():
 
-    mentor =  Mentor.query.filter_by(id=get_jwt_identity()).first()
+    mentor =  Mentor.query.get(get_jwt_identity())
     if mentor is None:
         return jsonify({"msg": "No mentor found"}), 404
 
     images = request.files.getlist("file")
+    mentor_img=MentorImage.query.filter_by(mentor_id=mentor.id).all()
     for image_file in images:
-        if len(MentorImage.query.filter_by(mentor_id=mentor.id).all()) > 0:
-            break
         response = uploader.upload(image_file)
-        print(f"{response.items()}")
-        new_image = MentorImage(public_id=response["public_id"], image_url=response["secure_url"],mentor_id=mentor.id)
-        db.session.add(new_image)
-        db.session.commit()
-        db.session.refresh(mentor)
+        print(response)
+        if len(mentor_img) == 1:
+            print(f"{response.items()}")
+            mentor_img[0].image_url=response['secure_url']
+            uploader.destroy(mentor_img[0].public_id)
+            mentor_img[0].public_id=response['public_id']
+            db.session.commit()
+        if len(mentor_img) == 0:
+            new_image = MentorImage(public_id=response["public_id"], image_url=response["secure_url"],mentor_id=mentor.id)
+            db.session.add(new_image)
+            db.session.commit()
 
     return jsonify ({"Msg": "Image Sucessfully Uploaded"})
+
+@api.route('/mentor/delete-photo', methods =['DELETE'])
+@mentor_required
+def mentor_delete_photo():
+    mentor =  Mentor.query.get(get_jwt_identity())
+
+    mentor_img=MentorImage.query.filter_by(mentor_id=get_jwt_identity()).first()
+    uploader.destroy(mentor_img.public_id)
+    db.session.delete(mentor_img)
+    db.session.commit()
+
+    return jsonify ({"Msg": "Image Sucessfully Deleted", "mentor": mentor.serialize()})
+
 
 @api.route('/mentor/upload-portfolio-image', methods =['POST'])
 @mentor_required

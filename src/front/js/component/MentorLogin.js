@@ -3,10 +3,10 @@ import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 
 export const MentorLogin = () => {
-    const navigate = useNavigate();
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         const success = await actions.logInMentor({ email, password });
@@ -14,6 +14,12 @@ export const MentorLogin = () => {
             navigate("/mentor-dashboard");
         } else {
             alert("Something went wrong, please try again");
+        }
+    };
+
+    const handlePasswordKeyPress = (event) => {
+        if (event.key === "Enter") {
+            handleLogin();
         }
     };
 
@@ -44,6 +50,7 @@ export const MentorLogin = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
+                    onKeyPress={handlePasswordKeyPress}   
                 />
                 <button
                     type="button"

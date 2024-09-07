@@ -29,19 +29,18 @@ JWTManager(app)
 
 # Cloudinary 
 
+# UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 app.config.from_mapping(
     CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
 )
-
           
 # cloudinary.config( 
 #   cloud_name = "dufs8hbca", 
 #   api_key = "442387455219856", 
 #   api_secret = "shYvKGsmGcMnNGftA-RK7Hy7eww" 
 # )
-UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")

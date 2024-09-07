@@ -16,8 +16,11 @@ import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 
-import { Navbar } from "./component/navbar";
-import { Footer } from "./component/footer";
+import { Navbar } from "./component/Navbar.jsx";
+// import { Footer } from "./component/footer";
+
+import Testing1MentorProfile from "./testing/MentorProfile.jsx";
+import T2MentorProfile from "./testing2/T2MentorProfile.jsx" 
 
 //create your first component
 const Layout = () => {
@@ -44,7 +47,9 @@ const Layout = () => {
                         <Route element={<CreateSession />} path="/create-session" />
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
-                        <Route
+                        <Route element={<Testing1MentorProfile />} path="/testing1-mentor-profile" />
+                        <Route element={<T2MentorProfile />} path="/testing2-mentor-profile" />
+                        <Route 
                             path="*"
                             element={
                                 <React.Fragment>
@@ -58,7 +63,7 @@ const Layout = () => {
                             }
                         />
                     </Routes>
-                    <Footer />
+                    {/* <Footer /> */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
