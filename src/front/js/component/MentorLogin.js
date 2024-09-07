@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export const MentorLogin = () => {
     const { actions } = useContext(Context);
@@ -33,7 +33,7 @@ export const MentorLogin = () => {
     //     }
     // };
 
-   return (
+    return (
         <div className="login-container">
             <div className="login-form">
                 <h2>Login</h2>
@@ -50,7 +50,7 @@ export const MentorLogin = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    onKeyPress={handlePasswordKeyPress}   
+                    onKeyPress={handlePasswordKeyPress}
                 />
                 <button
                     type="button"
@@ -66,6 +66,7 @@ export const MentorLogin = () => {
                 >
                     Forgot Password?
                 </a> */}
+                <Link to="forgot-password">Forgot Password?</Link>
             </div>
         </div>
     );

@@ -19,8 +19,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({
                     token: token,
                     customerId: customer_id,
-                    isMentorLoggedIn: !!token,
-                    isCustomerLoggedIn: !!customer_id
                 });
             },
             signUpMentor: async (mentor) => {

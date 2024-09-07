@@ -84,9 +84,12 @@ def sitemap():
 
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
-    if not os.path.isfile(os.path.join(static_file_dir, path)):
-        path = 'index.html'
-    response = send_from_directory(static_file_dir, path)
+    if path.statswith('api/'):
+        return jsonify({"error": "Not found"}), 404
+    # if not os.path.isfile(os.path.join(static_file_dir, path)):
+        # path = 'index.html'
+    # response = send_from_directory(static_file_dir, path)
+    response = send_from_directory(static_file_dir, 'index.html')
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 

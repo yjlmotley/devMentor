@@ -471,6 +471,7 @@ export const MentorProfile = () => {
 							)}
 						</dd>
 					</dl>
+					<Link to="forgot-password">Change My Password</Link>
 				</div>
 			</div>
 

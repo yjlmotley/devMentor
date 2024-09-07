@@ -7,16 +7,16 @@ import { Home } from "./pages/Home";
 import { MentorSignup } from "./pages/MentorSignup";
 import { MentorLogin } from "./component/MentorLogin";
 import { MentorDashboard } from "./pages/MentorDashboard";
+import { ForgotPassword } from "./pages/ForgotPassword.js";
+import { ResetPassword } from "./pages/ResetPassword.js";
 import { CustomerLogin } from "./component/CustomerLogin";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { MentorProfile } from "./pages/MentorProfile";
 import { MentorSessionBoard } from "./pages/MentorSessionBoard";
 import { CreateSession } from "./pages/CreateSession";
-import { Demo } from "./pages/demo";
-import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
 
-import { Navbar } from "./component/Navbar.jsx";
+import { Navbar } from "./component/Navbar.js";
 // import { Footer } from "./component/footer";
 
 import Testing1MentorProfile from "./testing/MentorProfile.jsx";
@@ -40,13 +40,17 @@ const Layout = () => {
                         <Route element={<MentorSignup />} path="/mentor-signup" />
                         <Route element={<MentorLogin />} path="/mentor-login" />
                         <Route element={<MentorDashboard />} path="/mentor-dashboard" />
+                        <Route element={<ForgotPassword />} path="/forgot-password" />
+
+                        <Route element={<ForgotPassword />} path="/mentor-profile/forgot-password" />
+                        <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" />
+                        
+                        <Route element={<ResetPassword />} path="/reset-password/:token" />
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<MentorProfile />} path="/mentor-profile" />
                         <Route element={<MentorSessionBoard />} path="/mentor-session-board" />
                         <Route element={<CreateSession />} path="/create-session" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Testing1MentorProfile />} path="/testing1-mentor-profile" />
                         <Route element={<T2MentorProfile />} path="/testing2-mentor-profile" />
                         <Route 

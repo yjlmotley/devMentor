@@ -1,21 +1,25 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+import os
+import logging
+from datetime import datetime, timedelta
+
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
+from flask_cors import CORS
 import jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from flask_cors import CORS
-
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta, timezone
-
-from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
-from api.utils import generate_sitemap, APIException
-from api.decorators import mentor_required, customer_required
 
 import cloudinary.uploader as uploader
 from cloudinary.uploader import destroy
 from cloudinary.api import delete_resources_by_tag
+
+from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
+from api.utils import generate_sitemap, APIException
+from api.decorators import mentor_required, customer_required
+from api.send_email import send_email
+
 
 api = Blueprint('api', __name__)
 
@@ -79,17 +83,115 @@ def mentor_login():
     if not check_password_hash(mentor.password, password):
         return jsonify({"msg": "Incorrect password, please try again."}), 401
 
-    # token = jwt.encode({
-    #     'identity': mentor.id,
-    #     'role': 'mentor',
-    #     'exp': datetime.now(timezone.utc) + timedelta(hours=3)
-    # }, current_app.config['SECRET_KEY'], algorithm='HS256')
-    
     access_token = create_access_token(
         identity=mentor.id, 
-        additional_claims={"role": "mentor"}
+        additional_claims={"role": "mentor"},
+        expires_delta=timedelta(hours=3)
     )
     return jsonify(access_token=access_token), 200
+
+@api.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data=request.json
+    email=data.get("email")
+    if not email:
+        return jsonify({"message": "Email is required"}), 400
+    
+    user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+    if user is None:
+        return jsonify({"message": "Email does not exist"}), 400
+    
+    expiration_time = datetime.utcnow() + timedelta(hours=3)
+    token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
+
+    #jwt_access_token 
+    # token= encrypt_string(json.dumps({
+    #     "email": email, 
+    #     "exp": expiration_time,
+    #     "current_time": datetime.datetime.now().isoformat()
+    # }), os.getenv("FLASK_APP_KEY"))
+    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password/{token}"
+    send_email(email, email_value, "Subject: Password recovery for devMentor")
+    return jsonify({"message": "Recovery password email has been sent!"}), 200
+
+
+@api.route("/reset-password/<token>", methods=["PUT"])
+def reset_password(token):
+    data = request.get_json()
+    password = data.get("password")
+    # secret = data.get("secret")
+
+    if not password:
+        return jsonify({"message": "Please provide a new password."}), 400
+
+    try:
+        # json_secret = json.loads(decrypt_string(secret, os.getenv('FLASK_APP_KEY')))
+        decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
+        email = decoded_token.get("email")
+    # except Exception as e:
+    #     return jsonify({"message": "Invalid or expired token."}), 400
+    except jwt.ExpiredSignatureError:
+        return jsonify({"message": "Token has expired"}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "Invalid token"}), 400
+
+    # email = json_secret.get('email')
+    # if not email:
+    #     return jsonify({"message": "Invalid token data."}), 400
+
+    # user = User.query.filter_by(email=email).first()
+    user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "Email does not exist"}), 400
+
+    # user.password = hashlib.sha256(password.encode()).hexdigest()
+    user.password = generate_password_hash(password)
+    db.session.commit()
+
+    send_email(email, "Your password has been changed successfully.", "Password Change Notification")
+
+    return jsonify({"message": "Password successfully changed."}), 200
+
+
+@api.route("/change-password", methods=["PUT"])
+@jwt_required()  # This ensures that the request includes a valid JWT token
+def change_password():
+    data = request.json
+    # secret = data.get("secret")
+    password = data.get("password")
+    
+    # if not secret or not password:
+    #     return jsonify({"message": "Invalid or expired token"}), 400
+
+    if not password:
+        return jsonify({"message": "Please provide a new password."}), 400
+    
+
+    try:
+        # user_id = get_jwt_identity()
+
+        # This will now work because @jwt_required() has validated the token
+        user_id = get_jwt_identity()
+        print(f"Decoded JWT Identity: {user_id}")
+
+        user = Mentor.query.get(user_id) or Customer.query.get(user_id)
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+        # user.password = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        user.password = generate_password_hash(password)
+        db.session.commit()
+        
+        # Send an email notification after the password has been changed
+        email_body = "Your password has been changed successfully. If you did not request this change, please contact support."
+        send_email(user.email, email_body, "Password Change Notification")
+
+        return jsonify({"message": "Password changed successfully"}), 200
+    except Exception as e:
+        print(f"Token decryption failed: {str(e)}")
+        logging.error(f"Error changing password: {str(e)}")
+        return jsonify({"message": "An error occurred. Please try again later."}), 500
+
+
 
 
 @api.route('/mentors', methods=['GET'])
