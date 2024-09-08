@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
+
 from sqlalchemy.ext.mutable import MutableList, MutableDict
 from sqlalchemy.types import ARRAY, JSON
 from sqlalchemy import DateTime
+
 
 import datetime
 
@@ -52,7 +54,7 @@ class Mentor(db.Model):
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
     past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
-    price = db.Column(db.Integer)
+    price = db.Column(Numeric(10,2))
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
@@ -87,7 +89,7 @@ class Mentor(db.Model):
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "portfolio_photos": [portfolio_photo.serialize() for portfolio_photo in self.portfolio_photos],
             "about_me": self.about_me,
-            "price": self.price
+            "price": str(self.price)
         }
     
 class Session(db.Model):

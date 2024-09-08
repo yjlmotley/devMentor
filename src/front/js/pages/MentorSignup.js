@@ -2,7 +2,11 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
-import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState, ValidateCountry, ValidatePhone } from "../component/Validators";
+// import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState, ValidatePhone } from "../component/Validators";
+import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState } from "../component/Validators";
+import Select from 'react-select';
+import CreatableSelect from "react-select/creatable";
+import { stateOptions, countryOptions } from "../store/data";
 
 
 export const MentorSignup = () => {
@@ -18,7 +22,6 @@ export const MentorSignup = () => {
     const [country, setCountry] = useState("");
     const [invalidItems, setInvalidItems] = useState([]);
 
-
     const handleSignup = async () => {
         setInvalidItems([]);
         let isEmailValid = ValidateEmail(email, setInvalidItems);
@@ -27,9 +30,9 @@ export const MentorSignup = () => {
         let isPasswordValid = ValidatePassword(password, setInvalidItems);
         let isCityValid = ValidateCity(city, setInvalidItems);
         let isWhat_stateValid = ValidateWhatState(what_state, setInvalidItems);
-        let isCountryValid = ValidateCountry(country, setInvalidItems);
-        let isPhoneValid = ValidatePhone(phone, setInvalidItems);
-        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isCountryValid && isPhoneValid) {
+        // let isPhoneValid = ValidatePhone(phone, setInvalidItems);
+        // if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isPhoneValid) {
+        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid) {
             const success = await actions.signUpMentor({
                 email: email,
                 password: password,
@@ -52,6 +55,13 @@ export const MentorSignup = () => {
         }
     }
 
+    const handleCountryChange = (selectedOption) => {
+        setCountry(selectedOption ? selectedOption.label : '');
+    };
+
+    const handleStateChange = (selectedOption) => {
+        setWhat_state(selectedOption ? selectedOption.value : '');
+    };
     // const handleLogin = async(event) => {
     // 	const success = await actions.logInCustomer({
     // 		email: email,
@@ -133,6 +143,92 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("phone") && <label className="error-label">phone number is required</label>}
                             </div>
+                            {/* <div style={{ marginBottom: '20px' }}>
+                                <input
+                                    type="country"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
+                                    placeholder="Country"
+                                    value={country}
+                                    onChange={(event) => setCountry(event.target.value)}
+                                    required
+                                />
+                                {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
+                            </div> */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <Select
+                                    isClearable
+                                    name="country"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
+                                    styles={{
+                                        menu: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            color: 'black',
+                                        }),
+                                        // singleValue: (base) => ({
+                                        //     ...base,
+                                        //     color: '#000', // Customize text color of selected value
+                                        // }),
+                                        // option: (base, state) => ({
+                                        //     ...base,
+                                        //     backgroundColor: '#fff',
+                                        //     color: '#000',
+                                        //     '&:hover': {
+                                        //         backgroundColor: state.isSelected ? '#007bff' : '#f0f0f0',
+                                        //     }
+                                        // }),
+                                    }}
+                                    options={countryOptions}
+                                    className="basic-single-select"
+                                    classNamePrefix="select"
+                                    onChange={handleCountryChange}
+                                    defaultValue={countryOptions[195]}
+                                    value={
+                                        country
+                                            ? { label: country, value: country }
+                                            : ''
+                                    }
+                                    placeholder="Select a Country..."
+                                    required
+                                />
+                                {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
+                            </div>
+                            {/* <div style={{ marginBottom: '20px' }}>
+                                <input
+                                    type="what_state"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
+                                    placeholder="State"
+                                    value={what_state}
+                                    onChange={(event) => setWhat_state(event.target.value)}
+                                    required
+                                />
+                                {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
+                            </div> */}
+                            <div style={{ marginBottom: '20px' }}>
+                                <CreatableSelect
+                                    isClearable
+                                    name="what_state"
+                                    styles={{
+                                        menu: (baseStyles, state) => ({
+                                            ...baseStyles,
+                                            color: 'black',
+                                        }),
+                                    }}
+                                    options={country === "United States of America (USA)" ? stateOptions : []}
+                                    className="basic-single-select"
+                                    classNamePrefix="select"
+                                    onChange={handleStateChange}
+                                    value={
+                                        what_state
+                                            ? { value: what_state, label: what_state }
+                                            : ''
+                                    }
+                                    placeholder="Select or Type a State/ Providence..."
+                                />
+                                {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
+                            </div>
+
+
+
                             <div style={{ marginBottom: '20px' }}>
                                 <input
                                     type="city"
@@ -143,28 +239,6 @@ export const MentorSignup = () => {
                                     required
                                 />
                                 {invalidItems.includes("city") && <label className="error-label">City is required</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="what_state"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="State"
-                                    value={what_state}
-                                    onChange={(event) => setWhat_state(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="country"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Country"
-                                    value={country}
-                                    onChange={(event) => setCountry(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
                             </div>
                             <div style={{ textAlign: 'center' }}>
                                 <button
