@@ -92,11 +92,11 @@ class Mentor(db.Model):
     
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(30), unique=False, nullable=False)
+    title = db.Column(db.String(100), unique=False, nullable=False)
     details = db.Column(db.String(2500), unique=False, nullable=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    hours_needed = db.Column(db.Integer, unique=False, nullable=False)
-    days = db.Column(MutableDict.as_mutable(JSON), default={})
+    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
+    time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -107,8 +107,8 @@ class Session(db.Model):
             "title": self.title,
             "details": self.details,
             "skills": [skill for skill in self.skills],
-            "hours_needed": self.hours_needed,
-            "days": self.days
+            "schedule": self.schedule,
+            "time_created": self.time_created,
         }
 
 class MentorImage(db.Model):

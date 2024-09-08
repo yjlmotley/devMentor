@@ -340,8 +340,6 @@ def handle_customer_edit_by_customer():
     response_body = {"msg": "Account succesfully edited!", "customer":customer.serialize()}
     return jsonify(response_body), 201
 
-
-
 @api.route('/current-customer', methods=['GET'])
 @jwt_required()
 def get_current_customer():
@@ -387,54 +385,83 @@ def session_by_id(session_id):
 
 @api.route('/session/create', methods=['POST'])
 def create_session():
-
     title = request.json.get("title", None)
     details = request.json.get("details", None)
     skills = request.json.get("skills", None)
-    hours_needed = request.json.get("hours_needed", None)
-    days = request.json.get("days", None) 
+    schedule = request.json.get("schedule", None) 
 
-    if title is None or details is None or skills is None or hours_needed is None or days is None:
+    # Check if all required fields are present
+    if title is None or details is None or skills is None or schedule is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
 
+    # Validate data types
     if not isinstance(skills, list):
         return jsonify({"msg": "Skills must be a list"}), 400
 
-    if not isinstance(days, dict):
-        return jsonify({"msg": "Days must be a dictionary"}), 400
-    
-    session = Session(title=title, details=details, skills=skills, hours_needed=hours_needed, days=days)
+    if not isinstance(schedule, dict):
+        return jsonify({"msg": "Schedule must be a dictionary"}), 400
+
+    # Validate schedule structure
+    for day, times in schedule.items():
+        if not isinstance(times, dict) or 'start' not in times or 'end' not in times:
+            return jsonify({"msg": f"Invalid schedule format for {day}"}), 400
+
+    # Create and save the new session
+    session = Session(
+        title=title,
+        details=details,
+        skills=skills,
+        schedule=schedule
+    )
     db.session.add(session)
     db.session.commit()
     db.session.refresh(session)
-    response_body = {"msg": "Session successfully created!", "session":session.serialize()}
+
+    response_body = {
+        "msg": "Session successfully created!",
+        "session": session.serialize()
+    }
     return jsonify(response_body), 201
 
 @api.route('/session/edit/<int:session_id>', methods=['PUT'])
 def edit_session(session_id):
-
     session = Session.query.get(session_id)
     if session is None:
-        return jsonify({"msg": "no session found"}), 404
+        return jsonify({"msg": "No session found"}), 404
 
+    # Extract and validate input data
     title = request.json.get("title")
     details = request.json.get("details")
     skills = request.json.get("skills")
-    hours_needed = request.json.get("hours_needed")
-    days = request.json.get("days")
+    schedule = request.json.get("schedule")
 
-    if title is None or details is None or skills is None or hours_needed is None or days is None:
+    if title is None or details is None or skills is None or schedule is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
-    
-    session.title=title
-    session.details=details
-    session.skills=skills
-    session.hours_needed=hours_needed
-    session.days=days
+
+    # Validate data types
+    if not isinstance(skills, list):
+        return jsonify({"msg": "Skills must be a list"}), 400
+
+    if not isinstance(schedule, dict):
+        return jsonify({"msg": "Schedule must be a dictionary"}), 400
+
+    # Validate schedule structure
+    for day, times in schedule.items():
+        if not isinstance(times, dict) or 'start' not in times or 'end' not in times:
+            return jsonify({"msg": f"Invalid schedule format for {day}"}), 400
+
+    # Update the session
+    session.title = title
+    session.details = details
+    session.skills = skills
+    session.schedule = schedule
     db.session.commit()
     db.session.refresh(session)
 
-    response_body = {"msg": "Mentor Session succesfully edited!", "session":session.serialize()}
+    response_body = {
+        "msg": "Session successfully edited!",
+        "session": session.serialize()
+    }
     return jsonify(response_body), 200
     
 @api.route('/session/delete/<int:sess_id>', methods =["DELETE"])
