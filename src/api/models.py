@@ -18,7 +18,7 @@ class Customer(db.Model):
     address = db.Column(db.String(50), unique=False, nullable=False)
     phone = db.Column(db.String(30), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
+    password = db.Column(db.String(256), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False,)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
 
@@ -42,7 +42,7 @@ class Mentor(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     last_active = db.Column(db.Boolean(), unique=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
+    password = db.Column(db.String(256), unique=False, nullable=False)
     first_name = db.Column(db.String(30), unique=False, nullable=False)
     last_name = db.Column(db.String(30), unique=False, nullable=False)
     nick_name = db.Column(db.String(30), unique=False)

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Context } from "../store/appContext";
 
-const PortfolioImage = ({ portfolioImgs, setMentor }) => {
+const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
   const { store, actions } = useContext(Context);
   const [imageSizeError, setImageSizeError] = useState(false)
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -27,9 +27,9 @@ const PortfolioImage = ({ portfolioImgs, setMentor }) => {
     }
   };
 
- const handleNewImage = async () => {
+  const handleNewImage = async () => {
     const success = await actions.addPortfolioImages(uploadedImages);
-    if(success){
+    if (success) {
       fetch(process.env.BACKEND_URL + "/api/mentor", {
         headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
       })
@@ -44,8 +44,8 @@ const PortfolioImage = ({ portfolioImgs, setMentor }) => {
 
 
   return (
-    <div className="container">
-      <div className="">
+    <div>
+      <div>
         <div className="row">
           {uploadedImages.map((image, index) => (
             <div key={index} className="col">
@@ -79,43 +79,46 @@ const PortfolioImage = ({ portfolioImgs, setMentor }) => {
           ))}
           {/* Render empty preview placeholders if less than 12 images */}
         </div>
-
-        <input
-          type="file"
-          className="form-control"
-          id="portfolio-images"
-          aria-describedby="inputGroupFileAddon04"
-          aria-label="Upload"
-          multiple
-          onChange={handleImageUpload}
-          filename={`${uploadedImages.length > 0 ? uploadedImages.length : "No"} selected file${uploadedImages.length === 1 ? "" : "s"}`}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={handleNewImage}
-        >
-          Upload Portfolio Images
-        </button>
+        
+        {editMode &&
+          <>
+            <input
+              type="file"
+              className="form-control"
+              id="portfolio-images"
+              aria-describedby="inputGroupFileAddon04"
+              aria-label="Upload"
+              multiple
+              onChange={handleImageUpload}
+              filename={`${uploadedImages.length > 0 ? uploadedImages.length : "No"} selected file${uploadedImages.length === 1 ? "" : "s"}`}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={handleNewImage}
+            >
+              Upload Portfolio Images
+            </button>
+         </> 
+        }
       </div>
 
       <div className="container-flex">
-        <div style={{ width: "900px", overflowY: "hidden" }}>
-          <div style={{ display: "flex", flexWrap: "nowrap", overflowX: "scroll" }}>
-            <div style={{ display: "flex" }}>
-              {portfolioImgs && portfolioImgs.map((image, index) => {
-                return <img
-                  key={index}
-                  src={image.image_url || image }
-                  alt="Random"
-                  style={{
-                    maxHeight: "500px",
-                    width: "auto",
-                    objectFit: "cover"
-                  }}
-                />
-              })}
+        <div className="row gap-1 justify-content-center">
+          {portfolioImgs && portfolioImgs.map((image, index) => {
+            return <div class="col-3 p-0 d-flex justify-content-center align-items-center">
+              <img
+                key={index}
+                className="img-fluid"
+                src={image.image_url || image}
+                alt="Random"
+              // style={{
+              //   maxHeight: "500px",
+              //   width: "auto",
+              //   objectFit: "cover"
+              // }}
+              />
             </div>
-          </div>
+          })}
         </div>
       </div>
     </div>

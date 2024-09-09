@@ -42,9 +42,9 @@ export const MentorProfile = () => {
 		about_me: '',
 	});
 	const placeholderImage = 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg'; // Path to your placeholder image
-	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg','https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg']
+	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg']
 	const profileImageUrl = mentor.profile_photo?.image_url || placeholderImage;
-	const portfolioImageUrls = mentor?.portfolio_photos?.length > 0? mentor.portfolio_photos : placeholderImages;
+	const portfolioImageUrls = mentor?.portfolio_photos?.length > 0 ? mentor.portfolio_photos : placeholderImages;
 
 	// const [loading, setLoading] = useState(true);
 	// if (loading) {
@@ -217,22 +217,26 @@ export const MentorProfile = () => {
 
 	return (
 
-		
+
 		<div className="container mt-5">
-			<h2 className="mb-4">Mentor Profile</h2>
+			<h2 className="mb-4 text-center">
+				Mentor Profile
+				{editMode == false
+					? (<button onClick={() => setEditMode(true)} className="btn btn-secondary fa-solid fa-pencil ms-4"></button>)
+					: ''
+				}
+			</h2>
 			{!mentor.is_active && (
 				<div className="alert alert-warning" role="alert">
 					Your account is currently deactivated, please reactivate your account if you would like to continue to offer your services.
 				</div>
 			)}
-			{editMode == false ? (<button onClick={() => setEditMode(true)}>Edit Profile</button>) : ''}
 			<div className="row">
-				<div className="col-6 mb-4">
-					<ProfilePhoto url={profileImageUrl} setMentor={setMentor} />
+				<div className="col-7 mb-4">
+					<ProfilePhoto url={profileImageUrl} setMentor={setMentor} editMode={editMode} />
+					<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} editMode={editMode} />
 				</div>
-				<div className="col-6 mb-4">
-				</div>
-				<div className="col-md-8">
+				<div className="col-5" style={{ marginTop: "50px" }}>
 					<dl className="row">
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
@@ -460,13 +464,14 @@ export const MentorProfile = () => {
 							{editMode ? (
 								<>
 									<textarea name="about_me" value={mentor.about_me} onChange={handleChange} className="form-control" rows="4"></textarea>
-									<p className={CharacterCount > 2500 ? "text-danger" :  ''} >{CharacterCount}</p>
+									<p className={CharacterCount > 2500 ? "text-danger" : ''} >{CharacterCount}</p>
 								</>
 							) : (
 								mentor.about_me
 							)}
 						</dd>
 					</dl>
+					<Link to="/forgot-password">Change My Password</Link>
 				</div>
 			</div>
 
@@ -482,22 +487,23 @@ export const MentorProfile = () => {
 					</div>
 				</div>
 			)} */}
-			{editMode ? (
-				<button onClick={handleCancelChanges}>Cancel Changes</button>
-			) : ''}
-			{editMode ? (<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>) : ''}
-			{mentor.is_active ? (
-				<button onClick={handleDeactivate}>Deactivate Account</button>
-			) : (
-				<button onClick={handleReactivate}>Reactivate Account</button>
-			)}
 
-			<div className="col-12 mb-4">
-				<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} />
+			<div className="d-flex justify-content-center gap-3">
+				{editMode &&
+					<>
+						<button onClick={handleCancelChanges}>Cancel Changes</button>
+						<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>
+					</>
+				}
+				{mentor.is_active ? (
+					<button onClick={handleDeactivate}>Deactivate Account</button>
+				) : (
+					<button onClick={handleReactivate}>Reactivate Account</button>
+				)}
 			</div>
-			
+
 		</div>
 
-		
+
 	);
 };
