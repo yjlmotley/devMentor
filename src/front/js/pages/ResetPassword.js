@@ -3,11 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 
 
 export const ResetPassword = () => {
-    const [error, setErrMsg] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [ searchParams, setSearchParams] = useSearchParams();
+    const [ error, setErrMsg ] = useState('');
+    const [ password, setPassword ] = useState('');
+    const [ confirmPassword, setConfirmPassword ] = useState('');
+    const [ searchParams, setSearchParams ] = useSearchParams();
     let token = searchParams.get("token");
+    // get user type here
     const navigate = useNavigate();
 
 
@@ -28,6 +29,7 @@ export const ResetPassword = () => {
                 if (response.status === 200) {
                     console.log("response", response.message)
                     alert("You have successfully reset your password. Please log in.")
+                    // use user type to determine where to navigate to
                     navigate('/login')
                 } else if (response.status === 400) {
                     return response.json().then(data => {

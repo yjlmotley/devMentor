@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 export const ForgotPassword = () => {
 	const { store } = useContext(Context);
-	const [hasToken, setHasToken] = useState(false);
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [error, setErrMsg] = useState('');
+	const [ hasToken, setHasToken ] = useState(false);
+	const [ email, setEmail ] = useState('');
+	const [ password, setPassword ] = useState('');
+	const [ confirmPassword, setConfirmPassword ] = useState('');
+	const [ error, setErrMsg ] = useState('');
 
 	const navigate = useNavigate();
 	const token = store.token;
@@ -34,6 +34,7 @@ export const ForgotPassword = () => {
 	};
 
 	async function handleSubmit(event) {
+		// here we will need to send information about what type of user in the function// can use
 		event.preventDefault();
 		if (!hasToken) {
             // handle forgot password request
@@ -46,10 +47,13 @@ export const ForgotPassword = () => {
 					method: "POST",
 					headers: { 'Content-Type': "application/json" },
 					body: JSON.stringify({ email: email.toLowerCase() })
+					// ^^ send that user info in here
 				});
 				if (response.ok) {
 					alert("An email has been sent to reset your password.");
-					setTimeout(() => navigate('/login'), 3000);
+					setTimeout(() => {
+						navigate('/login'), 3000
+					});
 				} else {
 					const data = await response.json();
 					setErrMsg(data.message || "Something went wrong.");
@@ -100,7 +104,7 @@ export const ForgotPassword = () => {
 					</div>
 				) : (
 					<div className="container">
-						<h1 className="text-center mt-5">Reset Password</h1>
+						<h1 className="text-center mt-5">Change Password</h1>
 						<div className="mb-3">
 							<label className="form-label" htmlFor="password">New Password</label>
 							<input onChange={(e) => setPassword(e.target.value)} className="form-control" id="password" type="password" placeholder="New Password" required />

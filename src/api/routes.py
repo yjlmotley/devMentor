@@ -94,6 +94,7 @@ def mentor_login():
 def forgot_password():
     data=request.json
     email=data.get("email")
+    # want to get user type in the same fashion as email
     if not email:
         return jsonify({"message": "Email is required"}), 400
     
@@ -104,12 +105,7 @@ def forgot_password():
     expiration_time = datetime.utcnow() + timedelta(hours=3)
     token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
 
-    #jwt_access_token 
-    # token= encrypt_string(json.dumps({
-    #     "email": email, 
-    #     "exp": expiration_time,
-    #     "current_time": datetime.datetime.now().isoformat()
-    # }), os.getenv("FLASK_APP_KEY"))
+    # /?userType = {usertype} in the email value
     email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
     send_email(email, email_value, "Subject: Password recovery for devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
@@ -119,13 +115,11 @@ def forgot_password():
 def reset_password(token):
     data = request.get_json()
     password = data.get("password")
-    # secret = data.get("secret")
 
     if not password:
         return jsonify({"message": "Please provide a new password."}), 400
 
     try:
-        # json_secret = json.loads(decrypt_string(secret, os.getenv('FLASK_APP_KEY')))
         decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
         email = decoded_token.get("email")
     # except Exception as e:
@@ -157,19 +151,11 @@ def reset_password(token):
 @jwt_required()  # This ensures that the request includes a valid JWT token
 def change_password():
     data = request.json
-    # secret = data.get("secret")
     password = data.get("password")
-    
-    # if not secret or not password:
-    #     return jsonify({"message": "Invalid or expired token"}), 400
-
     if not password:
         return jsonify({"message": "Please provide a new password."}), 400
     
-
     try:
-        # user_id = get_jwt_identity()
-
         # This will now work because @jwt_required() has validated the token
         user_id = get_jwt_identity()
         print(f"Decoded JWT Identity: {user_id}")
@@ -177,7 +163,6 @@ def change_password():
         user = Mentor.query.get(user_id) or Customer.query.get(user_id)
         if not user:
             return jsonify({"message": "User not found"}), 404
-        # user.password = hashlib.sha256(password.encode("utf-8")).hexdigest()
         user.password = generate_password_hash(password)
         db.session.commit()
         

@@ -66,7 +66,7 @@ export const MentorLogin = () => {
                 >
                     Forgot Password?
                 </a> */}
-                <Link to="forgot-password">Forgot Password?</Link>
+                <Link to="/forgot-password">Forgot Password?</Link>
             </div>
         </div>
     );

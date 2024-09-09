@@ -19,8 +19,6 @@ import injectContext from "./store/appContext";
 import { Navbar } from "./component/Navbar.js";
 // import { Footer } from "./component/footer";
 
-import Testing1MentorProfile from "./testing/MentorProfile.jsx";
-import T2MentorProfile from "./testing2/T2MentorProfile.jsx" 
 
 //create your first component
 const Layout = () => {
@@ -42,17 +40,15 @@ const Layout = () => {
                         <Route element={<MentorDashboard />} path="/mentor-dashboard" />
                         <Route element={<ForgotPassword />} path="/forgot-password" />
 
-                        <Route element={<ForgotPassword />} path="/mentor-profile/forgot-password" />
-                        <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" />
-                        
+                        {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" /> */}
+                        {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password/:userType" /> */}
                         <Route element={<ResetPassword />} path="/reset-password"/>
+
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<MentorProfile />} path="/mentor-profile" />
                         <Route element={<MentorSessionBoard />} path="/mentor-session-board" />
                         <Route element={<CreateSession />} path="/create-session" />
-                        <Route element={<Testing1MentorProfile />} path="/testing1-mentor-profile" />
-                        <Route element={<T2MentorProfile />} path="/testing2-mentor-profile" />
                         <Route 
                             path="*"
                             element={
