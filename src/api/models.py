@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.mutable import MutableList
-from sqlalchemy.types import ARRAY
-from sqlalchemy import DateTime, Numeric
+
+from sqlalchemy.ext.mutable import MutableList, MutableDict
+from sqlalchemy.types import ARRAY, JSON
+from sqlalchemy import DateTime
+
 
 import datetime
 
@@ -52,7 +54,7 @@ class Mentor(db.Model):
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
     past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
-    price = db.Column(Numeric(10,2))
+    price = db.Column(db.Numeric(10,2))
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
@@ -92,11 +94,11 @@ class Mentor(db.Model):
     
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(30), unique=False, nullable=False)
+    title = db.Column(db.String(100), unique=False, nullable=False)
     details = db.Column(db.String(2500), unique=False, nullable=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    hours_needed = db.Column(db.Integer, unique=False, nullable=False)
-    days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
+    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
+    time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -107,8 +109,8 @@ class Session(db.Model):
             "title": self.title,
             "details": self.details,
             "skills": [skill for skill in self.skills],
-            "hours_needed": self.hours_needed,
-            "days": [day for day in self.days]
+            "schedule": self.schedule,
+            "time_created": self.time_created,
         }
 
 class MentorImage(db.Model):

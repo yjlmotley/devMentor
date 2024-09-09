@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ab8c2352014c
+Revision ID: 5bb8c003088b
 Revises: 
-Create Date: 2024-07-11 21:11:50.230583
+Create Date: 2024-09-09 19:02:38.701835
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ab8c2352014c'
+revision = '5bb8c003088b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -49,7 +49,7 @@ def upgrade():
     sa.Column('skills', sa.ARRAY(sa.String(length=255)), nullable=True),
     sa.Column('past_sessions', sa.ARRAY(sa.String(length=255)), nullable=True),
     sa.Column('days', sa.ARRAY(sa.String(length=255)), nullable=True),
-    sa.Column('price', sa.Integer(), nullable=True),
+    sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('date_joined', sa.DateTime(timezone=True), nullable=True),
     sa.Column('about_me', sa.String(length=2500), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -57,11 +57,11 @@ def upgrade():
     )
     op.create_table('session',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=30), nullable=False),
+    sa.Column('title', sa.String(length=100), nullable=False),
     sa.Column('details', sa.String(length=2500), nullable=False),
     sa.Column('skills', sa.ARRAY(sa.String(length=255)), nullable=True),
-    sa.Column('hours_needed', sa.Integer(), nullable=False),
-    sa.Column('days', sa.ARRAY(sa.String(length=255)), nullable=True),
+    sa.Column('schedule', sa.JSON(), nullable=True),
+    sa.Column('time_created', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('mentor_image',
