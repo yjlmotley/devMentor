@@ -4,6 +4,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             isMentorLoggedIn: false,
             isCustomerLoggedIn: false,
             mentors: [],
+            sessionRequests: [],
             customerId: undefined,
             // sessions: [],
             // message: null,
@@ -175,6 +176,32 @@ const getState = ({ getStore, getActions, setStore }) => {
                 sessionStorage.setItem("customerId", customer_id);
             },
 
+            createSession: async (session) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/session/create", {
+                    method: "POST",
+                    body: JSON.stringify({ title: session.title, details: session.details, skills: session.skills, schedule: session.schedule }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+                );
+                if (response.status !== 201) return false;
+                const responseBody = await response.json();
+                console.log(responseBody)
+
+                return true;
+            },
+
+            getAllSessionRequests: () => {
+                fetch(
+                    process.env.BACKEND_URL + "/api/sessions"
+                )
+                .then(response => response.json())
+                .then(data => setStore({
+                    sessionRequests: data
+                }))
+            }
         }
     };
 };

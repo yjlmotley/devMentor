@@ -1,0 +1,141 @@
+/* Minimalistic Learning Environment CSS */
+
+:root {
+    --primary-color: #4a90e2;
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --border-color: #e0e0e0;
+    --input-background: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.75rem;
+    width: 100%;
+    background-color: var(--input-background);
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3a7bc8;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-check-input {
+    margin-right: 0.5rem;
+  }
+  
+  /* React-Select custom styling */
+  .select__control {
+    border-color: var(--border-color);
+    box-shadow: none;
+  }
+  
+  .select__control:hover {
+    border-color: var(--primary-color);
+  }
+  
+  .select__control--is-focused {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
+  }
+  
+  .select__option--is-focused {
+    background-color: rgba(74, 144, 226, 0.1);
+  }
+  
+  .select__option--is-selected {
+    background-color: var(--primary-color);
+  }
+  
+  /* Schedule inputs styling */
+  .form-group.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: var(--input-background);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+  }
+  
+  .form-group.row > div {
+    padding: 0 0.5rem;
+  }
+  
+  .form-group.row input[type="time"],
+  .form-group.row input[type="number"] {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .form-group.row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .form-group.row > div {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+  

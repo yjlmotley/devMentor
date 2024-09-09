@@ -1,25 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import CreatableSelect from "react-select/creatable";
 import { skillsList } from "../store/data";
+import { Context } from "../store/appContext";
 
 
 
 export const CreateSession = () => {
+	const { store, actions } = useContext(Context);
+
+
 	const [title, setTitle] = useState("");
 	const [details, setDetails] = useState("");
 	const [selectedSkills, setSelectedSkills] = useState([]);
+	const [hours_needed, setHours_needed] = useState("");
+	const [days, setDays] = useState([]);
+	const [schedule, setSchedule] = useState({
+		monday: { checked: false, start: "", end: "", hours_needed: 0 },
+		tuesday: { checked: false, start: "", end: "", hours_needed: 0 },
+		wednesday: { checked: false, start: "", end: "", hours_needed: 0 },
+		thursday: { checked: false, start: "", end: "", hours_needed: 0 },
+		friday: { checked: false, start: "", end: "", hours_needed: 0 },
+		saturday: { checked: false, start: "", end: "", hours_needed: 0 },
+		sunday: { checked: false, start: "", end: "", hours_needed: 0 },
+	});
 
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
-		console.log("Form submitted:", { title, details, selectedSkills });
-		// Handle form submission logic here
+
+		// Transform schedule object to remove unchecked days
+		const transformedSchedule = Object.entries(schedule).reduce((acc, [day, value]) => {
+			if (value.checked) {
+				acc[day] = { start: value.start, end: value.end, hours_needed: value.hours_needed };
+			}
+			return acc;
+		}, {});
+
+		console.log("Form submitted:", {
+			title,
+			details,
+			skills: selectedSkills,
+			schedule: transformedSchedule
+		});
+
+		const success = await actions.createSession({
+			title: title,
+			details: details,
+			skills: selectedSkills,
+			schedule: transformedSchedule
+		});
+
+		if (success) {
+			// Reset form fields
+			setTitle("");
+			setDetails("");
+			setSelectedSkills([]);
+			setSchedule({
+				monday: { checked: false, start: "", end: "", hours_needed: 0 },
+				tuesday: { checked: false, start: "", end: "", hours_needed: 0 },
+				wednesday: { checked: false, start: "", end: "", hours_needed: 0 },
+				thursday: { checked: false, start: "", end: "", hours_needed: 0 },
+				friday: { checked: false, start: "", end: "", hours_needed: 0 },
+				saturday: { checked: false, start: "", end: "", hours_needed: 0 },
+				sunday: { checked: false, start: "", end: "", hours_needed: 0 },
+			});
+		} else {
+			alert("Something went wrong creating a Mentor Session.");
+		}
 	};
 
 
-	const handleSelectChange = (selectedOptions, { name }) => {
+	const handleSelectChange = (selectedOptions) => {
 		const values = selectedOptions ? selectedOptions.map(option => option.label) : [];
-		setSelectedSkills(values); // Set selectedSkills to an array of labels
+		setSelectedSkills(values);
+	};
+
+	const handleScheduleChange = (day, field, value) => {
+		setSchedule(prevSchedule => ({
+			...prevSchedule,
+			[day]: { ...prevSchedule[day], [field]: field === 'checked' ? !prevSchedule[day].checked : value }
+		}));
 	};
 
 	return (
@@ -67,42 +127,59 @@ export const CreateSession = () => {
 
 
 				</div>
-				<div>
-					<div class="day-container">
-						<label for="monday">Monday:</label>
-						<input type="text" id="mondayStart" name="mondayStart" /> to
-						<input type="text" id="mondayEnd" name="mondayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="tuesday">Tuesday:</label>
-						<input type="time" id="tuesdayStart" name="tuesdayStart" /> to
-						<input type="time" id="tuesdayEnd" name="tuesdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="wednesday">Wednesday:</label>
-						<input type="time" id="wednesdayStart" name="wednesdayStart" /> to
-						<input type="time" id="wednesdayEnd" name="wednesdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="thursday">Thursday:</label>
-						<input type="time" id="thursdayStart" name="thursdayStart" /> to
-						<input type="time" id="thursdayEnd" name="thursdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="friday">Friday:</label>
-						<input type="time" id="fridayStart" name="fridayStart" /> to
-						<input type="time" id="fridayEnd" name="fridayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="saturday">Saturday:</label>
-						<input type="time" id="saturdayStart" name="saturdayStart" /> to
-						<input type="time" id="saturdayEnd" name="saturdayEnd" />
-					</div>
-					<div class="day-container">
-						<label for="sunday">Sunday:</label>
-						<input type="time" id="sundayStart" name="sundayStart" /> to
-						<input type="time" id="sundayEnd" name="sundayEnd" />
-					</div>
+				<div className="container mt-4">
+					{Object.entries(schedule).map(([day, value]) => (
+						<div className="form-group row" key={day}>
+							<div className="col-md-2">
+								<div className="form-check">
+									<input
+										className="form-check-input"
+										type="checkbox"
+										id={`${day}Checkbox`}
+										checked={value.checked}
+										onChange={() => handleScheduleChange(day, 'checked')}
+									/>
+									<label className="form-check-label" htmlFor={`${day}Checkbox`}>
+										{day.charAt(0).toUpperCase() + day.slice(1)}:
+									</label>
+								</div>
+							</div>
+							<div className="col-md-3">
+								<input
+									type="time"
+									className="form-control"
+									id={`${day}Start`}
+									name={`${day}Start`}
+									value={value.start}
+									onChange={(e) => handleScheduleChange(day, 'start', e.target.value)}
+									disabled={!value.checked}
+								/>
+							</div>
+							<div className="col-md-3">
+								<input
+									type="time"
+									className="form-control"
+									id={`${day}End`}
+									name={`${day}End`}
+									value={value.end}
+									onChange={(e) => handleScheduleChange(day, 'end', e.target.value)}
+									disabled={!value.checked}
+								/>
+							</div>
+							<div className="col-md-3">
+								<input
+									type="number"
+									className="form-control"
+									id={`${day}Hours`}
+									name={`${day}Hours`}
+									value={value.hours_needed}
+									onChange={(e) => handleScheduleChange(day, 'hours_needed', parseInt(e.target.value))}
+									disabled={!value.checked}
+									placeholder="Hours needed"
+								/>
+							</div>
+						</div>
+					))}
 				</div>
 				<button type="submit" className="btn btn-primary">
 					Create Session
