@@ -4,6 +4,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             // isLoggedIn: false,
             // mentors: [],
             mentors: [],
+            sessionRequests: [],
             customerId: undefined,
             // customerId: undefined,
             // sessions: [],
@@ -190,6 +191,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                 return true;
             },
+
+            getAllSessionRequests: () => {
+                fetch(
+                    process.env.BACKEND_URL + "/api/sessions"
+                )
+                .then(response => response.json())
+                .then(data => setStore({
+                    sessionRequests: data
+                }))
+            }
         }
     };
 };
