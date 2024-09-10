@@ -30,6 +30,7 @@ CORS(api)
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
 
 
 @api.route('/mentor/signup', methods=['POST'])
@@ -374,6 +375,63 @@ def reactivate_mentor():
 # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
 # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start # Customer Routes Start
 
+@api.route('/customer/signup', methods=['POST'])
+def customer_signup():
+   
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    first_name = request.json.get("first_name", None)
+    last_name = request.json.get("last_name", None)
+    city = request.json.get("city", None)
+    what_state = request.json.get("what_state", None)
+    country = request.json.get("country", None)
+    phone = request.json.get("phone", "None")
+    
+    
+    if email is None or password is None or first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    customer = Customer.query.filter_by(email=email).one_or_none()
+    if customer:
+        return jsonify({"msg": "An account associated with the email already exists"}), 409
+    customer = Customer(
+        email=email, 
+        password=generate_password_hash(password), 
+        first_name=first_name, 
+        last_name=last_name, 
+        city=city, 
+        what_state=what_state, 
+        country=country, 
+        phone=phone
+    )
+    db.session.add(customer)
+    db.session.commit()
+    db.session.refresh(customer)
+    response_body = {"msg": "Account succesfully created!", "customer":customer.serialize()}
+    return jsonify(response_body), 201
+
+@api.route('/customer/login', methods=['POST'])
+def customer_login():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    if email is None or password is None:
+        return jsonify({"msg": "No email or password"}), 400
+    
+    customer = Customer.query.filter_by(email=email).one_or_none()
+    if customer is None:
+        return jsonify({"msg": "no such user"}), 404
+    if not check_password_hash(customer.password, password):
+        return jsonify({"msg": "Incorrect password, please try again."}), 401
+
+    access_token = create_access_token(
+        identity=customer.id,
+        additional_claims = {"role": "customer"},
+        expires_delta=timedelta(hours=24) 
+        )
+    return jsonify({
+        "access_token": access_token,
+        "customer_id": customer.id
+    }), 201
+
 @api.route('/customers', methods=['GET'])
 def all_customers():
    customers = Customer.query.all()
@@ -391,47 +449,6 @@ def customer_by_id(cust_id):
     
     return jsonify(customer.serialize()), 200
 
-@api.route('/customer/login', methods=['POST'])
-def customer_login():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    if email is None or password is None:
-        return jsonify({"msg": "No email or password"}), 400
-    customer = Customer.query.filter_by(email=email).one_or_none()
-    if customer is None:
-        return jsonify({"msg": "no such user"}), 404
-    if customer.password != password:
-        return jsonify({"msg": "Bad email or password"}), 401
-
-    access_token = create_access_token(
-        identity=customer.id,
-        additional_claims = {"role": "customer"} 
-        )
-    return jsonify(access_token=access_token), 201
-
-
-@api.route('/customer/signup', methods=['POST'])
-def customer_signup():
-   
-    first_name = request.json.get("first_name", None)
-    last_name = request.json.get("last_name", None)
-    address = request.json.get("address", None)
-    phone = request.json.get("phone", None)
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    
-    
-    if first_name is None or last_name is None or phone is None or email is None or password is None:
-        return jsonify({"msg": "Some fields are missing in your request"}), 400
-    customer = Customer.query.filter_by(email=email).one_or_none()
-    if customer:
-        return jsonify({"msg": "An account associated with the email already exists"}), 409
-    customer = Customer(first_name=first_name, last_name=last_name, address=address, phone=phone, email=email, password=password)
-    db.session.add(customer)
-    db.session.commit()
-    db.session.refresh(customer)
-    response_body = {"msg": "Account succesfully created!", "customer":customer.serialize()}
-    return jsonify(response_body), 201
 
 @api.route('/customer/edit-self', methods=['PUT'])
 @customer_required

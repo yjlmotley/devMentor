@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const CustomerLogin = () => {
     const navigate = useNavigate();
@@ -59,6 +59,7 @@ export const CustomerLogin = () => {
                 >
                     Forgot Password?
                 </a> */}
+                <Link to="/forgot-password">Forgot Password?</Link>
             </div>
         </div>
     );
