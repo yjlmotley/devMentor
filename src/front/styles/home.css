@@ -1,7 +1,158 @@
-/*
-    home.css: This website contains selectors only used in home.css
+.homepage {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .hero {
+    background-image: url('https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1725933624/Saved/ChickTeachingDude_ocwdax.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    padding: 100px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    border-radius: 10px;
+  }
+  
+  .hero h1 {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .hero .lead {
+    font-size: 18px;
+    color: #6c757d;
+    max-width: 800px;
+    margin: 0 auto 30px;
+  }
+  
+  .search-container {
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .search-input {
+    flex-grow: 1;
+    padding: 10px 20px;
+    font-size: 18px;
+    border: 1px solid #ced4da;
+    border-radius: 5px 0 0 5px;
+  }
+  
+  .search-button {
+    padding: 10px 30px;
+    font-size: 18px;
+    background-color: #ffc107;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    color: #212529;
+    cursor: pointer;
+  }
+  
+  .why-devmentor {
+    padding: 80px 0;
+  }
+  
+  .why-devmentor h2,
+  .featured-mentors h2 {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .feature-card {
+    text-align: center;
+    padding: 0px;
+  }
+  
+  .feature-image {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
+  
+  .feature-card h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .feature-card p {
+    color: #6c757d;
+  }
+  
+  .featured-mentors {
+    background-color: #f8f9fa;
+    padding: 80px 0;
+  }
+  
+  .mentor-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  
+  .stat-item {
+    text-align: center;
+  }
+  
+  .stat-item h3 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .stat-item p {
+    color: #6c757d;
+  }
+  
+  .mentor-profiles {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .mentor-profile {
+    text-align: center;
+    max-width: 300px;
+  }
+  
+  .mentor-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  
+  .mentor-profile h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .mentor-profile p {
+    color: #6c757d;
+    margin-bottom: 20px;
+  }
+  
+  .follow-button {
+    padding: 8px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .follow-button:hover {
+    background-color: #0056b3;
+  }
 
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
+  .header-background {
+    background-color: rgba(0, 0, 0, 0.075); /* Dark background with 50% opacity */
+    padding: 20px; /* Optional: Add some padding for better spacing */
+    border-radius: 8px; /* Optional: Rounding corners for aesthetics */
+  }
