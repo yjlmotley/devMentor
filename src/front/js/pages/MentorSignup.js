@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
-// import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState, ValidatePhone } from "../component/Validators";
+// import { ValidatePhone } from "../component/Validators";
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
@@ -11,7 +11,7 @@ import { stateOptions, countryOptions } from "../store/data";
 
 export const MentorSignup = () => {
     const navigate = useNavigate();
-    const { store, actions } = useContext(Context);
+    const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [first_name, setFirst_name] = useState("");
@@ -262,7 +262,7 @@ export const MentorSignup = () => {
                                 </button>
                             </div>
                             <div>
-                                <Link to='/mentor-login' className="customer-login-link">Already have an account?</Link>
+                                <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
                             </div>
                         </div>
                     </div>
