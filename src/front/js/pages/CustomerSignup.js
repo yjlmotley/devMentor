@@ -2,14 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
-// import { ValidatePhone } from "../component/Validators";
+// import {  ValidatePhone } from "../component/Validators";
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
 
 
-export const MentorSignup = () => {
+export const CustomerSignup = () => {
     const navigate = useNavigate();
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ export const MentorSignup = () => {
         // let isPhoneValid = ValidatePhone(phone, setInvalidItems);
         // if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isPhoneValid) {
         if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid) {
-            const success = await actions.signUpMentor({
+            const success = await actions.signUpCustomer({
                 email: email,
                 password: password,
                 first_name: first_name,
@@ -44,7 +44,7 @@ export const MentorSignup = () => {
                 country: country
             });
             if (success) {
-                navigate("/mentor-login");
+                navigate("/customer-login");
                 // handleLogin();
             } else {
                 alert("something went wrong");
@@ -262,7 +262,7 @@ export const MentorSignup = () => {
                                 </button>
                             </div>
                             <div>
-                                <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
+                                <Link to='/customer-login' className="customer-login-link">Already have an account?</Link>
                             </div>
                         </div>
                     </div>

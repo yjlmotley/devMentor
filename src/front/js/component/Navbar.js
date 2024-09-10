@@ -38,8 +38,8 @@ export const Navbar = () => {
 								</>
 							{/* ) : ( */}
 								{/* <> */}
-								<Link to="/" className="dropdown-item bold-text text-end fa-solid fa-user-plus"> Customer Sign up</Link>
-								<Link to="/" className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket"> Log in</Link>
+								<Link to="/customer-signup" className="dropdown-item bold-text text-end fa-solid fa-user-plus"> Customer Sign up</Link>
+								<Link to="/customer-login" className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket"> Log in</Link>
 								{/* </> */}
 							{/* )} */}
 						</ul>

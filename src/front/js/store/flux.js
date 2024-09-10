@@ -145,6 +145,23 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.log("Logged out:", getStore().token)
             },
 
+            signUpCustomer: async (customer) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/customer/signup", {
+                    method: "POST",
+                    body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password, city: customer.city, what_state: customer.what_state, country: customer.country }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (response.status !== 201) return false;
+
+                const responseBody = await response.json();
+                console.log(responseBody)
+
+                return true;
+            },
+
             logInCustomer: async (customerCredentials) => {
                 const response = await fetch(`${process.env.BACKEND_URL}/api/customer/login`, {
                     method: "POST",
