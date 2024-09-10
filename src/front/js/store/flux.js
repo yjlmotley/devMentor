@@ -140,9 +140,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                     isMentorLoggedIn: false,
                     isCustomerLoggedIn: false
                 });
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("customerId");
-                console.log("Logged out:", getStore().token)
+
+                sessionStorage.clear();
+                // -- or -- (remove specific items from sessionStorage)
+                // sessionStorage.removeItem("token");
+                // sessionStorage.removeItem("customerId");
+
+                // console.log("Logged out. Updated store:", getStore());
+                console.log("Logged out. Token should be undefined:", getStore().token === undefined);
             },
 
             signUpCustomer: async (customer) => {
@@ -170,6 +175,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 });
                 if (response.ok) {
                     const data = await response.json();
+                    console.log("data from the flux.actions.logInCustomer", data);
                     setStore({
                         token: data.access_token,
                         customerId: data.customer_id,
@@ -214,10 +220,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 fetch(
                     process.env.BACKEND_URL + "/api/sessions"
                 )
-                .then(response => response.json())
-                .then(data => setStore({
-                    sessionRequests: data
-                }))
+                    .then(response => response.json())
+                    .then(data => setStore({
+                        sessionRequests: data
+                    }))
             }
         }
     };

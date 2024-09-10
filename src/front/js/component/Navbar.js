@@ -10,7 +10,7 @@ export const Navbar = () => {
 
 	const handleLogout = () => {
 		actions.logOut();
-		navigate("/mentor-login");
+		navigate("/");
 	}
 
 	return (

@@ -30,6 +30,7 @@ CORS(api)
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
 
 
 @api.route('/mentor/signup', methods=['POST'])
@@ -414,11 +415,10 @@ def customer_login():
     password = request.json.get("password", None)
     if email is None or password is None:
         return jsonify({"msg": "No email or password"}), 400
+    
     customer = Customer.query.filter_by(email=email).one_or_none()
     if customer is None:
         return jsonify({"msg": "no such user"}), 404
-    # if customer.password != password:
-        # return jsonify({"msg": "Bad email or password"}), 401
     if not check_password_hash(customer.password, password):
         return jsonify({"msg": "Incorrect password, please try again."}), 401
 
@@ -427,7 +427,10 @@ def customer_login():
         additional_claims = {"role": "customer"},
         expires_delta=timedelta(hours=24) 
         )
-    return jsonify(access_token=access_token), 201
+    return jsonify({
+        "access_token": access_token,
+        "customer_id": customer.id
+    }), 201
 
 @api.route('/customers', methods=['GET'])
 def all_customers():
