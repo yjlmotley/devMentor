@@ -287,6 +287,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("city") && <label className="error-label">City is required</label>}
                             </div>
+                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, and CustomerLogin.js pages) */}
                             <div style={{ textAlign: 'center' }}>
                                 <button
                                     type="button"
@@ -318,3 +319,5 @@ export const MentorSignup = () => {
         </form>
     );
 }
+
+// TODO: When first going to the page, the user is taken straight to the phone number. Please fix this bug so that the user is taken to the top of the page on window.onload

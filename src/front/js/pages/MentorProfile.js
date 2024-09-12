@@ -1,19 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
-// import { arrayOf } from "prop-types";
+import { Link } from "react-router-dom";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 import { ValidatePrice, ValidateNumber, ValidatePhoneNumber } from "../component/Validators";
-
+import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-// import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
-
 import "../../styles/mentorProfile.css";
-// import { useAsync } from "react-select/async";
 
 import ProfilePhoto from "../component/ProfilePhoto";
 import PortfolioImage from "../component/PortfolioImage";
@@ -304,7 +299,7 @@ export const MentorProfile = () => {
 									{phoneError && <div className="text-danger">{phoneError}</div>}
 								</>
 							) : (
-								// mentor.phone && formatPhoneNumber(`+${mentor.phone}`)
+								// TODO: If extra time: change the font of the phone input disabled number so it matches the rest of the font text on the page
 								<PhoneInput
 									disabled
 									country={'us'}
