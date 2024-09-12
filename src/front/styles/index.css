@@ -1,56 +1,8 @@
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(7px);
-    }
-    40% {
-        transform: translateY(-4px);
-    }
-}
-.btn-outline-secondary.dropdown-toggle.show .fa-school,
-.btn-outline-secondary.dropdown-toggle.show .fa-person-chalkboard
-{
-    animation: bounce 1.8s infinite;
+.authDiv input {
+    text-align: center;
 }
 
-/*  ----------------------- */
-
- /* @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    30% {
-        transform: translateY(-7px);
-    }
-}
-.btn-outline-secondary.dropdown-toggle.show .fa-school,
-.btn-outline-secondary.dropdown-toggle.show .fa-person-chalkboard
- {
-    animation: bounce 1.4s infinite;
-} */
-
-
-.navbar-dropdown .dropdown-menu.show {
-    box-shadow: 3px 5px 4px 2px rgba(108,117,125,.5);
-}
-
-.navbar-dropdown .dropdown-item {
-    display: flex;
-    align-items: center; /* Align items vertically centered */
-    justify-content: flex-end; /* Align items to the end (right side) */
-    padding: .12rem .72rem;
-}
-
-.navbar-dropdown .dropdown-item i {
-    margin-right: 8px; /* Space between icon and text */
-}
-
-.navbar-dropdown .dropdown-item span {
-    display: inline; /* Ensure text is inline with the icon */
-}
-
-.navbarFont {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    font-size: 15px;
-    margin-right: .5rem;
+input.form-control.disabled.border-0 {
+    /* this is for the Mentor Profile's phone input view */
+    background-color: transparent;
 }

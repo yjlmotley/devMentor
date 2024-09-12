@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-
+import "../../styles/navbar.css";
 
 
 export const Navbar = () => {
@@ -31,7 +31,6 @@ export const Navbar = () => {
 							<i className="ms-3 fa-solid fa-school" />
 						</button>
 						<ul className="dropdown-menu dropdown-menu-end mt-1">
-							{/* <Link to="/customer-dashboard" className="dropdown-item bold-text text-end fa-solid fa-chalkboard"> Customer Dashboard</Link> */}
 							<Link to="/customer-dashboard" className="dropdown-item bold-text text-end">
 								<span className="navbarFont">Customer Dashboard</span>
 								<i className="fa-solid fa-chalkboard" />
