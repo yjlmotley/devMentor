@@ -110,7 +110,6 @@ def forgot_password():
     send_email(email, email_value, "Subject: Password recovery for devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
 
-
 @api.route("/reset-password/<token>", methods=["PUT"])
 def reset_password(token):
     data = request.get_json()
@@ -146,7 +145,6 @@ def reset_password(token):
 
     return jsonify({"message": "Password successfully changed."}), 200
 
-
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()  # This ensures that the request includes a valid JWT token
 def change_password():
@@ -175,9 +173,6 @@ def change_password():
         print(f"Token decryption failed: {str(e)}")
         logging.error(f"Error changing password: {str(e)}")
         return jsonify({"message": "An error occurred. Please try again later."}), 500
-
-
-
 
 @api.route('/mentors', methods=['GET'])
 def all_mentors():
@@ -409,7 +404,6 @@ def customer_login():
         )
     return jsonify(access_token=access_token), 201
 
-
 @api.route('/customer/signup', methods=['POST'])
 def customer_signup():
    
@@ -508,10 +502,14 @@ def create_session():
     title = request.json.get("title", None)
     details = request.json.get("details", None)
     skills = request.json.get("skills", None)
-    schedule = request.json.get("schedule", None) 
+    schedule = request.json.get("schedule", None)
+    is_active = request.json.get("is_active", None)
+    focusAreas = request.json.get("focusAreas", None)
+    totalHours = request.json.get("totalHours", None)
+    resourceLink = request.json.get("resourceLink", None)
 
     # Check if all required fields are present
-    if title is None or details is None or skills is None or schedule is None:
+    if title is None or details is None or skills is None or schedule is None or is_active is None or focusAreas is None or totalHours is None or resourceLink is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
 
     # Validate data types
@@ -526,12 +524,17 @@ def create_session():
         if not isinstance(times, dict) or 'start' not in times or 'end' not in times:
             return jsonify({"msg": f"Invalid schedule format for {day}"}), 400
 
+
     # Create and save the new session
     session = Session(
         title=title,
         details=details,
         skills=skills,
-        schedule=schedule
+        schedule=schedule,
+        is_active=is_active,
+        focusAreas=focusAreas,
+        totalHours=totalHours,
+        resourceLink=resourceLink
     )
     db.session.add(session)
     db.session.commit()

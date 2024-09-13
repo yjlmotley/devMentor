@@ -98,7 +98,12 @@ class Session(db.Model):
     details = db.Column(db.String(2500), unique=False, nullable=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     schedule = db.Column(MutableDict.as_mutable(JSON), default={})
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    focusAreas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
+    totalHours = db.Column(db.Integer)
+    resourceLink = db.Column(db.String(255))
+    
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -110,7 +115,11 @@ class Session(db.Model):
             "details": self.details,
             "skills": [skill for skill in self.skills],
             "schedule": self.schedule,
+            "is_active": self.is_active,
             "time_created": self.time_created,
+            "focusAreas": [focusArea for focusArea in self.focusAreas],
+            "totalHours": self.totalHours,
+            "resourceLink": self.resourceLink
         }
 
 class MentorImage(db.Model):

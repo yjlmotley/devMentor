@@ -1,0 +1,23 @@
+.time-range-slider {
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 18px;
+  }
+  
+  .time-range-thumb {
+    height: 36px;
+    width: 36px;
+    background-color: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.time-range-track {
+height: 36px;
+background: #f0f0f0;
+border-radius: 18px;
+}
+
+.time-range-track.time-range-track-1 {
+background: lightgrey;
+}

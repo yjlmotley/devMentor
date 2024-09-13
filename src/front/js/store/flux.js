@@ -180,7 +180,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/session/create", {
                     method: "POST",
-                    body: JSON.stringify({ title: session.title, details: session.details, skills: session.skills, schedule: session.schedule }),
+                    body: JSON.stringify({ 
+                        title: session.title,
+                        details: session.details,
+                        skills: session.skills,
+                        schedule: session.schedule,
+                        is_active: session.visibility,
+                        focusAreas: session.focusAreas,
+                        totalHours: session.totalHours,
+                        resourceLink: session.resourceLink
+                    }),
                     headers: {
                         "Content-Type": "application/json"
                     }
