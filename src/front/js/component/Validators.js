@@ -19,16 +19,31 @@ export const ValidateEmail = (email, setInvalidItems) => {
 //     return true;
 // };
 
+export const ValidatePhone = (phoneNumber, countryCode, setInvalidItems) => {
+    const regex = phoneRegex[countryCode];
+    // leave the 3 console log statements below for testing purposes:
+    // console.log(countryCode);
+    // console.log(phoneNumber)
+    // console.log("regex:", regex);
+
+    if (!regex || !regex.test(phoneNumber)) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "phone"]);
+        return false;
+    }
+
+    return true;
+};
+
 export const ValidatePhoneNumber = (phoneNumber, country) => {
     console.log(country);
     console.log(phoneNumber);
     const regex = phoneRegex[country];
     console.log("regex:", regex);
-    // if (regex && regex.test(phoneNumber)) {
-    //     return { isValid: true, message: '' };
-    // } else {
-    //     return { isValid: false, message: 'Invalid phone number' };
-    // }
+
+    if (!regex) {
+        return { isValid: false, message: 'Invalid country code or phone number format' };
+    }
+
     if (regex.test(phoneNumber)) {
         return { isValid: true, message: '' };
     } else {
@@ -37,7 +52,7 @@ export const ValidatePhoneNumber = (phoneNumber, country) => {
 };
 
 export const ValidateFirstName = (first_name, setInvalidItems) => {
-    if (first_name.trim() === "" || first_name.length <= 2 || first_name.length > 25) {
+    if (first_name.trim() === "" || first_name.length < 2 || first_name.length > 25) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "first_name"]);
         return false;
     }
@@ -45,7 +60,7 @@ export const ValidateFirstName = (first_name, setInvalidItems) => {
 };
 
 export const ValidateLastName = (last_name, setInvalidItems) => {
-    if (last_name.trim() === "" || last_name.length <= 2 || last_name.length > 25) {
+    if (last_name.trim() === "" || last_name.length < 2 || last_name.length > 25) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "last_name"]);
         return false;
     }
@@ -53,7 +68,7 @@ export const ValidateLastName = (last_name, setInvalidItems) => {
 };
 
 export const ValidatePassword = (password, setInvalidItems) => {
-    if (password.trim() === "" || password.length <= 5 || password.length > 20) {
+    if (password.trim() === "" || password.length < 5 || password.length > 20) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "password"]);
         return false;
     }
@@ -187,7 +202,10 @@ export function ValidateEstCompletion(est_completion, setInvalidItems) {
 
 export const ValidatePrice = (price, setInvalidItems) => {
     const priceRegex = /^\d+(\.\d{2})?$/;
-    if (!priceRegex.test(price) || price.trim() === "") {
+    if (price === null || price.trim() === "" || price == "Null") {
+        return true;
+    }
+    if (!priceRegex.test(price)) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "price"]);
         return false;
     }

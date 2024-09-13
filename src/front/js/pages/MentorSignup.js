@@ -2,8 +2,9 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
-// import { ValidatePhone } from "../component/Validators";
-import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidateWhatState } from "../component/Validators";
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidatePhone } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
@@ -14,25 +15,30 @@ export const MentorSignup = () => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [first_name, setFirst_name] = useState("");
     const [last_name, setLast_name] = useState("");
     const [phone, setPhone] = useState("");
     const [city, setCity] = useState("");
     const [what_state, setWhat_state] = useState("");
     const [country, setCountry] = useState("");
+    const [countryCode, setCountryCode] = useState("us");
     const [invalidItems, setInvalidItems] = useState([]);
 
     const handleSignup = async () => {
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
         setInvalidItems([]);
         let isEmailValid = ValidateEmail(email, setInvalidItems);
         let isFirstNameValid = ValidateFirstName(first_name, setInvalidItems);
         let isLastNameValid = ValidateLastName(last_name, setInvalidItems);
         let isPasswordValid = ValidatePassword(password, setInvalidItems);
         let isCityValid = ValidateCity(city, setInvalidItems);
-        let isWhat_stateValid = ValidateWhatState(what_state, setInvalidItems);
-        // let isPhoneValid = ValidatePhone(phone, setInvalidItems);
-        // if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid && isPhoneValid) {
-        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhat_stateValid) {
+        let isPhoneValid = ValidatePhone(phone, countryCode, setInvalidItems);
+        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isPhoneValid) {
             const success = await actions.signUpMentor({
                 email: email,
                 password: password,
@@ -45,7 +51,6 @@ export const MentorSignup = () => {
             });
             if (success) {
                 navigate("/mentor-login");
-                // handleLogin();
             } else {
                 alert("something went wrong");
             }
@@ -62,32 +67,32 @@ export const MentorSignup = () => {
     const handleStateChange = (selectedOption) => {
         setWhat_state(selectedOption ? selectedOption.value : '');
     };
-    // const handleLogin = async(event) => {
-    // 	const success = await actions.logInCustomer({
-    // 		email: email,
-    // 		password: password
-    // 	});
-    // 	if (success) {
-    //         navigate("/customer-profile");
-    //     } else {
-    //     alert("something went wrong");
-    //     }
-    // }
+
+    const handlePhoneChange = (value, countryData) => {
+        const countryCode = countryData?.countryCode || "us";
+        setCountryCode(countryData?.countryCode || "us");
+
+        setPhone(value);
+
+        // comment out the bottom 4 lines if you do not want to see the phone error before form submission
+        const isPhoneValid = ValidatePhone(value, countryCode, setInvalidItems);
+        if (isPhoneValid) {
+            setInvalidItems(prevInvalidItems => prevInvalidItems.filter(item => item !== "phone"));
+        }
+    };
 
 
     return (
-
 
         <form onSubmit={(event) => {
             event.preventDefault();
             handleSignup();
         }}>
-            {/* <div className="container pt-5 bg-black "> */}
-            <div style={{ width: '100%', maxWidth: '1000px', margin: '100px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
+            <div style={{ width: '100%', maxWidth: '1000px', margin: '30px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
                 <div className="row justify-content-center">
-                    <div className="col-md-6 pb-5 text-light" >
+                    <div className="col-md-6 pb-5 text-light authDiv" >
                         <div style={{ padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 50px rgba(255, 255, 255, 0.2)', border: '1px solid white' }}>
-                            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome!</h2>
+                            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome Mentors!</h2>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
                                     type="email"
@@ -106,6 +111,17 @@ export const MentorSignup = () => {
                                     placeholder="Password"
                                     value={password}
                                     onChange={(event) => setPassword(event.target.value)}
+                                    required
+                                />
+                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format</label>}
+                            </div>
+                            <div style={{ marginBottom: '20px' }}>
+                                <input
+                                    type="password"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={(event) => setConfirmPassword(event.target.value)}
                                     required
                                 />
                                 {invalidItems.includes("password") && <label className="error-label">Invalid Password format</label>}
@@ -133,7 +149,7 @@ export const MentorSignup = () => {
                                 {invalidItems.includes("last_name") && <label className="error-label">Last Name is required</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
-                                <input
+                                {/* <input
                                     type="phone"
                                     style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
                                     placeholder="Phone"
@@ -141,8 +157,25 @@ export const MentorSignup = () => {
                                     onChange={(event) => setPhone(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("phone") && <label className="error-label">phone number is required</label>}
+                                {invalidItems.includes("phone") && <label className="error-label">phone number is required</label>} */}
+                                <PhoneInput
+                                    country={'us'}
+                                    value={phone}
+                                    onChange={handlePhoneChange}
+                                    inputClass="form-control"
+                                    inputStyle={{
+                                        width: '100%'
+                                    }}
+                                    inputProps={{
+                                        name: 'phone',
+                                        required: true,
+                                        autoFocus: true
+                                    }}
+                                    required
+                                />
+                                {invalidItems.includes("phone") && <label className="error-label">Invalid phone format</label>}
                             </div>
+
                             {/* <div style={{ marginBottom: '20px' }}>
                                 <input
                                     type="country"
@@ -154,7 +187,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
                             </div> */}
-                            <div style={{ marginBottom: '20px' }}>
+                            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
                                 <Select
                                     isClearable
                                     name="country"
@@ -164,10 +197,24 @@ export const MentorSignup = () => {
                                             ...baseStyles,
                                             color: 'black',
                                         }),
-                                        // singleValue: (base) => ({
-                                        //     ...base,
-                                        //     color: '#000', // Customize text color of selected value
+                                        // TODO: Center the search text for Country & State : https://react-select.com/styles
+                                        // input: (provided) => ({
+                                        //     ...provided,
+                                        //     textAlign: 'center'
                                         // }),
+                                        // singleValue: (provided, state) => ({
+                                        //     ...provided,
+                                        //     textAlign: 'center', // Centers text in single value
+                                        // }),
+                                        // control: (provided) => ({
+                                        //     ...provided,
+                                        //     alignItems: 'center',
+                                        //     width: 300,
+                                        // }),
+                                        // control: (baseStyles, state) => ({
+                                        //     ...baseStyles,
+                                        //     textAlign: state.isFocused ? 'center' : 'center',
+                                        // })
                                         // option: (base, state) => ({
                                         //     ...base,
                                         //     backgroundColor: '#fff',
@@ -240,6 +287,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("city") && <label className="error-label">City is required</label>}
                             </div>
+                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, and CustomerLogin.js pages) */}
                             <div style={{ textAlign: 'center' }}>
                                 <button
                                     type="button"
@@ -271,3 +319,5 @@ export const MentorSignup = () => {
         </form>
     );
 }
+
+// TODO: When first going to the page, the user is taken straight to the phone number. Please fix this bug so that the user is taken to the top of the page on window.onload

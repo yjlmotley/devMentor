@@ -61,7 +61,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             editMentor: async (mentor) => {
                 console.log("Updating mentor with data:", mentor);
                 const token = getStore().token;
-                console.log("Token being used:", token);
+                // console.log("Token being used:", token);
                 console.log("Updating mentor with data:", mentor);
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/mentor/edit-self", {

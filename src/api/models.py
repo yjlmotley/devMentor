@@ -90,7 +90,7 @@ class Mentor(db.Model):
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
     past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
-    price = db.Column(db.Numeric(10,2))
+    price = db.Column(db.Numeric(10,2), nullable=True)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######

@@ -34,7 +34,7 @@ const phoneRegex = {
     'pk': /^92\d{10}$/,          // Pakistan: 10 digits after country code 92
     'rw': /^250\d{9}$/,          // Rwanda: 9 digits after country code 250
     'sg': /^65\d{8}$/,           // Singapore: 8 digits after country code 65
-    'sl': /^94\d{7}$/,           // Sri Lanka: 7 digits after country code 94
+    'sl': /^94\d{9}$/,           // Sri Lanka: 9 digits after country code 94
     'tz': /^255\d{9}$/,          // Tanzania: 9 digits after country code 255
     'ug': /^256\d{9}$/,          // Uganda: 9 digits after country code 256
     'us': /^1\d{10}$/,           // US: 10 digits after country code 1
@@ -107,3 +107,5 @@ const phoneRegex = {
     'yt': /^262\d{9}$/,          // Mayotte: 9 digits after country code 262
     'zw': /^263\d{9}$/,          // Zimbabwe: 9 digits after country code 263
 };
+
+export default phoneRegex;
