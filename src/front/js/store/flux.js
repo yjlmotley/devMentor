@@ -1,3 +1,4 @@
+
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
@@ -61,7 +62,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             editMentor: async (mentor) => {
                 console.log("Updating mentor with data:", mentor);
                 const token = getStore().token;
-                // console.log("Token being used:", token);
+                console.log("Token being used:", token);
                 console.log("Updating mentor with data:", mentor);
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/mentor/edit-self", {
@@ -140,31 +141,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     isMentorLoggedIn: false,
                     isCustomerLoggedIn: false
                 });
-
-                sessionStorage.clear();
-                // -- or -- (remove specific items from sessionStorage)
-                // sessionStorage.removeItem("token");
-                // sessionStorage.removeItem("customerId");
-
-                // console.log("Logged out. Updated store:", getStore());
-                console.log("Logged out. Token should be undefined:", getStore().token === undefined);
-            },
-
-            signUpCustomer: async (customer) => {
-                const response = await fetch(
-                    process.env.BACKEND_URL + "/api/customer/signup", {
-                    method: "POST",
-                    body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password, city: customer.city, what_state: customer.what_state, country: customer.country }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-                if (response.status !== 201) return false;
-
-                const responseBody = await response.json();
-                console.log(responseBody)
-
-                return true;
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("customerId");
+                console.log("Logged out:", getStore().token)
             },
 
             logInCustomer: async (customerCredentials) => {
@@ -175,7 +154,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("data from the flux.actions.logInCustomer", data);
                     setStore({
                         token: data.access_token,
                         customerId: data.customer_id,
@@ -203,7 +181,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/session/create", {
                     method: "POST",
-                    body: JSON.stringify({ title: session.title, details: session.details, skills: session.skills, schedule: session.schedule }),
+                    body: JSON.stringify({ 
+                        title: session.title,
+                        details: session.details,
+                        skills: session.skills,
+                        schedule: session.schedule,
+                        is_active: session.visibility,
+                        focusAreas: session.focusAreas,
+                        totalHours: session.totalHours,
+                        resourceLink: session.resourceLink
+                    }),
                     headers: {
                         "Content-Type": "application/json"
                     }
@@ -220,10 +207,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 fetch(
                     process.env.BACKEND_URL + "/api/sessions"
                 )
-                    .then(response => response.json())
-                    .then(data => setStore({
-                        sessionRequests: data
-                    }))
+                .then(response => response.json())
+                .then(data => setStore({
+                    sessionRequests: data
+                }))
             }
         }
     };

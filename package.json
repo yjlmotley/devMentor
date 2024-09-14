@@ -81,6 +81,7 @@
 		"react-phone-input-2": "^2.15.1",
 		"react-polyfills": "0.0.1",
 		"react-router-dom": "^6.3.0",
-		"react-select": "^5.8.0"
+		"react-select": "^5.8.0",
+		"react-slider": "^2.0.6"
 	}
 }
