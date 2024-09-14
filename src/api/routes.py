@@ -597,4 +597,3 @@ def delete_session(sess_id):
     db.session.delete(session)
     db.session.commit()
     return jsonify({"msg": "Session Sucessfully Deleted"}), 200
-

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-
+import "../../styles/navbar.css";
 
 
 export const Navbar = () => {
@@ -10,7 +10,7 @@ export const Navbar = () => {
 
 	const handleLogout = () => {
 		actions.logOut();
-		navigate("/mentor-login");
+		navigate("/");
 	}
 
 	return (
@@ -24,44 +24,76 @@ export const Navbar = () => {
 				</Link> */}
 
 				<div className="d-flex gap-2">
-					<div className="dropdown">
-						<button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<div className="dropdown navbar-dropdown">
+
+						<button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 							Customers
-							<i className="ms-2 fa-solid fa-school"></i>
+							<i className="ms-3 fa-solid fa-school" />
 						</button>
 						<ul className="dropdown-menu dropdown-menu-end mt-1">
-							<Link to="/customer-dashboard" className="dropdown-item bold-text text-end fa-solid fa-chalkboard"> Customer Dashboard</Link>
+							<Link to="/customer-dashboard" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Customer Dashboard</span>
+								<i className="fa-solid fa-chalkboard" />
+							</Link>
 							{/* {store.isCustomerLoggedIn ? ( */}
-								<>
-									<Link to="/create-session" className="dropdown-item bold-text text-end fa-solid fa-folder-plus"> Create Session</Link>
-									<button className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket" onClick={handleLogout}> Log out</button>
-								</>
+							{/* <> */}
+							<Link to="/create-session" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Create Session</span>
+								<i className="fa-solid fa-folder-plus" />
+							</Link>
+							<button className="dropdown-item bold-text text-end" onClick={handleLogout}>
+								<span className="navbarFont">Log Out</span>
+								<i className="fa-solid fa-right-from-bracket" />
+							</button>
+							{/* </> */}
 							{/* ) : ( */}
-								{/* <> */}
-								<Link to="/" className="dropdown-item bold-text text-end fa-solid fa-user-plus"> Customer Sign up</Link>
-								<Link to="/" className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket"> Log in</Link>
-								{/* </> */}
+							{/* <> */}
+							<Link to="/customer-signup" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Customer Sign Up</span>
+								<i className="fa-solid fa-user-plus" />
+							</Link>
+							<Link to="/customer-login" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Log In</span>
+								<i className="fa-solid fa-right-to-bracket" />
+							</Link>
+							{/* </> */}
 							{/* )} */}
 						</ul>
+
 					</div>
-					<div className="dropdown">
-						<button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<div className="dropdown navbar-dropdown">
+						<button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 							Mentors
-							<i className="ms-2 fa-solid fa-person-chalkboard"></i>
+							<i className="ms-3 fa-solid fa-person-chalkboard"></i>
 						</button>
 						<ul className="dropdown-menu dropdown-menu-end mt-1">
-							{/* {store.isMentorLoggedIn ? ( */}
-								<>
-									<Link to="/mentor-dashboard" className="dropdown-item bold-text text-end fa-solid fa-chalkboard" > Mentor Dashboard</Link>
-									<Link to="./mentor-profile" className="dropdown-item bold-text text-end fa-solid fa-id-card-clip"> Mentor Profile</Link>
-									<button className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket" onClick={handleLogout}> Log out</button>
-								</>
-							{/* ) : ( */}
-								{/* <> */}
-									<Link to="/mentor-signup" className="dropdown-item bold-text text-end fa-solid fa-user-plus"> Mentor Sign up</Link>
-									<Link to="/mentor-login" className="dropdown-item bold-text text-end fa-solid fa-right-to-bracket"> Log in</Link>
-								{/* </> */}
-							{/* )} */}
+							{/* {store.isMentorLoggedIn ? (
+								<>  */}
+							<Link to="/mentor-dashboard" className="dropdown-item bold-text text-end" >
+								<span className="navbarFont">Mentor Dashboard</span>
+								<i className="fa-solid fa-chalkboard" />
+							</Link>
+							<Link to="./mentor-profile" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Mentor Profile</span>
+								<i className="fa-solid fa-id-card-clip" />
+							</Link>
+							<button className="dropdown-item bold-text text-end" onClick={handleLogout}>
+								<span className="navbarFont">Log Out</span>
+								<i className="fa-solid fa-right-from-bracket" />
+							</button>
+							{/* </> 
+							) : ( 
+								<>  */}
+							<Link to="/mentor-signup" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Mentor Sign Up</span>
+								<i className="fa-solid fa-user-plus" />
+							</Link>
+							<Link to="/mentor-login" className="dropdown-item bold-text text-end">
+								<span className="navbarFont">Log In</span>
+								<i className="fa-solid fa-right-to-bracket" />
+							</Link>
+							{/* </> 
+							)}  */}
 						</ul>
 					</div>
 				</div>

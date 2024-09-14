@@ -1,30 +1,26 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { arrayOf } from "prop-types";
+import { Link } from "react-router-dom";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 import { ValidatePrice, ValidateNumber, ValidatePhoneNumber } from "../component/Validators";
-
+import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import { parsePhoneNumber, AsYouType } from 'libphonenumber-js';
-
 import "../../styles/mentorProfile.css";
-import { useAsync } from "react-select/async";
 
 import ProfilePhoto from "../component/ProfilePhoto";
 import PortfolioImage from "../component/PortfolioImage";
 
 
 export const MentorProfile = () => {
-	const { store, actions } = useContext(Context);
+	const { actions } = useContext(Context);
 	const [editMode, setEditMode] = useState(false);
 	const [originalMentor, setOriginalMentor] = useState({});
 	const [invalidItems, setInvalidItems] = useState([]);
 	const [phoneError, setPhoneError] = useState('');
+	const [CharacterCount, setCharacterCount] = useState(0);
 	const [mentor, setMentor] = useState({
 		email: '',
 		is_active: true,
@@ -41,6 +37,22 @@ export const MentorProfile = () => {
 		price: '',
 		about_me: '',
 	});
+
+
+	useEffect(() => {
+		fetch(process.env.BACKEND_URL + "/api/mentor", {
+			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
+		})
+			.then(resp => resp.json())
+			.then(data => {
+				setMentor(data);
+				setOriginalMentor(data);
+			})
+			// .then(() => { setLoading(false) })
+			.catch(error => console.log(error))
+
+	}, []);
+
 	const placeholderImage = 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg'; // Path to your placeholder image
 	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg']
 	const profileImageUrl = mentor.profile_photo?.image_url || placeholderImage;
@@ -59,7 +71,6 @@ export const MentorProfile = () => {
 		setEditMode(false);
 	};
 
-	const [CharacterCount, setCharacterCount] = useState(0);
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		let x = value
@@ -82,19 +93,11 @@ export const MentorProfile = () => {
 	};
 
 
-
 	const handleSelectChange = (selectedOptions, { name }) => {
 		const values = selectedOptions ? selectedOptions.map(option => option.label) : [];
 		setMentor((prevMentorInfo) => ({
 			...prevMentorInfo,
 			[name]: values
-		}));
-	};
-
-	const handleStateChange = (selectedOption) => {
-		setMentor((prevMentorInfo) => ({
-			...prevMentorInfo,
-			what_state: selectedOption ? selectedOption.value : '',
 		}));
 	};
 
@@ -105,28 +108,48 @@ export const MentorProfile = () => {
 		}));
 	};
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setInvalidItems([]);
-		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems);
-		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
-		const phoneValidation = ValidatePhoneNumber(mentor.phone, selectedCountry);
-		if (isPriceValid && isYearValid && phoneValidation.isValid) {
-			const success = await actions.editMentor(mentor);
-			if (success) {
-				alert('Mentor information updated sucessfully')
-				setEditMode(false)
-			} else {
-				alert('Failed to update mentor information')
-			}
-		} else {
-			if (!phoneValidation.isValid) {
-				setPhoneError(phoneValidation.message);
-			}
-			console.log("Invalid inputs:", invalidItems);
-			console.log(mentor.phone);
-		}
+	const handleStateChange = (selectedOption) => {
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
+			what_state: selectedOption ? selectedOption.value : '',
+		}));
 	};
+
+	const handlePriceChange = (event) => {
+		const { value } = event.target;
+		setMentor((prevMentorInfo) => ({
+			...prevMentorInfo,
+			price: value.trim() === "" ? null : value,
+		}));
+	}
+
+
+	const [selectedCountry, setSelectedCountry] = useState();
+	const handlePhoneChange = (value, countryData) => {
+		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
+		setSelectedCountry(countryData.countryCode);
+		if (phoneValidation.isValid) {
+			setPhoneError('');
+		} else {
+			setPhoneError(phoneValidation.message);
+		}
+		console.log(value);
+		setMentor(prevMentorInfo => ({
+			...prevMentorInfo,
+			phone: value
+		}));
+	};
+
+	// const customStyles = {
+	// 	option: (provided, state) => ({
+	// 		...provided,
+	// 		color: state.data.type === 'colour' ? 'blue' : 'green',
+	// 	}),
+	// 	multiValue: (provided, state) => ({
+	// 		...provided,
+	// 		backgroundColor: state.data.type === 'colour' ? 'lightblue' : 'lightgreen',
+	// 	}),
+	// };
 
 	const handleDeactivate = async () => {
 		const token = sessionStorage.getItem('token');
@@ -171,52 +194,33 @@ export const MentorProfile = () => {
 		}
 	}
 
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-	const [selectedCountry, setSelectedCountry] = useState();
-
-	const handlePhoneChange = (value, countryData) => {
-		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
-		setSelectedCountry(countryData.countryCode);
-		if (phoneValidation.isValid) {
-			setPhoneError('');
-		} else {
-			setPhoneError(phoneValidation.message);
+		if (mentor.price === "None") {
+			setMentor((prevMentorInfo) => ({
+				...prevMentorInfo,
+				price: null,
+			}));
+			return;
 		}
-		console.log(value);
-		setMentor(prevMentorInfo => ({
-			...prevMentorInfo,
-			phone: value
-		}));
+		setInvalidItems([]);
+		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems, setMentor);
+		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
+
+		if (isPriceValid && isYearValid) {
+			const success = await actions.editMentor(mentor);
+			if (success) {
+				alert('Mentor information updated sucessfully')
+				setEditMode(false)
+			} else {
+				alert('Failed to update mentor information')
+			}
+		}
 	};
-
-	// const customStyles = {
-	// 	option: (provided, state) => ({
-	// 		...provided,
-	// 		color: state.data.type === 'colour' ? 'blue' : 'green',
-	// 	}),
-	// 	multiValue: (provided, state) => ({
-	// 		...provided,
-	// 		backgroundColor: state.data.type === 'colour' ? 'lightblue' : 'lightgreen',
-	// 	}),
-	// };
-
-	useEffect(() => {
-		fetch(process.env.BACKEND_URL + "/api/mentor", {
-			headers: { Authorization: "Bearer " + sessionStorage.getItem("token") }
-		})
-			.then(resp => resp.json())
-			.then(data => {
-				setMentor(data);
-				setOriginalMentor(data);
-			})
-			// .then(() => { setLoading(false) })
-			.catch(error => console.log(error))
-	}, []);
-
 
 
 	return (
-
 
 		<div className="container mt-5">
 			<h2 className="mb-4 text-center">
@@ -295,7 +299,7 @@ export const MentorProfile = () => {
 									{phoneError && <div className="text-danger">{phoneError}</div>}
 								</>
 							) : (
-								// mentor.phone && formatPhoneNumber(`+${mentor.phone}`)
+								// TODO: If extra time: change the font of the phone input disabled number so it matches the rest of the font text on the page
 								<PhoneInput
 									disabled
 									country={'us'}
@@ -434,15 +438,19 @@ export const MentorProfile = () => {
 									<input
 										type="text"
 										name="price"
-										value={mentor.price || ''}
-										onChange={handleChange}
+										value={mentor.price || null}
+										onChange={handlePriceChange}
+										// TODO: After signing up, the default value of price goes to "" which then the input changes to None.
+										// The first time you hit send, it'll give you an error then change it to null, then the next time it pushes thru
+										// Figure out a better situation for this
 										className="form-control"
 									/>
 									<span className="input-group-text">/hr</span>
 								</div>
 							) : (
-								mentor.price ? `$${mentor.price} /hr` : ''
+								mentor.price && mentor.price !== "None" ? `$${mentor.price} /hr` : ''
 							)}
+							{/* TODO: Make sure the invalideItems errors go away/reset if you hit 'cancel changes' button */}
 							{invalidItems.includes("price") &&
 								<label className="error-label alert alert-danger" role="alert" style={{
 									padding: '0.5rem',

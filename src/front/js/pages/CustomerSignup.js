@@ -10,7 +10,7 @@ import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
 
 
-export const MentorSignup = () => {
+export const CustomerSignup = () => {
     const navigate = useNavigate();
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
@@ -39,7 +39,7 @@ export const MentorSignup = () => {
         let isCityValid = ValidateCity(city, setInvalidItems);
         let isPhoneValid = ValidatePhone(phone, countryCode, setInvalidItems);
         if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isPhoneValid) {
-            const success = await actions.signUpMentor({
+            const success = await actions.signUpCustomer({
                 email: email,
                 password: password,
                 first_name: first_name,
@@ -50,7 +50,7 @@ export const MentorSignup = () => {
                 country: country
             });
             if (success) {
-                navigate("/mentor-login");
+                navigate("/customer-login");
             } else {
                 alert("something went wrong");
             }
@@ -69,11 +69,11 @@ export const MentorSignup = () => {
     };
 
     const handlePhoneChange = (value, countryData) => {
-        const countryCode = countryData?.countryCode || "us";
+        const countryCode = countryData?.countryCode || "us"; 
         setCountryCode(countryData?.countryCode || "us");
 
         setPhone(value);
-
+        
         // comment out the bottom 4 lines if you do not want to see the phone error before form submission
         const isPhoneValid = ValidatePhone(value, countryCode, setInvalidItems);
         if (isPhoneValid) {
@@ -88,11 +88,12 @@ export const MentorSignup = () => {
             event.preventDefault();
             handleSignup();
         }}>
+            {/* <div className="container pt-5 bg-black "> */}
             <div style={{ width: '100%', maxWidth: '1000px', margin: '30px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
                 <div className="row justify-content-center">
                     <div className="col-md-6 pb-5 text-light authDiv" >
                         <div style={{ padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 50px rgba(255, 255, 255, 0.2)', border: '1px solid white' }}>
-                            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome Mentors!</h2>
+                            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome!</h2>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
                                     type="email"
@@ -175,7 +176,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("phone") && <label className="error-label">Invalid phone format</label>}
                             </div>
-
+                            
                             {/* <div style={{ marginBottom: '20px' }}>
                                 <input
                                     type="country"
@@ -187,7 +188,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
                             </div> */}
-                            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                            <div style={{ marginBottom: '20px' }}>
                                 <Select
                                     isClearable
                                     name="country"
@@ -197,24 +198,10 @@ export const MentorSignup = () => {
                                             ...baseStyles,
                                             color: 'black',
                                         }),
-                                        // TODO: Center the search text for Country & State : https://react-select.com/styles
-                                        // input: (provided) => ({
-                                        //     ...provided,
-                                        //     textAlign: 'center'
+                                        // singleValue: (base) => ({
+                                        //     ...base,
+                                        //     color: '#000', // Customize text color of selected value
                                         // }),
-                                        // singleValue: (provided, state) => ({
-                                        //     ...provided,
-                                        //     textAlign: 'center', // Centers text in single value
-                                        // }),
-                                        // control: (provided) => ({
-                                        //     ...provided,
-                                        //     alignItems: 'center',
-                                        //     width: 300,
-                                        // }),
-                                        // control: (baseStyles, state) => ({
-                                        //     ...baseStyles,
-                                        //     textAlign: state.isFocused ? 'center' : 'center',
-                                        // })
                                         // option: (base, state) => ({
                                         //     ...base,
                                         //     backgroundColor: '#fff',
@@ -287,7 +274,6 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("city") && <label className="error-label">City is required</label>}
                             </div>
-                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, and CustomerLogin.js pages) */}
                             <div style={{ textAlign: 'center' }}>
                                 <button
                                     type="button"
@@ -310,7 +296,7 @@ export const MentorSignup = () => {
                                 </button>
                             </div>
                             <div>
-                                <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
+                                <Link to='/customer-login' className="customer-login-link">Already have an account?</Link>
                             </div>
                         </div>
                     </div>
@@ -319,5 +305,3 @@ export const MentorSignup = () => {
         </form>
     );
 }
-
-// TODO: When first going to the page, the user is taken straight to the phone number. Please fix this bug so that the user is taken to the top of the page on window.onload
