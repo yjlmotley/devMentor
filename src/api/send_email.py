@@ -6,7 +6,7 @@ MAIL_SERVER="smtp.gmail.com"
 #replace with your email providers smtp server if needed
 MAIL_PORT = 465 #TLS PORT
 MAIL_USE_TLS = True
-MAIL_USERNAME= os.getenv("GMAIL")
+MAIL_USERNAME = os.getenv("GMAIL")
 MAIL_PASSWORD = os.getenv("GMAIL_PASSWORD")
 
 def send_email(recipient, body, subject):

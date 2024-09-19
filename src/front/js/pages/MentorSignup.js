@@ -287,7 +287,7 @@ export const MentorSignup = () => {
                                 />
                                 {invalidItems.includes("city") && <label className="error-label">City is required</label>}
                             </div>
-                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, and CustomerLogin.js pages) */}
+                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, CustomerLogin, Forgot/Reset/Change Password pages) */}
                             <div style={{ textAlign: 'center' }}>
                                 <button
                                     type="button"
