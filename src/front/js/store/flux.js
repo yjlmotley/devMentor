@@ -1,3 +1,4 @@
+
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
@@ -90,7 +91,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             editMentor: async (mentor) => {
                 console.log("Updating mentor with data:", mentor);
                 const token = getStore().token;
-                // console.log("Token being used:", token);
+                console.log("Token being used:", token);
                 console.log("Updating mentor with data:", mentor);
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/mentor/edit-self", {
@@ -212,7 +213,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("data from the flux.actions.logInCustomer", data);
                     setStore({
                         token: data.access_token,
                         customerId: data.customer_id,
@@ -240,7 +240,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/session/create", {
                     method: "POST",
-                    body: JSON.stringify({ title: session.title, details: session.details, skills: session.skills, schedule: session.schedule }),
+                    body: JSON.stringify({ 
+                        title: session.title,
+                        details: session.details,
+                        skills: session.skills,
+                        schedule: session.schedule,
+                        is_active: session.visibility,
+                        focusAreas: session.focusAreas,
+                        totalHours: session.totalHours,
+                        resourceLink: session.resourceLink
+                    }),
                     headers: {
                         "Content-Type": "application/json"
                     }
@@ -257,10 +266,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 fetch(
                     process.env.BACKEND_URL + "/api/sessions"
                 )
-                    .then(response => response.json())
-                    .then(data => setStore({
-                        sessionRequests: data
-                    }))
+                .then(response => response.json())
+                .then(data => setStore({
+                    sessionRequests: data
+                }))
             }
         }
     };
