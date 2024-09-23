@@ -436,18 +436,20 @@ def customer_signup():
    
     first_name = request.json.get("first_name", None)
     last_name = request.json.get("last_name", None)
-    address = request.json.get("address", None)
+    city = request.json.get("city", None)
+    what_state = request.json.get("what_state",None)
+    country = request.json.get("country",None)
     phone = request.json.get("phone", None)
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     
     
-    if first_name is None or last_name is None or phone is None or email is None or password is None:
+    if first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None or email is None or password is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     customer = Customer.query.filter_by(email=email).one_or_none()
     if customer:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
-    customer = Customer(first_name=first_name, last_name=last_name, address=address, phone=phone, email=email, password=password)
+    customer = Customer(first_name=first_name, last_name=last_name, city=city, what_state=what_state, country=country, phone=phone, email=email, password=password)
     db.session.add(customer)
     db.session.commit()
     db.session.refresh(customer)
@@ -460,10 +462,12 @@ def handle_customer_edit_by_customer():
     email = request.json.get("email")
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
-    address = request.json.get("address")
+    city = request.json.get("city")
+    what_state = request.json.get("what_state",None)
+    country = request.json.get("country",None)
     phone = request.json.get("phone")
     
-    if email is None or first_name is None or last_name is None or address is None or phone is None:
+    if email is None or first_name is None or last_name is None or city is None or what_state is None is None or country is None or phone is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
    
     customer = Customer.query.filter_by(id=get_jwt_identity()).first()
@@ -473,7 +477,9 @@ def handle_customer_edit_by_customer():
     customer.email=email 
     customer.first_name=first_name   
     customer.last_name=last_name 
-    customer.address=address    
+    customer.city=city    
+    customer.what_state=what_state    
+    customer.country=country    
     customer.phone=phone
     db.session.commit()
     db.session.refresh(customer)
