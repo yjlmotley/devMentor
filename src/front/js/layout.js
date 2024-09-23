@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
+import { Context } from "./store/appContext";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
@@ -31,6 +32,14 @@ const Layout = () => {
     const basename = process.env.BASENAME || "";
 
     if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+
+    const { actions } = useContext(Context);
+    
+    useEffect(() => {
+        setInterval(() => {
+            actions.getCurrentUser()
+        }, 60000)
+    }, []);
 
     return (
         <div>

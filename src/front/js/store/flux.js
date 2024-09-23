@@ -5,16 +5,45 @@ const getState = ({ getStore, getActions, setStore }) => {
             isMentorLoggedIn: false,
             isCustomerLoggedIn: false,
             mentors: [],
+            currentUserData: null,
             sessionRequests: [],
             customerId: undefined,
             // sessions: [],
             // message: null,
             token: sessionStorage.getItem("token"),
-            sessionStorageChecked: !!sessionStorage.getItem("token")
+            // sessionStorageChecked: !!sessionStorage.getItem("token")
         },
 
         actions: {
 
+            getCurrentUser: async () => {
+                const response = await fetch(`${process.env.BACKEND_URL}/api/current/user`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('token')
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("userdata from token", data);
+                    if (data.role == "mentor") {
+                        setStore({
+                            isMentorLoggedIn: true,
+                            currentUserData: data
+                        })
+                    }
+                    if (data.role == "customer") {
+                        setStore({
+                            isCustomerLoggedIn: true,
+                            currentUserData: data
+                        })
+                    }
+                } else {
+                    console.error("Login failed with status:", response.status);
+                    getActions().logOut()
+                }
+            },
             checkStorage: () => {
                 const token = sessionStorage.getItem("token", undefined)
                 const customer_id = sessionStorage.getItem("customerId", undefined)
@@ -135,15 +164,45 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             logOut: () => {
+                if (getStore().isMentorLoggedIn) {
+                    window.location.href = process.env.FRONTEND_URL + "/mentor-login"
+                }
+                if (getStore().isCustomerLoggedIn) {
+                    window.location.href = process.env.FRONTEND_URL + "/customer-login"
+                }
+
                 setStore({
                     token: undefined,
                     customerId: undefined,
                     isMentorLoggedIn: false,
-                    isCustomerLoggedIn: false
+                    isCustomerLoggedIn: false,
+                    currentUserData: null
                 });
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("customerId");
-                console.log("Logged out:", getStore().token)
+
+                sessionStorage.clear();
+                // -- or -- (remove specific items from sessionStorage)
+                // sessionStorage.removeItem("token");
+                // sessionStorage.removeItem("customerId");
+
+                // console.log("Logged out. Updated store:", getStore());
+                console.log("Logged out. Token should be undefined:", getStore().token === undefined);
+            },
+
+            signUpCustomer: async (customer) => {
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/customer/signup", {
+                    method: "POST",
+                    body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password, city: customer.city, what_state: customer.what_state, country: customer.country }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (response.status !== 201) return false;
+
+                const responseBody = await response.json();
+                console.log(responseBody)
+
+                return true;
             },
 
             logInCustomer: async (customerCredentials) => {

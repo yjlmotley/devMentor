@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from flask_cors import CORS
 import jwt
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import cloudinary.uploader as uploader
@@ -27,6 +27,27 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 
+
+@api.route('/current/user')
+@jwt_required()
+def get_current_user():
+    user_id = get_jwt_identity()
+    role = get_jwt()['role']
+
+    if role == 'mentor':
+        mentor = Mentor.query.get(user_id)
+        if mentor is None:
+            return jsonify({"msg": "No user with this email exists."}), 404
+        return jsonify(role = "mentor", user_data = mentor.serialize())
+    
+    if role == 'customer':
+        customer = Customer.query.get(user_id)
+        if customer is None:
+            return jsonify({"msg": "No user with this email exists."}), 404
+        return jsonify(role = "customer", user_data = customer.serialize())
+
+
+# Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
 # Mentor routes Start # Mentor routes Start # Mentor routes Start
@@ -132,7 +153,9 @@ def reset_password(token):
     # if not email:
     #     return jsonify({"message": "Invalid token data."}), 400
 
-    # user = User.query.filter_by(email=email).first()
+    mentor = Mentor.query.filter_by(email=email).first()
+    customer = Customer.query.filter_by(email=email).first()
+
     user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
     if not user:
         return jsonify({"message": "Email does not exist"}), 400
@@ -143,7 +166,11 @@ def reset_password(token):
 
     send_email(email, "Your password has been changed successfully.", "Password Change Notification")
 
-    return jsonify({"message": "Password successfully changed."}), 200
+    return jsonify({
+        "message": "Password successfully changed.", 
+        "role": "mentor" if mentor else "customer" if customer else None
+    }), 200
+
 
 @api.route("/change-password", methods=["PUT"])
 @jwt_required()  # This ensures that the request includes a valid JWT token
