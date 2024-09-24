@@ -1,3 +1,8 @@
-/* 
-    General Styles used on every website (Don't Repeat Yourself)
-*/
+.authDiv input {
+    text-align: center;
+}
+
+input.form-control.disabled.border-0 {
+    /* this is for the Mentor Profile's phone input view */
+    background-color: transparent;
+}

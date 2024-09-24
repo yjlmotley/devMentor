@@ -1,0 +1,21 @@
+const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    console.log(files)
+    files.forEach(file => {
+      const file_size = file.size
+      if (file_size <= 100000) {
+        console.log(">>> files", files);
+        setImageSizeError(false)
+        
+        
+        setUploadedImages((prev) => ([
+          ...prev,
+          file
+        ]));
+      } else {
+        setImageSizeError(true)
+      }
+    })
+    console.log(file_size)
+      
+  };
