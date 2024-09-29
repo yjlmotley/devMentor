@@ -28,6 +28,7 @@ class Customer(db.Model):
     about_me = db.Column(db.String(2500), unique=False)
 
     profile_photo = db.relationship("CustomerImage", back_populates="customer", uselist=False)
+    sessions = db.relationship("Session", back_populates="customer", lazy="dynamic")
 
     def __repr__(self):
         return f'<Customer {self.email}>'
@@ -47,7 +48,8 @@ class Customer(db.Model):
             "past_sessions": [past_session for past_session in self.past_sessions],
             "date_joined": self.date_joined,
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
-            "about_me": self.about_me
+            "about_me": self.about_me,
+            "sessions": [session.id for session in self.sessions]
         }
     
 class CustomerImage(db.Model):
@@ -131,14 +133,19 @@ class Mentor(db.Model):
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), unique=False, nullable=False)
-    details = db.Column(db.String(2500), unique=False, nullable=False)
-    skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
+    description = db.Column(db.String(2500), unique=False, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
-    focusAreas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    totalHours = db.Column(db.Integer)
+    focus_areas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
+    skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     resourceLink = db.Column(db.String(255))
+    duration = db.Column(db.String(25), unique=False, nullable=False)
+    totalHours = db.Column(db.Integer)
+
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    customer = db.relationship("Customer", back_populates="sessions")
+    
     
 
     def __repr__(self):
@@ -148,14 +155,16 @@ class Session(db.Model):
         return {
             "id": self.id, 
             "title": self.title,
-            "details": self.details,
-            "skills": [skill for skill in self.skills],
-            "schedule": self.schedule,
+            "description": self.description,
             "is_active": self.is_active,
+            "schedule": self.schedule,
             "time_created": self.time_created,
-            "focusAreas": [focusArea for focusArea in self.focusAreas],
+            "focus_areas": [focus_area for focus_area in self.focus_areas],
+            "skills": [skill for skill in self.skills],
+            "resourceLink": self.resourceLink,
+            "duration": self.duration,
             "totalHours": self.totalHours,
-            "resourceLink": self.resourceLink
+            "customer_id": self.customer_id
         }
 
 class MentorImage(db.Model):

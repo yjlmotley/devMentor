@@ -1,63 +1,97 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
-
 import { Context } from "../store/appContext";
+import "../../styles/MentorSessionBoard.css";
 
 export const MentorSessionBoard = () => {
 	const { store, actions } = useContext(Context);
+	const [activeTab, setActiveTab] = useState('all');
 
 	useEffect(() => {
-		actions.getAllSessionRequests()
-	}, [])
+		actions.getAllSessionRequests();
+	}, []);
 
-	const formatSchedule = (day, schedule) => {
-		if (schedule && schedule[day] && schedule[day].start && schedule[day].end) {
-			return `${schedule[day].start} - ${schedule[day].end}`;
-		}
-		return "Not available";
+	const formatTime = (minutes) => {
+		const hours = Math.floor(minutes / 60);
+		const mins = minutes % 60;
+		return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+	};
+
+	const formatSchedule = (schedule) => {
+		return Object.entries(schedule)
+			.filter(([day, slot]) => slot.checked)
+			.map(([day, slot]) => `${day.charAt(0).toUpperCase() + day.slice(1)}: ${formatTime(slot.start)} - ${formatTime(slot.end)}`)
+			.join(', ');
 	};
 
 	return (
-		<div className="container">
-			<h2>TBD: MENTOR SESSION BOARD</h2>
-			<ul class="list-group">
-				{store.sessionRequests.map((request, index) => {
-					return (
-						<li class="list-group-item">
-							<div key={request.id} className="col-md-4 mb-3">
-								<div className="card h-100">
-									<div className="card-body">
-										<h5 className="card-title">{request.title}</h5>
-										<p className="card-text">{request.details}</p>
-										<h6>Skills:</h6>
-										<ul>
-											{request.skills.map((skill, index) => (
-												<li key={index}>{skill}</li>
-											))}
-										</ul>
-										<h6>Schedule:</h6>
-										<p>Monday: {formatSchedule('monday', request.schedule)}</p>
-										<p>Saturday: {formatSchedule('saturday', request.schedule)}</p>
-										<p>Wednesday: {formatSchedule('wednesday', request.schedule)}</p>
-									</div>
-									<div className="card-footer">
-										<small className="text-muted">Created at: {new Date(request.time_created).toLocaleString()}</small>
-										<Link to="/">
-											<button className="btn btn-primary">Submit Bid</button>
-										</Link>
-									</div>
-								</div>
-							</div>
-						</li>
-					)
-				})}
+		<div className="session-board-container">
+			<div className="session-board card-custom">
+				<div className="d-flex justify-content-between align-items-center mb-4">
+					<h1 className="session-title">Sessions</h1>
+					<div>
+						<button className="btn btn-primary custom-create-btn">Create session</button>
+						<button className="btn btn-link">
+							<i className="bi bi-person-circle profile-icon"></i>
+						</button>
+					</div>
+				</div>
 
+				<ul className="nav nav-tabs mb-3 custom-nav-tabs">
+					<li className="nav-item">
+						<button
+							className={`nav-link ${activeTab === 'all' ? 'active' : ''}`}
+							onClick={() => setActiveTab('all')}
+						>
+							All
+						</button>
+					</li>
+					<li className="nav-item">
+						<button
+							className={`nav-link ${activeTab === 'upcoming' ? 'active' : ''}`}
+							onClick={() => setActiveTab('upcoming')}
+						>
+							Upcoming
+						</button>
+					</li>
+				</ul>
 
-			</ul>
-			<br />
-			<Link to="/">
-				<button className="btn btn-primary">Back home</button>
-			</Link>
+				<div className="table-responsive">
+					<table className="table table-hover custom-table">
+						<thead>
+							<tr>
+								<th>Session</th>
+								<th>Description</th>
+								<th>Skills</th>
+								<th>Schedule</th>
+								<th>Created</th>
+								<th>Focus areas</th>
+								<th>Resource_link</th>
+								<th>Actions</th>
+								
+							</tr>
+						</thead>
+						<tbody>
+							{store.sessionRequests.map((session) => (
+								<tr key={session.id}>
+									<td>{session.title}</td>
+									<td>{session.description}</td>
+									<td>{session.skills.join(', ')}</td>
+									<td>{formatSchedule(session.schedule)}</td>
+									<td>{new Date(session.time_created).toLocaleDateString()}</td>
+									<td>{session.focus_areas.join(', ')}</td>
+									<td> <a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+									{session.resourceLink}</a>
+									</td>
+									<td>
+										<Link to="/" className="btn btn-primary btn-sm">Submit Bid</Link>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</div>
 		</div>
 	);
 };
