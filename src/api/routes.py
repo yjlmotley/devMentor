@@ -532,18 +532,26 @@ def session_by_id(session_id):
 
 @api.route('/session/create', methods=['POST'])
 def create_session():
+    customer_id = request.json.get("customer_id")
     title = request.json.get("title", None)
-    details = request.json.get("details", None)
-    skills = request.json.get("skills", None)
-    schedule = request.json.get("schedule", None)
+    description = request.json.get("description", None)
     is_active = request.json.get("is_active", None)
-    focusAreas = request.json.get("focusAreas", None)
-    totalHours = request.json.get("totalHours", None)
+    schedule = request.json.get("schedule", None)
+    focus_areas = request.json.get("focus_areas", None)
+    skills = request.json.get("skills", None)
     resourceLink = request.json.get("resourceLink", None)
+    duration = request.json.get("duration", None)
+    totalHours = request.json.get("totalHours", None)
+    
 
-    # Check if all required fields are present
-    if title is None or details is None or skills is None or schedule is None or is_active is None or focusAreas is None or totalHours is None or resourceLink is None:
-        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    # # Check if all required fields are present
+    # if title is None or description is None or is_active is None or schedule is None or focus_areas is None or skills is None or resourceLink is None or duration is None or totalHours is None:
+    #     return jsonify({"msg": "Some fields are missing in your request"}), 400
+    
+    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
+
+    if missing_fields:
+        return jsonify({"msg": f"Missing fields: {', '.join(missing_fields)}"}), 400
 
     # Validate data types
     if not isinstance(skills, list):
@@ -560,14 +568,17 @@ def create_session():
 
     # Create and save the new session
     session = Session(
+        customer_id=customer_id,
         title=title,
-        details=details,
-        skills=skills,
-        schedule=schedule,
+        description=description,
         is_active=is_active,
-        focusAreas=focusAreas,
+        schedule=schedule,
+        focus_areas=focus_areas,
+        skills=skills,
+        resourceLink=resourceLink,
+        duration = duration,
         totalHours=totalHours,
-        resourceLink=resourceLink
+        
     )
     db.session.add(session)
     db.session.commit()
@@ -587,11 +598,11 @@ def edit_session(session_id):
 
     # Extract and validate input data
     title = request.json.get("title")
-    details = request.json.get("details")
+    description = request.json.get("description")
     skills = request.json.get("skills")
     schedule = request.json.get("schedule")
 
-    if title is None or details is None or skills is None or schedule is None:
+    if title is None or description is None or skills is None or schedule is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
 
     # Validate data types
@@ -608,7 +619,7 @@ def edit_session(session_id):
 
     # Update the session
     session.title = title
-    session.details = details
+    session.description = description
     session.skills = skills
     session.schedule = schedule
     db.session.commit()

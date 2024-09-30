@@ -240,15 +240,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/session/create", {
                     method: "POST",
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
+                        customer_id: session.customer_id,
                         title: session.title,
-                        details: session.details,
-                        skills: session.skills,
+                        description: session.description,
+                        is_active: session.is_active,
                         schedule: session.schedule,
-                        is_active: session.visibility,
-                        focusAreas: session.focusAreas,
+                        focus_areas: session.focus_areas,
+                        skills: session.skills,
+                        resourceLink: session.resourceLink,
+                        duration: session.duration,
                         totalHours: session.totalHours,
-                        resourceLink: session.resourceLink
                     }),
                     headers: {
                         "Content-Type": "application/json"
@@ -266,10 +268,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 fetch(
                     process.env.BACKEND_URL + "/api/sessions"
                 )
-                .then(response => response.json())
-                .then(data => setStore({
-                    sessionRequests: data
-                }))
+                    .then(response => response.json())
+                    .then(data => setStore({
+                        sessionRequests: data
+                    }))
             }
         }
     };
