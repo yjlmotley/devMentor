@@ -63,7 +63,7 @@ export const CreateSession = () => {
     if(!store.token) {
         navigate("/customer-login");
     }
-}, [store.token])
+  }, [store.token])
 
   const handleSubmit = async (event) => {
     event.preventDefault();

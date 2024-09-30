@@ -8,7 +8,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             currentUserData: null,
             sessionRequests: [],
             customerId: undefined,
-            // sessions: [],
+            customerSessions: [],
             // message: null,
             token: sessionStorage.getItem("token"),
             // sessionStorageChecked: !!sessionStorage.getItem("token")
@@ -272,6 +272,33 @@ const getState = ({ getStore, getActions, setStore }) => {
                     .then(data => setStore({
                         sessionRequests: data
                     }))
+            },
+
+            getCustomerSessions: async () => {
+                const store = getStore();
+                const token = sessionStorage.getItem('token');
+
+                if (!token) {
+                    console.error("No token found in sessionStorage");
+                    return;
+                }
+
+                const response = await fetch(
+                    process.env.BACKEND_URL + "/api/sessions/customer", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + sessionStorage.getItem('token')
+                        }
+                    }
+                )
+                if (response.ok) {
+                    const sessions = await response.json();
+                    console.log("Customer sessions:", sessions);
+                    setStore({...store, customerSessions: sessions})
+                } else {
+                    console.error("Failed to fetch customer sessions with status:", response.status);
+                }
             }
         }
     };

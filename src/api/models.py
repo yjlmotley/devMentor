@@ -88,21 +88,17 @@ class Mentor(db.Model):
     city = db.Column(db.String(30), unique=False, nullable=False)
     what_state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
+    about_me = db.Column(db.String(2500), unique=False)
     years_exp = db.Column(db.String(30), unique=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
-    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
     price = db.Column(db.Numeric(10,2), nullable=True)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
-    
+    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
+    confirmed_sessions = db.relationship("Session", back_populates="mentor")
+
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
     portfolio_photos = db.relationship("PortfolioPhoto", back_populates="mentor")   ######
-
-    # ratings = 
-    about_me = db.Column(db.String(2500), unique=False)
-    
-    
-    
 
     def __repr__(self):
         return f'<Mentor {self.email}>'
@@ -123,6 +119,7 @@ class Mentor(db.Model):
             "years_exp": self.years_exp,
             "skills": [skill for skill in self.skills],
             "past_sessions": [past_session for past_session in self.past_sessions],
+            "confirmed_sessions": [confirmed_session for confirmed_session in self.confirmed_sessions],
             "days": [day for day in self.days],
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "portfolio_photos": [portfolio_photo.serialize() for portfolio_photo in self.portfolio_photos],
@@ -146,7 +143,8 @@ class Session(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     customer = db.relationship("Customer", back_populates="sessions")
     
-    
+    mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=True)
+    mentor = db.relationship("Mentor", back_populates="confirmed_sessions")
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -164,7 +162,8 @@ class Session(db.Model):
             "resourceLink": self.resourceLink,
             "duration": self.duration,
             "totalHours": self.totalHours,
-            "customer_id": self.customer_id
+            "customer_id": self.customer_id,
+            "mentor_id": self.mentor_id
         }
 
 class MentorImage(db.Model):

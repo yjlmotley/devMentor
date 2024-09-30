@@ -401,17 +401,17 @@ def all_customers():
    customers = Customer.query.all()
    return jsonify([customer.serialize() for customer in customers]), 200
 
-@api.route('/customer/<int:cust_id>', methods=['GET'])
-# @mentor_required()
-def customer_by_id(cust_id):
-    # current_user_id = get_jwt_identity()
-    # current_user = User.query.get(current_user_id)
+# @api.route('/customer/<int:cust_id>', methods=['GET'])
+# # @mentor_required()
+# def customer_by_id(cust_id):
+#     # current_user_id = get_jwt_identity()
+#     # current_user = User.query.get(current_user_id)
 
-    customer = Customer.query.get(cust_id)
-    if customer is None:
-        return jsonify({"msg": "No customer found"}), 404
+#     customer = Customer.query.get(cust_id)
+#     if customer is None:
+#         return jsonify({"msg": "No customer found"}), 404
     
-    return jsonify(customer.serialize()), 200
+#     return jsonify(customer.serialize()), 200
 
 @api.route('/customer/login', methods=['POST'])
 def customer_login():
@@ -513,6 +513,9 @@ def delete_customer(cust_id):
     db.session.delete(customer)
     db.session.commit()
     return jsonify({"msg": "customer successfully deleted"}), 200
+
+
+    
 
 # Session Routes Start
 
@@ -641,3 +644,17 @@ def delete_session(sess_id):
     db.session.delete(session)
     db.session.commit()
     return jsonify({"msg": "Session Sucessfully Deleted"}), 200
+
+@api.route('/sessions/customer', methods=['GET'])
+@customer_required
+def get_sessions_by_customer_id():
+    cust_id = get_jwt_identity()
+    print(f"Customer ID from JWT: {cust_id}")
+
+    customer = Customer.query.get(cust_id)
+    if not customer:
+        return jsonify({"msg": "Customer not found"}), 404
+    
+    sessions = [session.serialize() for session in customer.sessions]
+
+    return jsonify(sessions), 200
