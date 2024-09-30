@@ -7,9 +7,20 @@ export const MentorSessionBoard = () => {
 	const { store, actions } = useContext(Context);
 	const [activeTab, setActiveTab] = useState('all');
 
+	const [characterCount, setCharacterCount] = useState(0);
+	const [ message, setMessage ] = useState("")
+
 	useEffect(() => {
 		actions.getAllSessionRequests();
 	}, []);
+
+	const handleMessage = (e) => {
+        const value = e.target.value;
+        if (value.length <= 2500) {
+            setMessage(value);
+            setCharacterCount(value.length);
+        }
+    };
 
 	const formatTime = (minutes) => {
 		const hours = Math.floor(minutes / 60);
@@ -68,7 +79,7 @@ export const MentorSessionBoard = () => {
 								<th>Focus areas</th>
 								<th>Resource_link</th>
 								<th>Actions</th>
-								
+
 							</tr>
 						</thead>
 						<tbody>
@@ -81,10 +92,30 @@ export const MentorSessionBoard = () => {
 									<td>{new Date(session.time_created).toLocaleDateString()}</td>
 									<td>{session.focus_areas.join(', ')}</td>
 									<td> <a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-									{session.resourceLink}</a>
+										{session.resourceLink}</a>
 									</td>
 									<td>
-										<Link to="/" className="btn btn-primary btn-sm">Submit Bid</Link>
+										<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#availabilityModal">
+											Submit Availabilty
+										</button>
+										<div class="modal fade" id="availabilityModal" tabindex="-1" aria-labelledby="availabilityModalLabel" aria-hidden="true">
+											<div class="modal-dialog">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h1 class="modal-title fs-5" id="availabilityModalLabel">Message Customer</h1>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<textarea name="about_me" value={message} onChange={handleMessage} className="form-control" rows="4"></textarea>
+														<p className={characterCount > 2500 ? "text-danger" : ''} >{characterCount}</p>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+														<button type="button" class="btn btn-primary">Save changes</button>
+													</div>
+												</div>
+											</div>
+										</div>
 									</td>
 								</tr>
 							))}

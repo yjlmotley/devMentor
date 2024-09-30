@@ -4,19 +4,6 @@ import rigoImageUrl from "../../img/rigo-baby.jpg";
 import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
 
-const SessionCard = ({ title, description, imageSrc }) => (
-	<div className="session-card">
-		<img variant="top" src={imageSrc} />
-		<div className="sessionBody">
-			<div className="sessionTitle">{title}</div>
-			<div className="sessionDescription">{description}</div>
-		</div>
-	</div>
-);
-
-
-
-
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
 
@@ -25,12 +12,17 @@ export const CustomerDashboard = () => {
 		actions.getCustomerSessions()
 	}, []);
 
+	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
+	const openSessions = store.customerSessions.filter(session => session.mentor_id == null && session.is_active);
+	const pastSessions = store.customerSessions.filter(session => session.is_completed);
+
 	return (
 		<div className="sessions-dashboard">
 			<h1 className="text-center mt-5">Your Sessions</h1>
+			{/* This should only show if a mentor.id exists and or is not null */}
 			<h2>Accepted sessions</h2>
 			<div className="open-sessions">
-				{store.customerSessions.map((session) => (
+				{acceptedSessions.map((session) => (
 					<div key={session.id} className="session-card">
 						<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" />
 						<div className="sessionBody">
@@ -40,6 +32,7 @@ export const CustomerDashboard = () => {
 					</div>
 				))}
 			</div>
+			{/* This should only show if a mentor.id doesnt exist and is_active is true */}
 			<h2>Open Sessions</h2>
 			<table className="striped bordered hover" >
 				<thead>
@@ -53,7 +46,7 @@ export const CustomerDashboard = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{store.customerSessions.map((session) => (
+					{openSessions.map((session) => (
 						<tr key={session.id}>
 							<td>{session.title}</td>
 							<td>{session.description}</td>
@@ -71,6 +64,7 @@ export const CustomerDashboard = () => {
 					))}
 				</tbody>
 			</table>
+			{/* This should only show if is_completed is true */}
 			<h2>Past Sessions</h2>
 			<table className="striped bordered hover" >
 				<thead>
@@ -84,7 +78,7 @@ export const CustomerDashboard = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{store.customerSessions.map((session) => (
+					{pastSessions.map((session) => (
 						<tr key={session.id}>
 							<td>{session.title}</td>
 							<td>{session.description}</td>

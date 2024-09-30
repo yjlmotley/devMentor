@@ -24,7 +24,6 @@ class Customer(db.Model):
     is_active = db.Column(db.Boolean(), unique=False,)
     last_active = db.Column(db.DateTime(timezone=True), unique=False)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
-    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     about_me = db.Column(db.String(2500), unique=False)
 
     profile_photo = db.relationship("CustomerImage", back_populates="customer", uselist=False)
@@ -45,7 +44,6 @@ class Customer(db.Model):
             "email": self.email,
             "is_active": self.is_active,
             "last_active": self.last_active,
-            "past_sessions": [past_session for past_session in self.past_sessions],
             "date_joined": self.date_joined,
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "about_me": self.about_me,
@@ -94,7 +92,6 @@ class Mentor(db.Model):
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
     price = db.Column(db.Numeric(10,2), nullable=True)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
-    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     confirmed_sessions = db.relationship("Session", back_populates="mentor")
 
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
@@ -118,7 +115,6 @@ class Mentor(db.Model):
             "country": self.country,
             "years_exp": self.years_exp,
             "skills": [skill for skill in self.skills],
-            "past_sessions": [past_session for past_session in self.past_sessions],
             "confirmed_sessions": [confirmed_session for confirmed_session in self.confirmed_sessions],
             "days": [day for day in self.days],
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
@@ -132,6 +128,7 @@ class Session(db.Model):
     title = db.Column(db.String(100), unique=False, nullable=False)
     description = db.Column(db.String(2500), unique=False, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_completed = db.Column(db.Boolean, nullable=True, default=False)
     schedule = db.Column(MutableDict.as_mutable(JSON), default={})
     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
     focus_areas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
@@ -155,6 +152,7 @@ class Session(db.Model):
             "title": self.title,
             "description": self.description,
             "is_active": self.is_active,
+            "is_completed": self.is_completed,
             "schedule": self.schedule,
             "time_created": self.time_created,
             "focus_areas": [focus_area for focus_area in self.focus_areas],

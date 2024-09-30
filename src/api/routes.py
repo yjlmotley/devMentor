@@ -539,6 +539,7 @@ def create_session():
     title = request.json.get("title", None)
     description = request.json.get("description", None)
     is_active = request.json.get("is_active", None)
+    is_completed = request.json.get("is_completed", None)
     schedule = request.json.get("schedule", None)
     focus_areas = request.json.get("focus_areas", None)
     skills = request.json.get("skills", None)
@@ -551,7 +552,7 @@ def create_session():
     # if title is None or description is None or is_active is None or schedule is None or focus_areas is None or skills is None or resourceLink is None or duration is None or totalHours is None:
     #     return jsonify({"msg": "Some fields are missing in your request"}), 400
     
-    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
+    missing_fields = [f for f, v in locals().items() if f in ["customer_id", "is_completed","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
 
     if missing_fields:
         return jsonify({"msg": f"Missing fields: {', '.join(missing_fields)}"}), 400
@@ -575,6 +576,7 @@ def create_session():
         title=title,
         description=description,
         is_active=is_active,
+        is_completed=is_completed,
         schedule=schedule,
         focus_areas=focus_areas,
         skills=skills,
