@@ -15,10 +15,11 @@ import cloudinary.uploader as uploader
 from cloudinary.uploader import destroy
 from cloudinary.api import delete_resources_by_tag
 
-from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
+from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto, Message, MyEnum
 from api.utils import generate_sitemap, APIException
 from api.decorators import mentor_required, customer_required
 from api.send_email import send_email
+from enum import Enum as PyEnum
 
 
 api = Blueprint('api', __name__)
@@ -539,7 +540,6 @@ def create_session():
     title = request.json.get("title", None)
     description = request.json.get("description", None)
     is_active = request.json.get("is_active", None)
-    is_completed = request.json.get("is_completed", None)
     schedule = request.json.get("schedule", None)
     focus_areas = request.json.get("focus_areas", None)
     skills = request.json.get("skills", None)
@@ -552,7 +552,7 @@ def create_session():
     # if title is None or description is None or is_active is None or schedule is None or focus_areas is None or skills is None or resourceLink is None or duration is None or totalHours is None:
     #     return jsonify({"msg": "Some fields are missing in your request"}), 400
     
-    missing_fields = [f for f, v in locals().items() if f in ["customer_id", "is_completed","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
+    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
 
     if missing_fields:
         return jsonify({"msg": f"Missing fields: {', '.join(missing_fields)}"}), 400
@@ -576,14 +576,12 @@ def create_session():
         title=title,
         description=description,
         is_active=is_active,
-        is_completed=is_completed,
         schedule=schedule,
         focus_areas=focus_areas,
         skills=skills,
         resourceLink=resourceLink,
         duration = duration,
-        totalHours=totalHours,
-        
+        totalHours=totalHours
     )
     db.session.add(session)
     db.session.commit()
@@ -660,3 +658,97 @@ def get_sessions_by_customer_id():
     sessions = [session.serialize() for session in customer.sessions]
 
     return jsonify(sessions), 200
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+
+@api.route('/message-mentor', methods=['POST'])
+@mentor_required
+def create_message_mentor():
+    session_id = request.json.get("session_id")
+    text = request.json.get("text")
+    
+    if None in [session_id, text]:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "Session not found"}), 404
+
+    mentor = Mentor.query.get(get_jwt_identity())
+    if mentor is None:
+        return jsonify({"msg": "Mentor not found"}), 404
+
+    # Create and save the new message
+    message = Message(
+        session_id=session_id,
+        mentor_id=mentor.id,
+        text=text,
+        sender=MyEnum("mentor")
+    )
+    db.session.add(message)
+    db.session.commit()
+
+    # Serialize the message, ensuring MyEnum is converted to a string
+    serialized_message = message.serialize()
+    # serialized_message['sender'] = serialized_message['sender'].value
+
+    response_body = {
+        "msg": "Message successfully created!",
+        "message": serialized_message
+    }
+    return jsonify(response_body), 201
+
+@api.route('/message-customer', methods=['POST'])
+@customer_required
+def create_message_customer():
+    session_id = request.json.get("session_id")
+    text = request.json.get("text")
+    mentor_id=request.json.get("mentor_id")
+
+    if None in [session_id, text,mentor_id]:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+
+   
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "Session not found"}), 404
+    mentor = Mentor.query.get(get_jwt_identity())
+    if mentor is None:
+        return jsonify({"msg": "Mentor not found"}), 404
+    customer = Customer.query.get(get_jwt_identity())
+    if customer is None or customer.id != session.customer_id:
+        return jsonify({"msg": "You are not authorized for this session"}), 403
+   
+    message = Message(
+        session_id=session_id,
+        mentor_id=mentor.id,
+        text=text,
+        sender=MyEnum("customer")
+    )
+    db.session.add(message)
+    db.session.commit()
+
+    # Serialize the message, ensuring MyEnum is converted to a string
+    serialized_message = message.serialize()
+    # serialized_message['sender'] = serialized_message['sender'].value
+
+    response_body = {
+        "msg": "Message successfully created!",
+        "message": serialized_message
+    }
+    return jsonify(response_body), 201
+
+@api.route('/messages/<int:session_id>', methods=['GET'])
+@jwt_required()
+def get_messages(session_id):
+    messages = Message.query.filter_by(session_id=session_id).order_by(Message.time_created).all()
+    
+    if not messages:
+        return jsonify({"msg": "No messages found for this session"}), 404
+
+    return jsonify([message.serialize() for message in messages]), 200

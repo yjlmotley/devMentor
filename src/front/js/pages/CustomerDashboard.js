@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
-import rigoImageUrl from "../../img/rigo-baby.jpg";
 import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
 
@@ -8,23 +7,110 @@ export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
 
 	useEffect(() => {
-		console.log("Fetching customer sessions on mount")
-		actions.getCustomerSessions()
+		console.log("Fetching customer sessions on mount");
+		actions.getCustomerSessions();
 	}, []);
 
 	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
 	const openSessions = store.customerSessions.filter(session => session.mentor_id == null && session.is_active);
 	const pastSessions = store.customerSessions.filter(session => session.is_completed);
 
+	const renderSessionMessages = (session) => {
+		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
+			const mentorId = msg.mentor_id || 'customer';
+			if (!acc[mentorId]) {
+				acc[mentorId] = [];
+			}
+			acc[mentorId].push(msg);
+			return acc;
+		}, {}) : {};
+
+		const mentors = Object.keys(groupedMessages).filter(id => id !== 'customer');
+
+		return (
+			<tr key={`${session.id}-messages`}>
+				<td colSpan="6">
+					<div className="accordion accordion-flush" id={`accordionFlush${session.id}`}>
+						<div className="accordion-item">
+							<h2 className="accordion-header">
+								<button
+									className="accordion-button collapsed"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target={`#flush-collapse${session.id}`}
+									aria-expanded="false"
+									aria-controls={`flush-collapse${session.id}`}
+								>
+									Messages for this session ({mentors.length} mentor{mentors.length !== 1 ? 's' : ''})
+								</button>
+							</h2>
+							<div
+								id={`flush-collapse${session.id}`}
+								className="accordion-collapse collapse"
+								data-bs-parent={`#accordionFlush${session.id}`}
+							>
+								<div className="accordion-body">
+									{mentors.length > 0 ? (
+										<div className="accordion" id={`mentorAccordion${session.id}`}>
+											{mentors.map((mentorId, index) => {
+												const mentorMessages = groupedMessages[mentorId] || [];
+												const customerMessages = groupedMessages['customer'] || [];
+												const allMessages = [...mentorMessages, ...customerMessages]
+													.sort((a, b) => new Date(a.time_created) - new Date(b.time_created));
+
+												return (
+													<div className="accordion-item" key={`${session.id}-${mentorId}`}>
+														<h2 className="accordion-header">
+															<button
+																className="accordion-button collapsed"
+																type="button"
+																data-bs-toggle="collapse"
+																data-bs-target={`#mentor-collapse-${session.id}-${mentorId}`}
+																aria-expanded="false"
+																aria-controls={`mentor-collapse-${session.id}-${mentorId}`}
+															>
+																Mentor {mentorMessages[0]?.mentor_name || `#${index + 1}`} ({allMessages.length} message{allMessages.length !== 1 ? 's' : ''})
+															</button>
+														</h2>
+														<div
+															id={`mentor-collapse-${session.id}-${mentorId}`}
+															className="accordion-collapse collapse"
+															data-bs-parent={`#mentorAccordion${session.id}`}
+														>
+															<div className="accordion-body">
+																{allMessages.map((msg) => (
+																	<div key={msg.id} className="message-row">
+																		<strong>{msg.sender === "mentor" ? `Mentor ${msg.mentor_name}` : "You"}:</strong> {msg.text}
+																		<p className="text-muted">{new Date(msg.time_created).toLocaleString()}</p>
+																	</div>
+																))}
+															</div>
+														</div>
+													</div>
+												);
+											})}
+										</div>
+									) : (
+										<p>No messages for this session yet.</p>
+									)}
+								</div>
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		);
+	};
+
 	return (
 		<div className="sessions-dashboard">
 			<h1 className="text-center mt-5">Your Sessions</h1>
-			{/* This should only show if a mentor.id exists and or is not null */}
-			<h2>Accepted sessions</h2>
+
+			<h2>Accepted Sessions</h2>
 			<div className="open-sessions">
 				{acceptedSessions.map((session) => (
 					<div key={session.id} className="session-card">
-						<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" />
+						<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
 						<div className="sessionBody">
 							<div className="sessionTitle">{session.title}</div>
 							<div className="sessionDescription">{session.description}</div>
@@ -32,9 +118,9 @@ export const CustomerDashboard = () => {
 					</div>
 				))}
 			</div>
-			{/* This should only show if a mentor.id doesnt exist and is_active is true */}
+
 			<h2>Open Sessions</h2>
-			<table className="striped bordered hover" >
+			<table className="striped bordered hover">
 				<thead>
 					<tr>
 						<th>Title</th>
@@ -47,26 +133,29 @@ export const CustomerDashboard = () => {
 				</thead>
 				<tbody>
 					{openSessions.map((session) => (
-						<tr key={session.id}>
-							<td>{session.title}</td>
-							<td>{session.description}</td>
-							<td>{session.skills.join(', ')}</td>
-							<td>{session.focus_areas.join(', ')}</td>
-							<td>
-								<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-									{session.resourceLink}
-								</a>
-							</td>
-							<td>
-								<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
-							</td>
-						</tr>
+						<React.Fragment key={session.id}>
+							<tr>
+								<td>{session.title}</td>
+								<td>{session.description}</td>
+								<td>{session.skills.join(', ')}</td>
+								<td>{session.focus_areas.join(', ')}</td>
+								<td>
+									<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+										{session.resourceLink}
+									</a>
+								</td>
+								<td>
+									<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
+								</td>
+							</tr>
+							{renderSessionMessages(session)}
+						</React.Fragment>
 					))}
 				</tbody>
 			</table>
-			{/* This should only show if is_completed is true */}
+
 			<h2>Past Sessions</h2>
-			<table className="striped bordered hover" >
+			<table className="striped bordered hover">
 				<thead>
 					<tr>
 						<th>Title</th>
@@ -79,20 +168,23 @@ export const CustomerDashboard = () => {
 				</thead>
 				<tbody>
 					{pastSessions.map((session) => (
-						<tr key={session.id}>
-							<td>{session.title}</td>
-							<td>{session.description}</td>
-							<td>{session.skills.join(', ')}</td>
-							<td>{session.focus_areas.join(', ')}</td>
-							<td>
-								<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-									{session.resourceLink}
-								</a>
-							</td>
-							<td>
-								<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
-							</td>
-						</tr>
+						<React.Fragment key={session.id}>
+							<tr>
+								<td>{session.title}</td>
+								<td>{session.description}</td>
+								<td>{session.skills.join(', ')}</td>
+								<td>{session.focus_areas.join(', ')}</td>
+								<td>
+									<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+										{session.resourceLink}
+									</a>
+								</td>
+								<td>
+									<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
+								</td>
+							</tr>
+							{renderSessionMessages(session)}
+						</React.Fragment>
 					))}
 				</tbody>
 			</table>

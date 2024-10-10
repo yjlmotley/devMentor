@@ -2,8 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.ext.mutable import MutableList, MutableDict
 from sqlalchemy.types import ARRAY, JSON
-from sqlalchemy import DateTime
-
+from sqlalchemy import DateTime, Enum
+from enum import Enum as PyEnum
 
 import datetime
 
@@ -137,6 +137,9 @@ class Session(db.Model):
     duration = db.Column(db.String(25), unique=False, nullable=False)
     totalHours = db.Column(db.Integer)
 
+
+    messages = db.relationship("Message", back_populates="session")
+
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     customer = db.relationship("Customer", back_populates="sessions")
     
@@ -161,7 +164,9 @@ class Session(db.Model):
             "duration": self.duration,
             "totalHours": self.totalHours,
             "customer_id": self.customer_id,
-            "mentor_id": self.mentor_id
+            "customer_name": f"{self.customer.first_name} {self.customer.last_name}" if self.customer else None,
+            "mentor_id": self.mentor_id,
+            "messages": [ message.serialize() for message in self.messages ]
         }
 
 class MentorImage(db.Model):
@@ -210,23 +215,31 @@ class PortfolioPhoto(db.Model):
             "image_url": self.image_url
     }
 
+class MyEnum(PyEnum):
+    CUSTOMER = "customer"
+    MENTOR = "mentor"
 
-# class Chat(db.Model):
-#     __tablename__ = 'comments'
+class Message(db.Model):
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     work_order_id = db.Column(db.Integer, db.ForeignKey("work_orders.id"), nullable=False)
-#     message = db.Column(db.String(500), unique=False, nullable=False)
-#     work_order = db.relationship("WorkOrder", back_populates="comments")
-#     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("session.id"), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
+    mentor = db.relationship("Mentor", backref="messages")
+    text = db.Column(db.String(500), unique=False, nullable=False)
+    sender = db.Column(Enum(MyEnum), nullable=False)
+    session = db.relationship("Session", back_populates="messages")
+    time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
-#     def __repr__(self):
-#         return f'<Comment {self.id}>'
+    def __repr__(self):
+        return f'<Comment {self.id}>'
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "work_order_id": self.work_order_id,
-#             "message": self.message,
-#             "time_created": self.time_created,
-#         }
+    def serialize(self):
+        return {
+            "id": self.id,
+            "session_id": self.session_id,
+            "mentor_id": self.mentor_id,
+            "mentor_name": f"{self.mentor.first_name} {self.mentor.last_name}" if self.mentor else None,
+            "text": self.text,
+            "sender": self.sender.value,
+            "time_created": self.time_created,
+        }

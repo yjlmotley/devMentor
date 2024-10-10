@@ -85,8 +85,7 @@ export const CreateSession = () => {
       skills: selectedSkills,
       resourceLink: resourceLink,
       duration: duration,
-      totalHours: totalHours,
-      
+      totalHours: totalHours
     })
 
     if (success) {
