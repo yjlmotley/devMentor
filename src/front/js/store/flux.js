@@ -362,13 +362,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            sendMessageCustomer: async (sessionId, text, mentor_id) => {
+            sendMessageCustomer: async (sessionId, text, mentorId) => {
                 const token = sessionStorage.getItem("token");
                 if (!token) {
                     console.error("No token found in sessionStorage");
                     return false;
                 }
-
+            
                 const response = await fetch(`${process.env.BACKEND_URL}/api/message-customer`, {
                     method: "POST",
                     headers: {
@@ -378,14 +378,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     body: JSON.stringify({
                         session_id: sessionId,
                         text: text,
-                        mentor_id: mentor_id
+                        mentor_id: mentorId
                     })
                 });
-
+            
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Message sent successfully:", data);
-                    
                     return true;
                 } else {
                     console.error("Failed to send message with status:", response.status);

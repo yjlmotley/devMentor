@@ -708,34 +708,33 @@ def create_message_mentor():
 def create_message_customer():
     session_id = request.json.get("session_id")
     text = request.json.get("text")
-    mentor_id=request.json.get("mentor_id")
+    mentor_id = request.json.get("mentor_id")
 
-    if None in [session_id, text,mentor_id]:
+    if None in [session_id, text, mentor_id]:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
 
-   
     session = Session.query.get(session_id)
     if session is None:
         return jsonify({"msg": "Session not found"}), 404
-    mentor = Mentor.query.get(get_jwt_identity())
-    if mentor is None:
-        return jsonify({"msg": "Mentor not found"}), 404
+
     customer = Customer.query.get(get_jwt_identity())
     if customer is None or customer.id != session.customer_id:
         return jsonify({"msg": "You are not authorized for this session"}), 403
-   
+
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "Mentor not found"}), 404
+
     message = Message(
         session_id=session_id,
-        mentor_id=mentor.id,
+        mentor_id=mentor_id,
         text=text,
         sender=MyEnum("customer")
     )
     db.session.add(message)
     db.session.commit()
 
-    # Serialize the message, ensuring MyEnum is converted to a string
     serialized_message = message.serialize()
-    # serialized_message['sender'] = serialized_message['sender'].value
 
     response_body = {
         "msg": "Message successfully created!",
