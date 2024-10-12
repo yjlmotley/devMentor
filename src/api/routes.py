@@ -15,10 +15,11 @@ import cloudinary.uploader as uploader
 from cloudinary.uploader import destroy
 from cloudinary.api import delete_resources_by_tag
 
-from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto
+from api.models import db, Mentor, Customer, Session, MentorImage, PortfolioPhoto, Message, MyEnum
 from api.utils import generate_sitemap, APIException
 from api.decorators import mentor_required, customer_required
 from api.send_email import send_email
+from enum import Enum as PyEnum
 
 
 api = Blueprint('api', __name__)
@@ -401,17 +402,17 @@ def all_customers():
    customers = Customer.query.all()
    return jsonify([customer.serialize() for customer in customers]), 200
 
-@api.route('/customer/<int:cust_id>', methods=['GET'])
-# @mentor_required()
-def customer_by_id(cust_id):
-    # current_user_id = get_jwt_identity()
-    # current_user = User.query.get(current_user_id)
+# @api.route('/customer/<int:cust_id>', methods=['GET'])
+# # @mentor_required()
+# def customer_by_id(cust_id):
+#     # current_user_id = get_jwt_identity()
+#     # current_user = User.query.get(current_user_id)
 
-    customer = Customer.query.get(cust_id)
-    if customer is None:
-        return jsonify({"msg": "No customer found"}), 404
+#     customer = Customer.query.get(cust_id)
+#     if customer is None:
+#         return jsonify({"msg": "No customer found"}), 404
     
-    return jsonify(customer.serialize()), 200
+#     return jsonify(customer.serialize()), 200
 
 @api.route('/customer/login', methods=['POST'])
 def customer_login():
@@ -514,6 +515,9 @@ def delete_customer(cust_id):
     db.session.commit()
     return jsonify({"msg": "customer successfully deleted"}), 200
 
+
+    
+
 # Session Routes Start
 
 @api.route('/sessions', methods= ['GET'])
@@ -577,8 +581,7 @@ def create_session():
         skills=skills,
         resourceLink=resourceLink,
         duration = duration,
-        totalHours=totalHours,
-        
+        totalHours=totalHours
     )
     db.session.add(session)
     db.session.commit()
@@ -641,3 +644,110 @@ def delete_session(sess_id):
     db.session.delete(session)
     db.session.commit()
     return jsonify({"msg": "Session Sucessfully Deleted"}), 200
+
+@api.route('/sessions/customer', methods=['GET'])
+@customer_required
+def get_sessions_by_customer_id():
+    cust_id = get_jwt_identity()
+    print(f"Customer ID from JWT: {cust_id}")
+
+    customer = Customer.query.get(cust_id)
+    if not customer:
+        return jsonify({"msg": "Customer not found"}), 404
+    
+    sessions = [session.serialize() for session in customer.sessions]
+
+    return jsonify(sessions), 200
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+# Message routes Start # Message routes Start # Message routes Start
+
+@api.route('/message-mentor', methods=['POST'])
+@mentor_required
+def create_message_mentor():
+    session_id = request.json.get("session_id")
+    text = request.json.get("text")
+    
+    if None in [session_id, text]:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "Session not found"}), 404
+
+    mentor = Mentor.query.get(get_jwt_identity())
+    if mentor is None:
+        return jsonify({"msg": "Mentor not found"}), 404
+
+    # Create and save the new message
+    message = Message(
+        session_id=session_id,
+        mentor_id=mentor.id,
+        text=text,
+        sender=MyEnum("mentor")
+    )
+    db.session.add(message)
+    db.session.commit()
+
+    # Serialize the message, ensuring MyEnum is converted to a string
+    serialized_message = message.serialize()
+    # serialized_message['sender'] = serialized_message['sender'].value
+
+    response_body = {
+        "msg": "Message successfully created!",
+        "message": serialized_message
+    }
+    return jsonify(response_body), 201
+
+@api.route('/message-customer', methods=['POST'])
+@customer_required
+def create_message_customer():
+    session_id = request.json.get("session_id")
+    text = request.json.get("text")
+    mentor_id = request.json.get("mentor_id")
+
+    if None in [session_id, text, mentor_id]:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "Session not found"}), 404
+
+    customer = Customer.query.get(get_jwt_identity())
+    if customer is None or customer.id != session.customer_id:
+        return jsonify({"msg": "You are not authorized for this session"}), 403
+
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "Mentor not found"}), 404
+
+    message = Message(
+        session_id=session_id,
+        mentor_id=mentor_id,
+        text=text,
+        sender=MyEnum("customer")
+    )
+    db.session.add(message)
+    db.session.commit()
+
+    serialized_message = message.serialize()
+
+    response_body = {
+        "msg": "Message successfully created!",
+        "message": serialized_message
+    }
+    return jsonify(response_body), 201
+
+@api.route('/messages/<int:session_id>', methods=['GET'])
+@jwt_required()
+def get_messages(session_id):
+    messages = Message.query.filter_by(session_id=session_id).order_by(Message.time_created).all()
+    
+    if not messages:
+        return jsonify({"msg": "No messages found for this session"}), 404
+
+    return jsonify([message.serialize() for message in messages]), 200

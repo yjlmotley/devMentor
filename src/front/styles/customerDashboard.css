@@ -1,0 +1,77 @@
+.sessions-dashboard {
+  padding: 20px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.sessions-dashboard h1 {
+  margin-bottom: 30px;
+}
+
+.sessions-dashboard h2 {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.accepted-sessions .session-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.session-card {
+  width: 18rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.session-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.session-body {
+  padding: 15px;
+}
+
+.session-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.session-description {
+  font-size: 0.9em;
+}
+
+.table {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .sessions-dashboard {
+    padding: 10px;
+  }
+
+  .session-card {
+    width: 100%;
+  }
+}
