@@ -78,13 +78,13 @@ export const Home = () => {
               <div className="mentor-profiles">
                 <div className="mentor-profile">
                   <img src="https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1725936902/Saved/JulieFace_vulxy2.jpg" alt="Jane Smith" className="mentor-image" />
-                  <h3>Jane Smith</h3>
-                  <p>New York, NY. Senior Frontend Developer. Passionate about education and helping others learn to code.</p>
+                  <h3>Yeju Motley</h3>
+                  <p>San Diego, CA. Full-stack Developer. Dedicated coder who is creative, curious, and excited to keep growing in this industry.</p>
                   <button className="follow-button">Follow</button>
                 </div>
                 <div className="mentor-profile">
                   <img src="https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1725936923/Saved/aimepic_fudlb7.jpg" alt="John Doe" className="mentor-image" />
-                  <h3>John Doe</h3>
+                  <h3>Michael Mirisciotta</h3>
                   <p>San Francisco, CA. Full-stack Developer. Experience mentoring junior developers and teaching coding bootcamps.</p>
                   <button className="follow-button">Follow</button>
                 </div>
