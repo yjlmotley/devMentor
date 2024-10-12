@@ -2,8 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.ext.mutable import MutableList, MutableDict
 from sqlalchemy.types import ARRAY, JSON
-from sqlalchemy import DateTime
-
+from sqlalchemy import DateTime, Enum
+from enum import Enum as PyEnum
 
 import datetime
 
@@ -24,10 +24,10 @@ class Customer(db.Model):
     is_active = db.Column(db.Boolean(), unique=False,)
     last_active = db.Column(db.DateTime(timezone=True), unique=False)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
-    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     about_me = db.Column(db.String(2500), unique=False)
 
     profile_photo = db.relationship("CustomerImage", back_populates="customer", uselist=False)
+    sessions = db.relationship("Session", back_populates="customer", lazy="dynamic")
 
     def __repr__(self):
         return f'<Customer {self.email}>'
@@ -44,10 +44,10 @@ class Customer(db.Model):
             "email": self.email,
             "is_active": self.is_active,
             "last_active": self.last_active,
-            "past_sessions": [past_session for past_session in self.past_sessions],
             "date_joined": self.date_joined,
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
-            "about_me": self.about_me
+            "about_me": self.about_me,
+            "sessions": [session.id for session in self.sessions]
         }
     
 class CustomerImage(db.Model):
@@ -86,21 +86,16 @@ class Mentor(db.Model):
     city = db.Column(db.String(30), unique=False, nullable=False)
     what_state = db.Column(db.String(30), unique=False, nullable=False)
     country = db.Column(db.String(30), unique=False, nullable=False)
+    about_me = db.Column(db.String(2500), unique=False)
     years_exp = db.Column(db.String(30), unique=False)
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list)
-    past_sessions = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=lambda: [])
     days = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=list) ## Days Avaiable 
     price = db.Column(db.Numeric(10,2), nullable=True)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
-    
+    confirmed_sessions = db.relationship("Session", back_populates="mentor")
+
     profile_photo = db.relationship("MentorImage", back_populates="mentor", uselist=False)   ######
     portfolio_photos = db.relationship("PortfolioPhoto", back_populates="mentor")   ######
-
-    # ratings = 
-    about_me = db.Column(db.String(2500), unique=False)
-    
-    
-    
 
     def __repr__(self):
         return f'<Mentor {self.email}>'
@@ -120,7 +115,7 @@ class Mentor(db.Model):
             "country": self.country,
             "years_exp": self.years_exp,
             "skills": [skill for skill in self.skills],
-            "past_sessions": [past_session for past_session in self.past_sessions],
+            "confirmed_sessions": [confirmed_session for confirmed_session in self.confirmed_sessions],
             "days": [day for day in self.days],
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "portfolio_photos": [portfolio_photo.serialize() for portfolio_photo in self.portfolio_photos],
@@ -131,15 +126,25 @@ class Mentor(db.Model):
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), unique=False, nullable=False)
-    details = db.Column(db.String(2500), unique=False, nullable=False)
-    skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
+    description = db.Column(db.String(2500), unique=False, nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_completed = db.Column(db.Boolean, nullable=True, default=False)
+    schedule = db.Column(MutableDict.as_mutable(JSON), default={})
     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
-    focusAreas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
-    totalHours = db.Column(db.Integer)
+    focus_areas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
+    skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     resourceLink = db.Column(db.String(255))
+    duration = db.Column(db.String(25), unique=False, nullable=False)
+    totalHours = db.Column(db.Integer)
+
+
+    messages = db.relationship("Message", back_populates="session")
+
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    customer = db.relationship("Customer", back_populates="sessions")
     
+    mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=True)
+    mentor = db.relationship("Mentor", back_populates="confirmed_sessions")
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -148,14 +153,20 @@ class Session(db.Model):
         return {
             "id": self.id, 
             "title": self.title,
-            "details": self.details,
-            "skills": [skill for skill in self.skills],
-            "schedule": self.schedule,
+            "description": self.description,
             "is_active": self.is_active,
+            "is_completed": self.is_completed,
+            "schedule": self.schedule,
             "time_created": self.time_created,
-            "focusAreas": [focusArea for focusArea in self.focusAreas],
+            "focus_areas": [focus_area for focus_area in self.focus_areas],
+            "skills": [skill for skill in self.skills],
+            "resourceLink": self.resourceLink,
+            "duration": self.duration,
             "totalHours": self.totalHours,
-            "resourceLink": self.resourceLink
+            "customer_id": self.customer_id,
+            "customer_name": f"{self.customer.first_name} {self.customer.last_name}" if self.customer else None,
+            "mentor_id": self.mentor_id,
+            "messages": [ message.serialize() for message in self.messages ]
         }
 
 class MentorImage(db.Model):
@@ -204,23 +215,31 @@ class PortfolioPhoto(db.Model):
             "image_url": self.image_url
     }
 
+class MyEnum(PyEnum):
+    CUSTOMER = "customer"
+    MENTOR = "mentor"
 
-# class Chat(db.Model):
-#     __tablename__ = 'comments'
+class Message(db.Model):
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     work_order_id = db.Column(db.Integer, db.ForeignKey("work_orders.id"), nullable=False)
-#     message = db.Column(db.String(500), unique=False, nullable=False)
-#     work_order = db.relationship("WorkOrder", back_populates="comments")
-#     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("session.id"), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey("mentor.id"), nullable=False)
+    mentor = db.relationship("Mentor", backref="messages")
+    text = db.Column(db.String(500), unique=False, nullable=False)
+    sender = db.Column(Enum(MyEnum), nullable=False)
+    session = db.relationship("Session", back_populates="messages")
+    time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
 
-#     def __repr__(self):
-#         return f'<Comment {self.id}>'
+    def __repr__(self):
+        return f'<Comment {self.id}>'
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "work_order_id": self.work_order_id,
-#             "message": self.message,
-#             "time_created": self.time_created,
-#         }
+    def serialize(self):
+        return {
+            "id": self.id,
+            "session_id": self.session_id,
+            "mentor_id": self.mentor_id,
+            "mentor_name": f"{self.mentor.first_name} {self.mentor.last_name}" if self.mentor else None,
+            "text": self.text,
+            "sender": self.sender.value,
+            "time_created": self.time_created,
+        }

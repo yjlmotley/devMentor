@@ -1,0 +1,112 @@
+/* Container adjustments */
+.session-board-container {
+    margin: 40px auto;
+    max-width: 1200px;
+}
+
+.session-board {
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+/* Title styling */
+.session-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Custom button styling */
+.custom-create-btn {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    font-size: 14px;
+    border-radius: 8px;
+}
+
+.custom-create-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Profile icon */
+.profile-icon {
+    font-size: 1.75rem;
+    color: #333;
+}
+
+/* Tab styling */
+.custom-nav-tabs .nav-link {
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    color: #666;
+}
+
+.custom-nav-tabs .nav-link.active {
+    border-bottom: 2px solid #0d6efd;
+    color: #0d6efd;
+}
+
+.custom-nav-tabs .nav-link:hover {
+    color: #0d6efd;
+}
+
+/* Table styling */
+.custom-table thead th {
+    border-bottom: none;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.custom-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.custom-table td {
+    vertical-align: middle;
+    color: #555;
+}
+
+/* Badge (Active/Inactive) */
+.badge {
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+}
+
+/* Remove vertical lines */
+.custom-table {
+    border-collapse: collapse;
+}
+
+.custom-table td, .custom-table th {
+    border-right: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .session-board-container {
+        margin: 20px;
+        padding: 15px;
+    }
+
+    .custom-create-btn {
+        font-size: 12px;
+    }
+
+    .session-title {
+        font-size: 1.5rem;
+    }
+
+    .profile-icon {
+        font-size: 1.5rem;
+    }
+}
