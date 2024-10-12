@@ -74,23 +74,38 @@ export const Home = () => {
               <p>Comments</p>
             </div>
           </div>
+          {/* TODO: Make a function so that the icons only show if the href is not null/empty for the <li> tags */}
           <div className="mentor-profiles">
-            <div className="mentor-profile">
+            {/* profile card for Julie */}
+            <div className="mentor-profile-card">
               <img src="https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1725936902/Saved/JulieFace_vulxy2.jpg" alt="Jane Smith" className="mentor-image" />
-              <h3>Yeju Motley</h3>
+              <h3 style={{ marginBottom: "1rem" }}>Yeju Motley</h3>
               <p className="mb-2">San Diego, CA. Full-Stack Developer.</p>
-              <p>
+              <p style={{ marginBottom: "1rem" }}>
                 Dedicated coder who is passionate about transforming ideas into seamless digital experiences through innovation, collaboration,
                 dedication and commitment.
               </p>
-              <button className="follow-button">Follow</button>
+              {/* <button className="follow-button">Follow</button> */}
+              <div className="social-icon-list social-links-footer">
+                <a href="https://www.linkedin.com/in/yjlmotley/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in"></i></a>
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-square-facebook"></i></a>
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-instagram"></i></a>
+                <a href="https://github.com/yjlmotley" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-square-github"></i></a>
+              </div>
             </div>
-            <div className="mentor-profile">
+            {/* profile card for Michael */}
+            <div className="mentor-profile-card">
               <img src="https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1725936923/Saved/aimepic_fudlb7.jpg" alt="John Doe" className="mentor-image" />
-              <h3>Michael Mirisciotta</h3>
+              <h3 style={{ marginBottom: "1rem" }}>Michael Mirisciotta</h3>
               <p className="mb-2">San Diego, CA. Full-Stack Developer.</p>
-              <p>Experience mentoring junior developers and teaching coding bootcamps.</p>
-              <button className="follow-button">Follow</button>
+              <p style={{ marginBottom: "1rem" }}>Experience mentoring junior developers and teaching coding bootcamps.</p>
+              {/* <button className="follow-button">Follow</button> */}
+              <div className="social-icon-list social-links-footer">
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in"></i></a>
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-square-facebook"></i></a>
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-instagram"></i></a>
+                <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-square-github"></i></a>
+              </div>
             </div>
           </div>
         </div>
@@ -98,4 +113,3 @@ export const Home = () => {
     </div>
   );
 };
-
