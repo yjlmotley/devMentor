@@ -13,7 +13,7 @@ module.exports = {
     publicPath: '/',
 },
   module: {
-    rules: [
+    rules: [git 
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
