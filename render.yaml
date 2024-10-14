@@ -11,3 +11,5 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18.x
+      - key: PYTHON_VERSION
+        value: 3.9.9  # or another version that's compatible with your packages
