@@ -681,6 +681,36 @@ def confirm_mentor(session_id):
     if session is None:
         return jsonify({"msg": "No session found"}), 404
     
+@api.route('/session/<int:session_id>/confirm-mentor/<int:mentor_id>', methods=['PUT'])
+@customer_required
+def confirm_mentor_for_session(session_id, mentor_id):
+    customer_id = get_jwt_identity()
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+
+    if session.customer_id != customer_id:
+        return jsonify({"msg": "You are not authorized to modify this session"}), 403
+
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+
+    # Confirm mentor for session
+    session.mentor_id = mentor_id
+    session.is_active = False  # Marking the session as inactive once a mentor is confirmed
+
+    db.session.commit()
+    db.session.refresh(session)
+
+    response_body = {
+        "msg": "Mentor successfully confirmed for session!",
+        "session": session.serialize()
+    }
+    return jsonify(response_body), 200
+    
 
 # Message routes Start # Message routes Start # Message routes Start
 # Message routes Start # Message routes Start # Message routes Start

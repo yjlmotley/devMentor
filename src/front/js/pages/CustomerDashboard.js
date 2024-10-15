@@ -42,7 +42,18 @@ export const CustomerDashboard = () => {
 		if (success) {
 			actions.getCustomerSessions();
 		}
-	}
+	};
+
+	const handleConfirmMentor = async (sessionId, mentorId) => {
+		const success = await actions.confirmMentorForSession(sessionId, mentorId);
+		if (success) {
+			console.log("Mentor confirmed successfully");
+			actions.getCustomerSessions(); // Refresh the sessions
+		} else {
+			console.error("Failed to confirm mentor");
+			// You might want to show an error message to the user here
+		}
+	};
 
 	const renderSessionMessages = (session) => {
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
@@ -137,7 +148,7 @@ export const CustomerDashboard = () => {
 																</button>
 																<button
 																	className="btn btn-success"
-																	onClick=""
+																	onClick={() => handleConfirmMentor(session.id, mentorId)}
 																>
 																	Confirm Mentor
 																</button>
@@ -214,7 +225,6 @@ export const CustomerDashboard = () => {
 						))}
 					</tbody>
 				</table>
-
 				<h2>Past Sessions</h2>
 				<table className="striped bordered hover">
 					<thead>
