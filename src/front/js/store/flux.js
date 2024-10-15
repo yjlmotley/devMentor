@@ -345,6 +345,25 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            deleteSessionById: async (sessionId) => {
+                const token = sessionStorage.getItem("token")
+                let options = {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: "Bearer " + token 
+                    }
+                }
+                let response = await fetch(process.env.BACKEND_URL + "/api/session/delete/" + sessionId, options)
+                if (response.status === 200) {
+                    let data = await response.json()
+                    console.log(data)
+                    return true
+                } else {
+                    alert("Delete Unsuccessful")
+                    return false
+                }
+            },
+
             getSessionById: async (sessionId) => {
                 const token = sessionStorage.getItem("token"); // or however you're storing the token
                 if (!token) {

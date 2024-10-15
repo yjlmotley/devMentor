@@ -69,10 +69,10 @@ export const MentorSessionBoard = () => {
             .join(', ');
     };
 
-    const filterSessionsForMentor = (sessions) => {
-        const mentorId = store.mentorId;
+    const filterSessionsIsActiveAndIsNotCompleted = (sessions) => {
         return sessions.filter(session => 
-            session.messages.some(msg => msg.mentor_id === mentorId)
+            session.is_active === true &&
+            session.is_completed === false
         );
     };
 
@@ -140,7 +140,7 @@ export const MentorSessionBoard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filterSessionsForMentor(store.sessionRequests).map((session) => (
+                            {store.sessionRequests && filterSessionsIsActiveAndIsNotCompleted(store.sessionRequests).map((session) => (
                                 <React.Fragment key={session.id}>
                                     <tr>
                                         <td>{session.title}</td>

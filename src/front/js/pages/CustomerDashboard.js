@@ -37,6 +37,13 @@ export const CustomerDashboard = () => {
 		}
 	};
 
+	let handleDeleteSession = async (sessionId) => {
+		let success = await actions.deleteSessionById(sessionId)
+		if (success) {
+			actions.getCustomerSessions();
+		}
+	}
+
 	const renderSessionMessages = (session) => {
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
 			const mentorId = msg.mentor_id;
@@ -91,6 +98,8 @@ export const CustomerDashboard = () => {
 															>
 																Mentor {allMessages[0]?.mentor_name || `#${index + 1}`} ({allMessages.length} message{allMessages.length !== 1 ? 's' : ''})
 															</button>
+
+
 														</h2>
 														<div
 															id={`mentor-collapse-${session.id}-${mentorId}`}
@@ -126,6 +135,13 @@ export const CustomerDashboard = () => {
 																>
 																	Send to Mentor {allMessages[0]?.mentor_name || `#${mentorId}`}
 																</button>
+																<button
+																	className="btn btn-success"
+																	onClick=""
+																>
+																	Confirm Mentor
+																</button>
+
 															</div>
 														</div>
 													</div>
@@ -187,7 +203,10 @@ export const CustomerDashboard = () => {
 										</a>
 									</td>
 									<td>
-									<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
+										<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
+										<button className="btn btn-danger mt-2" onClick={() => handleDeleteSession(session.id)}>
+											Delete Session
+										</button>
 									</td>
 								</tr>
 								{renderSessionMessages(session)}

@@ -649,10 +649,10 @@ def edit_session(session_id):
     }
     return jsonify(response_body), 200
     
-@api.route('/session/delete/<int:sess_id>', methods =["DELETE"])
-def delete_session(sess_id):
+@api.route('/session/delete/<int:session_id>', methods =["DELETE"])
+def delete_session(session_id):
 
-    session = Session.query.get(sess_id)
+    session = Session.query.get(session_id)
     if session is None:
         return jsonify({"msg": "No session found"}), 404
 
@@ -674,7 +674,13 @@ def get_sessions_by_customer_id():
 
     return jsonify(sessions), 200
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
+@api.route('/session/confirm/<int:session_id>', methods=['GET'])
+@customer_required
+def confirm_mentor(session_id):
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+    
 
 # Message routes Start # Message routes Start # Message routes Start
 # Message routes Start # Message routes Start # Message routes Start

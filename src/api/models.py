@@ -138,7 +138,7 @@ class Session(db.Model):
     totalHours = db.Column(db.Integer)
 
 
-    messages = db.relationship("Message", back_populates="session")
+    messages = db.relationship("Message", back_populates="session", cascade="all, delete")
 
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     customer = db.relationship("Customer", back_populates="sessions")
