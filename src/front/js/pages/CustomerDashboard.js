@@ -180,9 +180,25 @@ export const CustomerDashboard = () => {
 					{acceptedSessions.map((session) => (
 						<div key={session.id} className="session-card">
 							<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
-							<div className="sessionBody">
-								<div className="sessionTitle">{session.title}</div>
+							<div className="container sessionBody">
+								
+									<div className="row align-items-center justify-content-center">
+										<label className="col-auto"><strong>Session with:</strong></label>
+										<div className="col-auto sessionTitle">
+											<strong>{session.messages[0].mentor_name
+												.split(' ')
+												.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+												.join(' ')}</strong>
+										</div>
+									</div>
+								
+								<div className="text-center">
+									<div className="sessionTitle"><h4>{session.title}</h4></div>
+								</div>
 								<div className="sessionDescription">{session.description}</div>
+								<div className="sessionDescription">{session.duration}</div>
+								<div className="sessionDescription">{session.totalHours}</div>
+
 							</div>
 						</div>
 					))}
