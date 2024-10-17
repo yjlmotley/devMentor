@@ -697,16 +697,32 @@ def confirm_mentor_for_session(session_id, mentor_id):
     if mentor is None:
         return jsonify({"msg": "No mentor found"}), 404
 
-
     # Confirm mentor for session
     session.mentor_id = mentor_id
     session.is_active = False  # Marking the session as inactive once a mentor is confirmed
+
+    # Add an appointment
+    # Assuming the request includes start_time and end_time in the JSON body
+    data = request.get_json()
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+
+    if start_time and end_time:
+        new_appointment = {
+            "start_time": start_time,
+            "end_time": end_time
+        }
+        if session.appointments is None:
+            session.appointments = []
+        session.appointments.append(new_appointment)
+    else:
+        return jsonify({"msg": "Start time and end time are required for the appointment"}), 400
 
     db.session.commit()
     db.session.refresh(session)
 
     response_body = {
-        "msg": "Mentor successfully confirmed for session!",
+        "msg": "Mentor successfully confirmed for session and appointment added!",
         "session": session.serialize()
     }
     return jsonify(response_body), 200

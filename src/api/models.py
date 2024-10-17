@@ -131,6 +131,7 @@ class Session(db.Model):
     is_completed = db.Column(db.Boolean, nullable=True, default=False)
     schedule = db.Column(MutableDict.as_mutable(JSON), default={})
     time_created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    
     focus_areas = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     skills = db.Column(MutableList.as_mutable(ARRAY(db.String(255))), default=[])
     resourceLink = db.Column(db.String(255))
@@ -145,6 +146,8 @@ class Session(db.Model):
     
     mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=True)
     mentor = db.relationship("Mentor", back_populates="confirmed_sessions")
+
+    appointments = db.Column(MutableList.as_mutable(JSON), default=[])
 
     def __repr__(self):
         return f'<Mentor {self.id}>'
@@ -166,7 +169,12 @@ class Session(db.Model):
             "customer_id": self.customer_id,
             "customer_name": f"{self.customer.first_name} {self.customer.last_name}" if self.customer else None,
             "mentor_id": self.mentor_id,
-            "messages": [ message.serialize() for message in self.messages ]
+             "mentor_name": f"{self.mentor.first_name} {self.mentor.last_name}",
+            "messages": [ message.serialize() for message in self.messages ],
+            "appointments": [
+            {"start_time": app["start_time"], "end_time": app["end_time"]} 
+            for app in self.appointments
+            ]
         }
 
 class MentorImage(db.Model):

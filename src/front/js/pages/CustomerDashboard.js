@@ -185,7 +185,7 @@ export const CustomerDashboard = () => {
 									<div className="row align-items-center justify-content-center">
 										<label className="col-auto"><strong>Session with:</strong></label>
 										<div className="col-auto sessionTitle">
-											<strong>{session.messages[0].mentor_name
+											<strong>{session.customer_name
 												.split(' ')
 												.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 												.join(' ')}</strong>
