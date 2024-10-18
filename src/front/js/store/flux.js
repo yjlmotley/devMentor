@@ -275,6 +275,44 @@ const getState = ({ getStore, getActions, setStore }) => {
                 return true;
             },
 
+            editSession: async (sessionId, updatedSession, token) => {
+                try {
+                  const response = await fetch(
+                    process.env.BACKEND_URL + `/api/session/edit/${sessionId}`, 
+                    {
+                      method: "PUT",
+                      body: JSON.stringify({
+                        title: updatedSession.title,
+                        description: updatedSession.description,
+                        is_active: updatedSession.is_active,
+                        schedule: updatedSession.schedule,
+                        focus_areas: updatedSession.focus_areas,
+                        skills: updatedSession.skills,
+                        resourceLink: updatedSession.resourceLink,
+                        duration: updatedSession.duration,
+                        totalHours: updatedSession.totalHours,
+                      }),
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                      }
+                    }
+                  );
+            
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+            
+                  const responseBody = await response.json();
+                  console.log(responseBody);
+            
+                  return true;
+                } catch (error) {
+                  console.error("Error in editSession:", error);
+                  return false;
+                }
+              },
+
             getAllSessionRequests: async () => {
                 const store = getStore();
                 const token = sessionStorage.getItem("token");
@@ -303,6 +341,56 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                 } catch (error) {
                     console.error("Error fetching sessions:", error);
+                    return false;
+                }
+            },
+
+            deleteSessionById: async (sessionId) => {
+                const token = sessionStorage.getItem("token")
+                let options = {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: "Bearer " + token 
+                    }
+                }
+                let response = await fetch(process.env.BACKEND_URL + "/api/session/delete/" + sessionId, options)
+                if (response.status === 200) {
+                    let data = await response.json()
+                    console.log(data)
+                    return true
+                } else {
+                    alert("Delete Unsuccessful")
+                    return false
+                }
+            },
+
+            getSessionById: async (sessionId) => {
+                const token = sessionStorage.getItem("token"); // or however you're storing the token
+                if (!token) {
+                    console.error("No token found");
+                    return false;
+                }
+            
+                try {
+                    const response = await fetch(
+                        process.env.BACKEND_URL + `/api/session/${sessionId}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+            
+                    if (!response.ok) {
+                        console.error("Response not OK:", response.status, response.statusText);
+                        return false;
+                    }
+            
+                    const sessionData = await response.json();
+                    console.log("Session data received:", sessionData);
+                    return sessionData;
+                } catch (error) {
+                    console.error("Error fetching session data:", error);
                     return false;
                 }
             },
