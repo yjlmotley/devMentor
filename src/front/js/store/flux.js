@@ -422,43 +422,38 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            confirmMentorForSession: async (sessionId, mentorId) => {
+            confirmMentorForSession: async (sessionId, mentorId, startTime, endTime) => {
                 try {
                     const store = getStore();
                     const token = sessionStorage.getItem("token");
-
+            
                     if (!token) {
                         console.error("No token found, user must be logged in");
                         return false;
                     }
-
+            
                     const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/confirm-mentor/${mentorId}`, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${token}`
-                        }
+                        },
+                        body: JSON.stringify({ start_time: startTime, end_time: endTime })
                     });
-
+            
                     if (response.ok) {
                         const data = await response.json();
                         console.log("Mentor confirmed for session:", data);
-
+            
                         // Update the relevant store properties
                         const updatedSessions = store.customerSessions.map(session => 
                             session.id === sessionId ? data.session : session
                         );
-
+            
                         setStore({ 
                             customerSessions: updatedSessions
                         });
-
-                        // Optionally, you might want to update other parts of the store
-                        // For example, if you have a current session in the store:
-                        // if (store.currentSession && store.currentSession.id === sessionId) {
-                        //     setStore({ currentSession: data.session });
-                        // }
-
+            
                         return true;
                     } else {
                         console.error("Failed to confirm mentor with status:", response.status);

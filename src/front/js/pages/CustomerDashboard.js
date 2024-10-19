@@ -6,6 +6,13 @@ import "../../styles/customerDashboard.css";
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
 	const [messageInputs, setMessageInputs] = useState({});
+	const [confirmModalData, setConfirmModalData] = useState({
+		sessionId: null,
+		mentorId: null,
+		date: "",
+		startTime: "",
+		endTime: ""
+	});
 
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
@@ -44,11 +51,24 @@ export const CustomerDashboard = () => {
 		}
 	};
 
-	const handleConfirmMentor = async (sessionId, mentorId) => {
-		const success = await actions.confirmMentorForSession(sessionId, mentorId);
+	const handleConfirmMentor = async () => {
+		const { sessionId, mentorId, date, startTime, endTime } = confirmModalData;
+		if (!date || !startTime || !endTime) {
+			alert("Please fill in all fields");
+			return;
+		}
+
+		const startDateTime = new Date(`${date}T${startTime}`).toISOString();
+		const endDateTime = new Date(`${date}T${endTime}`).toISOString();
+
+		const success = await actions.confirmMentorForSession(sessionId, mentorId, startDateTime, endDateTime);
 		if (success) {
 			console.log("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
+			// Close the modal
+			const modal = document.getElementById(`ConfirmMentorModal${sessionId}${mentorId}`);
+			const modalInstance = bootstrap.Modal.getInstance(modal);
+			modalInstance.hide();
 		} else {
 			console.error("Failed to confirm mentor");
 			// You might want to show an error message to the user here
@@ -152,6 +172,76 @@ export const CustomerDashboard = () => {
 																>
 																	Confirm Mentor
 																</button>
+																{/* # #### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START ##### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START #### */}
+
+																<button
+																	type="button"
+																	className="btn btn-primary"
+																	data-bs-toggle="modal"
+																	data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
+																>
+																	Confirm Mentor Modal
+																</button>
+
+																<div
+																	className="modal fade"
+																	id={`ConfirmMentorModal${session.id}${mentorId}`}
+																	tabIndex="-1"
+																	role="dialog"
+																	aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
+																	aria-hidden="true"
+																>
+																	<div className="modal-dialog modal-dialog-centered" role="document">
+																		<div className="modal-content">
+																			<div className="modal-header">
+																				<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
+																				<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+																			</div>
+																			<div className="modal-body">
+																				<form>
+																					<div className="mb-3">
+																						<label htmlFor="date" className="form-label">Date</label>
+																						<input
+																							type="date"
+																							className="form-control"
+																							id="date"
+																							value={confirmModalData.date}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
+																						/>
+																					</div>
+																					<div className="mb-3">
+																						<label htmlFor="startTime" className="form-label">Start Time</label>
+																						<input
+																							type="time"
+																							className="form-control"
+																							id="startTime"
+																							value={confirmModalData.startTime}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, startTime: e.target.value })}
+																						/>
+																					</div>
+																					<div className="mb-3">
+																						<label htmlFor="endTime" className="form-label">End Time</label>
+																						<input
+																							type="time"
+																							className="form-control"
+																							id="endTime"
+																							value={confirmModalData.endTime}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, endTime: e.target.value })}
+																						/>
+																					</div>
+																				</form>
+																			</div>
+																			<div className="modal-footer">
+																				<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																				<button type="button" className="btn btn-success" onClick={() => handleConfirmMentor(session.id, mentorId)}>Confirm Mentor</button>
+																			</div>
+																		</div>
+																	</div>
+
+
+																</div>
+
+																{/* ##### Confirm Mentor Modal END ####  ##### Confirm Mentor Modal END ##### Confirm Mentor Modal END ####  ##### Confirm Mentor Modal END #### */}
 
 															</div>
 														</div>
@@ -181,17 +271,17 @@ export const CustomerDashboard = () => {
 						<div key={session.id} className="session-card">
 							<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
 							<div className="container sessionBody">
-								
-									<div className="row align-items-center justify-content-center">
-										<label className="col-auto"><strong>Session with:</strong></label>
-										<div className="col-auto sessionTitle">
-											<strong>{session.customer_name
-												.split(' ')
-												.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-												.join(' ')}</strong>
-										</div>
+
+								<div className="row align-items-center justify-content-center">
+									<label className="col-auto"><strong>Session with:</strong></label>
+									<div className="col-auto sessionTitle">
+										<strong>{session.customer_name
+											.split(' ')
+											.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+											.join(' ')}</strong>
 									</div>
-								
+								</div>
+
 								<div className="text-center">
 									<div className="sessionTitle"><h4>{session.title}</h4></div>
 								</div>
