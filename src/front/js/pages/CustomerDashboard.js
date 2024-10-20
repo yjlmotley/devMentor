@@ -53,7 +53,7 @@ export const CustomerDashboard = () => {
 
 	const handleConfirmMentor = async () => {
 		const { sessionId, mentorId, date, startTime, endTime } = confirmModalData;
-		if (!date || !startTime || !endTime) {
+		if (!sessionId || !mentorId || !date || !startTime || !endTime) {
 			alert("Please fill in all fields");
 			return;
 		}
@@ -66,9 +66,6 @@ export const CustomerDashboard = () => {
 			console.log("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
 			// Close the modal
-			const modal = document.getElementById(`ConfirmMentorModal${sessionId}${mentorId}`);
-			const modalInstance = bootstrap.Modal.getInstance(modal);
-			modalInstance.hide();
 		} else {
 			console.error("Failed to confirm mentor");
 			// You might want to show an error message to the user here
@@ -166,21 +163,16 @@ export const CustomerDashboard = () => {
 																>
 																	Send to Mentor {allMessages[0]?.mentor_name || `#${mentorId}`}
 																</button>
-																<button
-																	className="btn btn-success"
-																	onClick={() => handleConfirmMentor(session.id, mentorId)}
-																>
-																	Confirm Mentor
-																</button>
 																{/* # #### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START ##### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START #### */}
 
 																<button
 																	type="button"
-																	className="btn btn-primary"
+																	className="btn btn-success"
 																	data-bs-toggle="modal"
 																	data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
+																	onClick={() => setConfirmModalData({ ...confirmModalData, sessionId: session.id, mentorId: mentorId })}
 																>
-																	Confirm Mentor Modal
+																	Confirm Mentor
 																</button>
 
 																<div
@@ -266,33 +258,36 @@ export const CustomerDashboard = () => {
 			<h1 className="text-center mt-5">Your Sessions</h1>
 			<div>
 				<h2>Accepted Sessions</h2>
-				<div className="open-sessions">
-					{acceptedSessions.map((session) => (
-						<div key={session.id} className="session-card">
-							<img variant="top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
-							<div className="container sessionBody">
+				<div className="open-sessions container">
+					<div className="row">
+						{acceptedSessions.map((session) => (
+							<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
+								<div className="session-card card h-100">
+									<img variant="top" className="card-img-top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
+									<div className="card-body">
+										<div className="row align-items-center justify-content-center">
+											<label className="col-auto"><strong>Session with:</strong></label>
+											<div className="col-auto sessionTitle">
+												<strong>{session.customer_name
+													.split(' ')
+													.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+													.join(' ')}</strong>
+											</div>
+										</div>
 
-								<div className="row align-items-center justify-content-center">
-									<label className="col-auto"><strong>Session with:</strong></label>
-									<div className="col-auto sessionTitle">
-										<strong>{session.customer_name
-											.split(' ')
-											.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-											.join(' ')}</strong>
+										<div className="text-center">
+											<div className="sessionTitle"><h4>{session.title}</h4></div>
+										</div>
+										<div className="sessionDescription">{session.description}</div>
+										<div className="sessionDescription">{session.duration}</div>
+										<div className="sessionDescription">{session.totalHours}</div>
 									</div>
 								</div>
-
-								<div className="text-center">
-									<div className="sessionTitle"><h4>{session.title}</h4></div>
-								</div>
-								<div className="sessionDescription">{session.description}</div>
-								<div className="sessionDescription">{session.duration}</div>
-								<div className="sessionDescription">{session.totalHours}</div>
-
 							</div>
-						</div>
-					))}
+						))}
+					</div>
 				</div>
+
 
 				<h2>Open Sessions</h2>
 				<table className="striped bordered hover">

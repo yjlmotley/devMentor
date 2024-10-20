@@ -115,7 +115,7 @@ class Mentor(db.Model):
             "country": self.country,
             "years_exp": self.years_exp,
             "skills": [skill for skill in self.skills],
-            "confirmed_sessions": [confirmed_session for confirmed_session in self.confirmed_sessions],
+            "confirmed_sessions": [session.serialize() for session in self.confirmed_sessions] if self.confirmed_sessions else [],
             "days": [day for day in self.days],
             "profile_photo": self.profile_photo.serialize() if self.profile_photo else None,
             "portfolio_photos": [portfolio_photo.serialize() for portfolio_photo in self.portfolio_photos],
