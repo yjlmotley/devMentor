@@ -72,6 +72,41 @@ export const CustomerDashboard = () => {
 		}
 	};
 
+	const formatDate = (dateString) => {
+		const date = new Date(dateString);
+		const months = [
+			"January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December"
+		];
+
+		const day = date.getDate();
+		const month = months[date.getMonth()];
+
+		// Add appropriate suffix to day
+		const suffix =
+			day % 10 === 1 && day !== 11 ? "st" :
+				day % 10 === 2 && day !== 12 ? "nd" :
+					day % 10 === 3 && day !== 13 ? "rd" : "th";
+
+		return `${month} ${day}${suffix}`;
+	};
+
+	const formatTime = (dateString) => {
+		const date = new Date(dateString);
+		let hours = date.getHours();
+		let minutes = date.getMinutes();
+		const ampm = hours >= 12 ? 'pm' : 'am';
+
+		// Convert to 12-hour format
+		hours = hours % 12;
+		hours = hours ? hours : 12; // Handle midnight (0:00)
+
+		// Ensure minutes have leading zero if needed
+		minutes = minutes < 10 ? '0' + minutes : minutes;
+
+		return `${hours}:${minutes}${ampm}`;
+	};
+
 	const renderSessionMessages = (session) => {
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
 			const mentorId = msg.mentor_id;
@@ -279,8 +314,30 @@ export const CustomerDashboard = () => {
 											<div className="sessionTitle"><h4>{session.title}</h4></div>
 										</div>
 										<div className="sessionDescription">{session.description}</div>
-										<div className="sessionDescription">{session.duration}</div>
-										<div className="sessionDescription">{session.totalHours}</div>
+										<div className="container-fluid justify-content-between d-flex">
+											<div className="row">
+												<div className="col-5 ">
+													<label ><strong>Duration:</strong></label>
+													<div>{session.duration + " Minutes"}</div>
+
+													<div className="text-secondary-emphasis rounded" >
+														<label><strong>Total Hours:</strong> {session.totalHours} </label>
+													</div>
+												</div>
+												<div className="col-7">
+													<div className="text-secondary-emphasis rounded" >
+														<div><strong>Date:</strong></div>
+														<div >{formatDate(session.appointments[0].start_time)}</div>
+													</div>
+
+
+													<div ><strong>Time:</strong></div>
+													<div >{formatTime(session.appointments[0].start_time) + "-" + formatTime(session.appointments[0].end_time)}</div>
+												</div>
+											</div>
+
+
+										</div>
 									</div>
 								</div>
 							</div>
