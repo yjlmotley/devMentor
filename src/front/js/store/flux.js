@@ -34,16 +34,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                             currentUserData: data,
                             mentorId: data.user_data.id
                         })
+                        return true
                     }
                     if (data.role == "customer") {
                         setStore({
                             isCustomerLoggedIn: true,
                             currentUserData: data
                         })
+                        return true
                     }
                 } else {
                     console.error("Login failed with status:", response.status);
                     getActions().logOut()
+                    return false
                 }
             },
             checkStorage: () => {
