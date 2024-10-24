@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 // import '../../styles/CustomerSignUp.css';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidatePhone } from "../component/Validators";
+import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidatePhone, ValidateWhatState, ValidateCountry } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
@@ -37,8 +37,10 @@ export const CustomerSignup = () => {
         let isLastNameValid = ValidateLastName(last_name, setInvalidItems);
         let isPasswordValid = ValidatePassword(password, setInvalidItems);
         let isCityValid = ValidateCity(city, setInvalidItems);
+        let isWhatStateValid = ValidateWhatState(what_state, setInvalidItems);
+        let isCountryValid = ValidateCountry(country, setInvalidItems);
         let isPhoneValid = ValidatePhone(phone, countryCode, setInvalidItems);
-        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isPhoneValid) {
+        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isWhatStateValid && isCountryValid && isCityValid && isPhoneValid) {
             const success = await actions.signUpCustomer({
                 email: email,
                 password: password,
@@ -69,11 +71,11 @@ export const CustomerSignup = () => {
     };
 
     const handlePhoneChange = (value, countryData) => {
-        const countryCode = countryData?.countryCode || "us"; 
+        const countryCode = countryData?.countryCode || "us";
         setCountryCode(countryData?.countryCode || "us");
 
         setPhone(value);
-        
+
         // comment out the bottom 4 lines if you do not want to see the phone error before form submission
         const isPhoneValid = ValidatePhone(value, countryCode, setInvalidItems);
         if (isPhoneValid) {
@@ -88,7 +90,6 @@ export const CustomerSignup = () => {
             event.preventDefault();
             handleSignup();
         }}>
-            {/* <div className="container pt-5 bg-black "> */}
             <div style={{ width: '100%', maxWidth: '1000px', margin: '30px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
                 <div className="row justify-content-center">
                     <div className="col-md-6 pb-5 text-light authDiv" >
@@ -103,7 +104,7 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setEmail(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("email") && <label className="error-label">Invalid email format</label>}
+                                {invalidItems.includes("email") && <label className="error-label">Invalid email format (must be similar to this example: example@domain.com)</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
@@ -114,7 +115,7 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setPassword(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format</label>}
+                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format. Must be between 5 and 20 characters.</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
@@ -125,7 +126,7 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setConfirmPassword(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format</label>}
+                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format. Must be between 5 and 20 characters.</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
@@ -136,7 +137,7 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setFirst_name(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("first_name") && <label className="error-label">First Name is required</label>}
+                                {invalidItems.includes("first_name") && <label className="error-label">First Name is required. Must be between 2 - 25 characters.</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
                                 <input
@@ -147,18 +148,9 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setLast_name(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("last_name") && <label className="error-label">Last Name is required</label>}
+                                {invalidItems.includes("last_name") && <label className="error-label">Last Name is required. Must be between 2 - 25 characters.</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>
-                                {/* <input
-                                    type="phone"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Phone"
-                                    value={phone}
-                                    onChange={(event) => setPhone(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("phone") && <label className="error-label">phone number is required</label>} */}
                                 <PhoneInput
                                     country={'us'}
                                     value={phone}
@@ -174,20 +166,8 @@ export const CustomerSignup = () => {
                                     }}
                                     required
                                 />
-                                {invalidItems.includes("phone") && <label className="error-label">Invalid phone format</label>}
+                                {invalidItems.includes("phone") && <label className="error-label">Invalid phone format. Please put in a valid phone number.</label>}
                             </div>
-                            
-                            {/* <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="country"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Country"
-                                    value={country}
-                                    onChange={(event) => setCountry(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
-                            </div> */}
                             <div style={{ marginBottom: '20px' }}>
                                 <Select
                                     isClearable
@@ -198,18 +178,6 @@ export const CustomerSignup = () => {
                                             ...baseStyles,
                                             color: 'black',
                                         }),
-                                        // singleValue: (base) => ({
-                                        //     ...base,
-                                        //     color: '#000', // Customize text color of selected value
-                                        // }),
-                                        // option: (base, state) => ({
-                                        //     ...base,
-                                        //     backgroundColor: '#fff',
-                                        //     color: '#000',
-                                        //     '&:hover': {
-                                        //         backgroundColor: state.isSelected ? '#007bff' : '#f0f0f0',
-                                        //     }
-                                        // }),
                                     }}
                                     options={countryOptions}
                                     className="basic-single-select"
@@ -226,17 +194,6 @@ export const CustomerSignup = () => {
                                 />
                                 {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
                             </div>
-                            {/* <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="what_state"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="State"
-                                    value={what_state}
-                                    onChange={(event) => setWhat_state(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
-                            </div> */}
                             <div style={{ marginBottom: '20px' }}>
                                 <CreatableSelect
                                     isClearable
@@ -258,7 +215,7 @@ export const CustomerSignup = () => {
                                     }
                                     placeholder="Select or Type a State/ Providence..."
                                 />
-                                {invalidItems.includes("what_state") && <label className="error-label">State is required</label>}
+                                {invalidItems.includes("what_state") && <label className="error-label">State/Providence is required. Must be between 2-80 characters.</label>}
                             </div>
 
 
@@ -272,7 +229,7 @@ export const CustomerSignup = () => {
                                     onChange={(event) => setCity(event.target.value)}
                                     required
                                 />
-                                {invalidItems.includes("city") && <label className="error-label">City is required</label>}
+                                {invalidItems.includes("city") && <label className="error-label">City is required. Must be between 2 - 80 characters.</label>}
                             </div>
                             <div style={{ textAlign: 'center' }}>
                                 <button

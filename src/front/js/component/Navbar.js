@@ -80,6 +80,10 @@ export const Navbar = () => {
 											<span className="navbarFont">Mentor Profile</span>
 											<i className="fa-solid fa-id-card-clip" />
 										</Link>
+										<Link to="/mentor-session-board" className="dropdown-item bold-text text-end">
+											<span className="navbarFont">Mentor Session Board</span>
+											<i className="fa-solid fa-id-card-clip" />
+										</Link>
 										<button className="dropdown-item bold-text text-end" onClick={handleLogout}>
 											<span className="navbarFont">Log Out</span>
 											<i className="fa-solid fa-right-from-bracket" />

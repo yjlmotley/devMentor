@@ -5,6 +5,7 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 import { Home } from "./pages/Home";
+import injectContext from "./store/appContext";
 
 import { MentorSignup } from "./pages/MentorSignup";
 import { MentorLogin } from "./component/MentorLogin";
@@ -18,8 +19,11 @@ import { ResetPassword } from "./pages/ResetPassword.js";
 import { CustomerSignup } from "./pages/CustomerSignup.js";
 import { CustomerLogin } from "./component/CustomerLogin";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
+
 import { CreateSession } from "./pages/CreateSession";
-import injectContext from "./store/appContext";
+import { EditSession } from "./pages/EditSession";
+
+
 
 import { Navbar } from "./component/Navbar.js";
 // import { Footer } from "./component/footer";
@@ -63,7 +67,9 @@ const Layout = () => {
                         <Route element={<CustomerSignup />} path="/customer-signup" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
+                        
                         <Route element={<CreateSession />} path="/create-session" />
+                        <Route element={<EditSession />} path="edit-session/:sessionId" />
 
                         <Route 
                             path="*"

@@ -4,14 +4,14 @@ import { skillsList } from "../store/data";
 import { Context } from "../store/appContext";
 import ReactSlider from "react-slider";
 import "../../styles/createSession.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const TimeRangeSlider = ({ day, value, onChange }) => {
   const formatTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     const period = hours < 12 ? 'AM' : 'PM';
-    const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+    const displayHours = hours % 12 || 12;
     return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
   };
 
@@ -37,9 +37,10 @@ const TimeRangeSlider = ({ day, value, onChange }) => {
   );
 };
 
-export const CreateSession = () => {
+export const EditSession = () => {
   const { actions, store } = useContext(Context);
   const navigate = useNavigate();
+  const { sessionId } = useParams();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -62,53 +63,58 @@ export const CreateSession = () => {
   useEffect(() => {
     if(!store.token) {
         navigate("/customer-login");
+    } else {
+        loadSessionData();
     }
-  }, [store.token])
+  }, [store.token, sessionId]);
+
+  const loadSessionData = async () => {
+    const sessionData = await actions.getSessionById(sessionId);
+    if (sessionData) {
+      setTitle(sessionData.title);
+      setDescription(sessionData.description);
+      setIs_Active(sessionData.is_active);
+      setSchedule(sessionData.schedule);
+      setfocus_areas(sessionData.focus_areas);
+      setSelectedSkills(sessionData.skills);
+      setResourceLink(sessionData.resourceLink);
+      setDuration(sessionData.duration);
+      setTotalHours(sessionData.totalHours);
+    } else {
+      alert("Failed to load session data.");
+      navigate("/sessions");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log("Submitting form...");
 
-    const customerId = store.currentUserData.user_data.id;
-
-    if (!store.currentUserData) {
-      alert("User data is not available. Please try again.");
-      return;
-    }
-
-    const success = await actions.createSession({
-      customer_id: customerId,
-      title: title,
-      description: description,
-      schedule: schedule,
-      is_active: is_active,
-      focus_areas: focus_areas,
+    const updatedSession = {
+      title,
+      description,
+      schedule,
+      is_active,
+      focus_areas,
       skills: selectedSkills,
-      resourceLink: resourceLink,
-      duration: duration,
-      totalHours: totalHours
-    })
+      resourceLink,
+      duration,
+      totalHours
+    };
 
-    if (success) {
-      setTitle("");
-      setDescription("");
-      setIs_Active(false)
-      setSchedule({
-        monday: { checked: false, start: 540, end: 1020 },
-        tuesday: { checked: false, start: 540, end: 1020 },
-        wednesday: { checked: false, start: 540, end: 1020 },
-        thursday: { checked: false, start: 540, end: 1020 },
-        friday: { checked: false, start: 540, end: 1020 },
-        saturday: { checked: false, start: 540, end: 1020 },
-        sunday: { checked: false, start: 540, end: 1020 },
-      });
-      setfocus_areas([])
-      setSelectedSkills([]);
-      setResourceLink("")
-      setDuration("")
-      setTotalHours(0)
-      
-    } else {
-      alert("Something went wrong creating a Mentor Session.");
+    console.log("Updated session data:", updatedSession);
+
+    try {
+      const success = await actions.editSession(sessionId, updatedSession, store.token);
+      if (success) {
+        alert("Session updated successfully!");
+        navigate("/customer-dashboard");
+      } else {
+        alert("Something went wrong updating the Mentor Session.");
+      }
+    } catch (error) {
+      console.error("Error updating session:", error);
+      alert("An error occurred while updating the session.");
     }
   };
 
@@ -135,11 +141,9 @@ export const CreateSession = () => {
     setfocus_areas(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]);
   };
 
-
-
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Propose a session</h1>
+      <h1 className="mb-4">Edit Session</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">Title</label>
@@ -173,7 +177,6 @@ export const CreateSession = () => {
             value={is_active ? "True" : "False"}
             onChange={(e) => setIs_Active(e.target.value === "True")}
           >
-            <option value="">Select visibility</option>
             <option value="True">Public</option>
             <option value="False">Private</option>
           </select>
@@ -209,7 +212,7 @@ export const CreateSession = () => {
         <div className="mb-3">
           <label className="form-label">Focus areas</label>
           <div className="d-flex flex-wrap">
-            {["Career advice", "Resume review", "Mock interview", "Machine Learning", "Algorithums", "AI", "SAAS", "WebApp Building", "Codeing"].map((area) => (
+            {["Career advice", "Resume review", "Mock interview", "Machine Learning", "Algorithms", "AI", "SAAS", "WebApp Building", "Coding"].map((area) => (
               <div key={area} className="form-check me-3">
                 <input
                   className="form-check-input"
@@ -252,10 +255,6 @@ export const CreateSession = () => {
           </div>
         </div>
 
-        {/* <div className="mb-3">
-          <button type="button" className="btn btn-outline-secondary">Upload file</button>
-        </div> */}
-
         <h2 className="mb-3">Finalize session</h2>
 
         <div className="mb-3">
@@ -266,7 +265,6 @@ export const CreateSession = () => {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           >
-            <option value="">Select duration</option>
             <option value="30">30 minutes</option>
             <option value="60">1 hour</option>
             <option value="90">1.5 hours</option>
@@ -290,10 +288,10 @@ export const CreateSession = () => {
           </div>
         </div>
 
-        <button type="submit" className="btn btn-warning w-100 mt-1 mb-4">Preview</button>
+        <button type="submit" className="btn btn-warning w-100 mt-1 mb-4">Update Session</button>
       </form>
     </div>
   );
 };
 
-export default CreateSession;
+export default EditSession;

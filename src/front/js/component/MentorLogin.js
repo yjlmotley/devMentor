@@ -83,7 +83,7 @@ export const MentorLogin = () => {
                         </div>
                     </div>
                 </div>
-            </div>Ks
+            </div>
         </form>
     );
 };
