@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
+import { GoogleMeeting } from "../component/GoogleMeeting";
 
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
@@ -21,6 +22,7 @@ export const CustomerDashboard = () => {
 
 	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
 	const openSessions = store.customerSessions.filter(session => session.mentor_id == null && session.is_active);
+	const draftSessions = store.customerSessions.filter(session => session.mentor_id == null && !session.is_active)
 	const pastSessions = store.customerSessions.filter(session => session.is_completed);
 
 	const handleMessageInputChange = (sessionId, mentorId, value) => {
@@ -335,9 +337,41 @@ export const CustomerDashboard = () => {
 													<div >{formatTime(session.appointments[0].start_time) + "-" + formatTime(session.appointments[0].end_time)}</div>
 												</div>
 											</div>
+										</div>
 
+										<div className="row mt-3">
+											<div className="col text-center">
+											
+											<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+													Launch Google Meet Now
+											</button>
+
+											</div> 
+											<div className="container-fluid justify-content-between d-flex">
+												{/* MODAL FOR GOOGLEMEET */}
+											
+												
+												<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+													<div class="modal-dialog modal-dialog-centered  modal-fullscreen-sm-down">
+														<div class="modal-content">
+															<div class="modal-header">
+																<h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+																<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div class="modal-body">
+																<GoogleMeeting />
+															</div>
+															<div class="modal-footer">
+																<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																<button type="button" class="btn btn-primary">Save changes</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
 
 										</div>
+
 									</div>
 								</div>
 							</div>
@@ -360,6 +394,43 @@ export const CustomerDashboard = () => {
 					</thead>
 					<tbody>
 						{openSessions.map((session) => (
+							<React.Fragment key={session.id}>
+								<tr>
+									<td>{session.title}</td>
+									<td>{session.description}</td>
+									<td>{session.skills.join(', ')}</td>
+									<td>{session.focus_areas.join(', ')}</td>
+									<td>
+										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+											{session.resourceLink}
+										</a>
+									</td>
+									<td>
+										<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
+										<button className="btn btn-danger mt-2" onClick={() => handleDeleteSession(session.id)}>
+											Delete Session
+										</button>
+									</td>
+								</tr>
+								{renderSessionMessages(session)}
+							</React.Fragment>
+						))}
+					</tbody>
+				</table>
+				<h2>Draft Sessions</h2>
+				<table className="striped bordered hover">
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Description</th>
+							<th>Skills</th>
+							<th>Focus Areas</th>
+							<th>Resource Link</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{draftSessions.map((session) => (
 							<React.Fragment key={session.id}>
 								<tr>
 									<td>{session.title}</td>
@@ -408,9 +479,7 @@ export const CustomerDashboard = () => {
 											{session.resourceLink}
 										</a>
 									</td>
-									<td>
-										<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
-									</td>
+
 								</tr>
 								{renderSessionMessages(session)}
 							</React.Fragment>

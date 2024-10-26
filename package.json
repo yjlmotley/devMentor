@@ -74,6 +74,7 @@
 	},
 	"dependencies": {
 		"libphonenumber-js": "^1.11.4",
+		"lucide-react": "^0.453.0",
 		"prop-types": "^15.6.1",
 		"react": "^16.8.4",
 		"react-dom": "^16.8.4",
