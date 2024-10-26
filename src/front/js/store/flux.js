@@ -134,7 +134,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     formData.append("file", images[i]);
                 }
 
-
                 const response = await fetch(process.env.BACKEND_URL + "/api/mentor/upload-photo", {
                     method: "POST",
                     headers: {
