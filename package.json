@@ -73,6 +73,7 @@
 		]
 	},
 	"dependencies": {
+		"cors": "^2.8.5",
 		"express": "^4.21.1",
 		"libphonenumber-js": "^1.11.4",
 		"prop-types": "^15.6.1",

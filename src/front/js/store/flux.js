@@ -140,7 +140,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     headers: {
                         Authorization: "Bearer " + sessionStorage.getItem("token")
                     },
-                    body: formData
+                    body: formData,
+                    mode: 'cors',
+                    credentials: 'include'
                 })
 
                 if (response.status !== 200) return false;
@@ -165,7 +167,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     headers: {
                         Authorization: "Bearer " + sessionStorage.getItem("token")
                     },
-                    body: formData
+                    body: formData,
+                    mode: 'cors',
+                    credentials: 'include'
                 })
                 if (response.status !== 200) return false;
                 const responseBody = await response.json();
@@ -278,12 +282,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             getAllSessionRequests: async () => {
                 const store = getStore();
                 const token = sessionStorage.getItem("token");
-            
+
                 if (!token) {
                     console.error("No token found in sessionStorage");
                     return false;
                 }
-            
+
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}/api/sessions`, {
                         method: "GET",
@@ -292,7 +296,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-            
+
                     if (response.ok) {
                         const data = await response.json();
                         setStore({ ...store, sessionRequests: data });
@@ -318,17 +322,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/sessions/customer", {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + sessionStorage.getItem('token')
-                        }
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('token')
                     }
+                }
                 )
                 if (response.ok) {
                     const sessions = await response.json();
                     console.log("Customer sessions:", sessions);
-                    setStore({...store, customerSessions: sessions})
+                    setStore({ ...store, customerSessions: sessions })
                 } else {
                     console.error("Failed to fetch customer sessions with status:", response.status);
                 }
@@ -355,7 +359,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Message sent successfully:", data);
-                    
+
                     return true;
                 } else {
                     console.error("Failed to send message with status:", response.status);
@@ -368,7 +372,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("No token found in sessionStorage");
                     return false;
                 }
-            
+
                 const response = await fetch(`${process.env.BACKEND_URL}/api/message-customer`, {
                     method: "POST",
                     headers: {
@@ -381,7 +385,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         mentor_id: mentorId
                     })
                 });
-            
+
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Message sent successfully:", data);
