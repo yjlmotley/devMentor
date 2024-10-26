@@ -1,13 +1,15 @@
-# ignore all files starting with .
+# Ignore all files starting with .
 .*
 
-# track this file .gitignore (i.e. do NOT ignore it)
+# Track this file .gitignore and .github (do NOT ignore them)
 !.gitignore
 !.github
-php_errorlog
-.log
 
-# do not ignore gitpod and render files
+# Ignore log files and specific log file types
+php_errorlog
+*.log
+
+# Track Gitpod, Render, and other development files
 !.gitpod.Dockerfile
 !.welcome
 !.devcontainer
@@ -17,39 +19,38 @@ php_errorlog
 !render.yml
 !.render-buildpacks.json
 
-# track webpack configs (i.e. do NOT ignore it)
+# Track webpack and config files
 !composer.json
 !webpack.config.js
 !package.json
 !webpack.production.js
 !webpack.development.js
 
-# track readme.md in the root (i.e. do NOT ignore it)
+# Track README.md in the root
 !README.md
 
-# ignore OS generated files
+# Ignore OS generated files
 ehthumbs.db
 Thumbs.db
+.DS_Store
 
-# ignore Editor files
+# Ignore editor-specific files
 *.sublime-project
 *.sublime-workspace
 *.komodoproject
 
-# ignore log files and databases
+# Ignore various log, SQL, and database files
 *.log
 *.sql
 *.sqlite
 
-# ignore compiled files
+# Ignore compiled and packaged files
 *.com
 *.class
 *.dll
 *.exe
 *.o
 *.so
-
-# ignore packaged files
 *.7z
 *.dmg
 *.gz
@@ -59,22 +60,47 @@ Thumbs.db
 *.tar
 *.zip
 
-# ignore node/grunt dependency directories
+# Ignore node/grunt dependency directories and cache
 node_modules/
+.cache/
+.webpack/
+.pnp/
+.pnp.js
 
-# webpack output
-dist/*
+# Ignore testing and coverage outputs
+/coverage
+
+# Ignore production build directories
+/dist
+/build
+/dist/*
+
+# Track specific files in public and dist directories
 !public/
 !public/*
-
-# ignore the dist directory were our bundle files are going to be
 !.gitkeep
 !.htaccess
-!.eslintrc
-!.env.example
-.now
 
-# backend stuff
+# Miscellaneous ignore rules
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug and error logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and editor config files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Backend specific files
 .venv
 database.database
 database.db
