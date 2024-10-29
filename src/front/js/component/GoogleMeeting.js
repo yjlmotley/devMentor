@@ -145,120 +145,119 @@ export const GoogleMeeting = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h1 className="text-3xl font-bold mb-2 text-center my-4 py-3">Google Meet Integration</h1>
-          <h5> 1. Authenticate with Google </h5>
-          <h5> 2. Create Meeting </h5>
-          <h5> 3. Message Mentor Meeting Link</h5>
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl border-4 border-gray-300 p-8">
+        <h1 className="text-3xl font-bold mb-2 text-center my-4 py-3">Google Meet Integration</h1>
+        <h5 className="mb-4">1. Authenticate with Google</h5>
+        <h5 className="mb-4">2. Create Meeting</h5>
+        <h5 className="mb-4">3. Message Mentor Meeting Link</h5>
+        <h5 className="mb-6">4. Join Meeting Link and meet mentor</h5>
 
-          {/* Auth Section */}
-          <div className="mb-6 d-flex justify-content-center">
-            <button
-              className="btn btn-primary d-flex align-items-center justify-content-center px-5 py-3"
-              onClick={startAuth}
-              disabled={meetingInfo.loading}
-            >
-              {meetingInfo.loading ? (
-                <span className="spinner-border spinner-border-sm mr-2"></span>
-              ) : (
-                <Users className="w-5 h-5 mr-2" />
-              )}
-              Authenticate with Google
-            </button>
+        {/* Auth Section */}
+        <div className="mb-6 flex justify-center">
+          <button
+            className="btn btn-primary flex items-center justify-center px-5 py-3 rounded-full hover:bg-blue-600 transition-colors"
+            onClick={startAuth}
+            disabled={meetingInfo.loading}
+          >
+            {meetingInfo.loading ? (
+              <span className="spinner-border spinner-border-sm mr-2"></span>
+            ) : (
+              <Users className="w-5 h-5 mr-2" />
+            )}
+            Authenticate with Google
+          </button>
+        </div>
+
+        {/* Create Meeting Button */}
+        <div className="mb-6 py-4 flex justify-center">
+          <button
+            className="btn btn-success flex items-center justify-center px-5 py-3 rounded-full hover:bg-green-600 transition-colors"
+            onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Create New Meeting
+          </button>
+        </div>
+
+        {/* Meeting Form */}
+        {meetingForm.isFormVisible && (
+          <div className="bg-gray-100 rounded-2xl p-6 mb-6">
+            <form onSubmit={createMeeting}>
+              {/* ... (code remains the same) */}
+            </form>
           </div>
+        )}
 
-          {/* Create Meeting Button */}
-          <div className="mb-6 py-4 d-flex justify-content-center">
-            <button
-              className="btn btn-success d-flex align-items-center justify-content-center px-5 py-3"
-              onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
+        {/* Error Display */}
+        {meetingInfo.error && (
+          <div className="alert alert-danger mb-6">{meetingInfo.error}</div>
+        )}
+
+        {/* Meetings List */}
+        <div className="space-y-4">
+          {meetingInfo.meetings.map((meeting) => (
+            <div
+              key={meeting.meetingId}
+              className="border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Create New Meeting
-            </button>
-          </div>
-
-          {/* Meeting Form */}
-          {meetingForm.isFormVisible && (
-            <div className="bg-light rounded-lg p-4 mb-6">
-              <form onSubmit={createMeeting}>
-                {/* ... (code remains the same) */}
-              </form>
-            </div>
-          )}
-
-          {/* Error Display */}
-          {meetingInfo.error && (
-            <div className="alert alert-danger mb-6">{meetingInfo.error}</div>
-          )}
-
-          {/* Meetings List */}
-          <div className="space-y-4">
-            {meetingInfo.meetings.map((meeting) => (
-              <div
-                key={meeting.meetingId}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md"
-              >
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <h3 className="font-weight-bold">{meeting.summary}</h3>
-                    <div className="text-muted mt-1">
-                      <div className="d-flex align-items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {new Date(meeting.startTime).toLocaleString()}
-                      </div>
-                      <div className="d-flex align-items-center mt-1">
-                        <Clock className="w-4 h-4 mr-1" />
-                        Duration: {
-                          Math.round(
-                            (new Date(meeting.endTime) - new Date(meeting.startTime)) / 1000 / 60
-                          )
-                        }{" "}
-                        minutes
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold">{meeting.summary}</h3>
+                  <div className="text-gray-500 mt-1">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {new Date(meeting.startTime).toLocaleString()}
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <Clock className="w-4 h-4 mr-1" />
+                      Duration: {
+                        Math.round(
+                          (new Date(meeting.endTime) - new Date(meeting.startTime)) / 1000 / 60
+                        )
+                      }{" "}
+                      minutes
+                    </div>
+                  </div>
+                  {meeting.attendees?.length > 0 && (
+                    <div className="text-gray-500 mt-1">
+                      <div className="flex items-center">
+                        <Users className="w-4 h-4 mr-1" />
+                        {meeting.attendees.join(", ")}
                       </div>
                     </div>
-                    {meeting.attendees?.length > 0 && (
-                      <div className="text-muted mt-1">
-                        <div className="d-flex align-items-center">
-                          <Users className="w-4 h-4 mr-1" />
-                          {meeting.attendees.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="d-flex space-x-2">
-                    <button
-                      onClick={() => copyToClipboard(meeting.meetingUrl)}
-                      className="text-primary"
-                      title="Copy meeting link"
-                    >
-                      <LinkIcon className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => deleteMeeting(meeting.meetingId)}
-                      className="text-danger"
-                      title="Delete meeting"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
+                  )}
                 </div>
 
-                <div className="mt-3">
-                  <a
-                    href={meeting.meetingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-success"
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => copyToClipboard(meeting.meetingUrl)}
+                    className="text-blue-500 hover:text-blue-600 transition-colors"
+                    title="Copy meeting link"
                   >
-                    Join Meeting
-                  </a>
+                    <LinkIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => deleteMeeting(meeting.meetingId)}
+                    className="text-red-500 hover:text-red-600 transition-colors"
+                    title="Delete meeting"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="mt-3">
+                <a
+                  href={meeting.meetingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-success rounded-full px-5 py-3 hover:bg-green-600 transition-colors"
+                >
+                  Join Meeting
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
