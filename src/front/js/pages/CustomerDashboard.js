@@ -7,6 +7,7 @@ import { GoogleMeeting } from "../component/GoogleMeeting";
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
 	const [messageInputs, setMessageInputs] = useState({});
+	const [activeSessionId, setActiveSessionId] = useState(null);
 	const [confirmModalData, setConfirmModalData] = useState({
 		sessionId: null,
 		mentorId: null,
@@ -18,7 +19,53 @@ export const CustomerDashboard = () => {
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
 		actions.getCustomerSessions();
+
+		// Parse URL parameters
+		const params = new URLSearchParams(location.search);
+		const auth = params.get('auth');
+		const error = params.get('error');
+
+		// If we have successful authentication and an active session ID
+		if (auth === 'success' && activeSessionId) {
+			// Use setTimeout to ensure the modal is available in the DOM
+			setTimeout(() => {
+				const modalElement = document.querySelector(`#GoogleMeetModal${activeSessionId}`);
+				if (modalElement) {
+					const bsModal = new bootstrap.Modal(modalElement);
+					bsModal.show();
+				}
+			}, 500);
+		} else if (error) {
+			// Handle error case
+			console.error("Authentication error:", error);
+			// You might want to show an error message to the user
+		}
+	}, [location.search, activeSessionId]);
+
+	useEffect(() => {
+		const storedSessionId = localStorage.getItem('pendingMeetingSessionId');
+		if (storedSessionId) {
+			setActiveSessionId(storedSessionId);
+			// Clear the stored sessionId
+			localStorage.removeItem('pendingMeetingSessionId');
+		}
 	}, []);
+
+	// Function to handle opening the Google Meet modal
+	const handleGoogleMeetClick = (sessionId) => {
+		setActiveSessionId(sessionId);
+		// Store the sessionId in localStorage before redirecting to OAuth
+		localStorage.setItem('pendingMeetingSessionId', sessionId);
+	};
+
+	const cleanupModal = () => {
+		const backdrop = document.querySelector('.modal-backdrop');
+		if (backdrop) {
+			backdrop.remove();
+		}
+		document.body.classList.remove('modal-open');
+		document.body.style.removeProperty('padding-right');
+	};
 
 	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
 	const openSessions = store.customerSessions.filter(session => session.mentor_id == null && session.is_active);
@@ -305,7 +352,13 @@ export const CustomerDashboard = () => {
 											<div className="container-fluid justify-content-between d-flex">
 												{/* MODAL FOR GOOGLEMEET */}
 
-												<div className="modal fade" id={`GoogleMeetModal${session.id}`} tabindex="-1" aria-labelledby={`GoogleMeetModal${session.id}`} aria-hidden="true">
+												<div className="modal fade"
+													onClick={() => handleGoogleMeetClick(session.id)}
+													id={`GoogleMeetModal${session.id}`}
+													tabindex="-1"
+													aria-labelledby={`GoogleMeetModal${session.id}`}
+													aria-hidden="true"
+												>
 													<div className="modal-dialog modal-dialog-centered  modal-fullscreen-sm-down">
 														<div className="modal-content">
 															<div className="modal-header">
@@ -318,7 +371,12 @@ export const CustomerDashboard = () => {
 																{renderSessionMessages(session, true)}
 															</div>
 															<div className="modal-footer">
-																<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																<button
+																	type="button"
+																	data-bs-dismiss="modal"
+																	aria-label="Close"
+																	onClick={cleanupModal}
+																>Close</button>
 																<button type="button" className="btn btn-primary">Save changes</button>
 															</div>
 														</div>
