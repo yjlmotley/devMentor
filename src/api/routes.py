@@ -5,7 +5,7 @@ import os
 import logging
 from datetime import datetime, timedelta
 
-from flask import Flask, request, jsonify, url_for, Blueprint, current_app
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app, redirect
 from flask_cors import CORS
 import jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
@@ -20,6 +20,9 @@ from api.utils import generate_sitemap, APIException
 from api.decorators import mentor_required, customer_required
 from api.send_email import send_email
 from enum import Enum as PyEnum
+
+from .googlemeet import meet_service
+from urllib.parse import urlencode
 
 
 api = Blueprint('api', __name__)
@@ -518,7 +521,10 @@ def delete_customer(cust_id):
 
     
 
-# Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
 
 @api.route('/sessions', methods= ['GET'])
 def all_sessions():
@@ -681,6 +687,52 @@ def confirm_mentor(session_id):
     if session is None:
         return jsonify({"msg": "No session found"}), 404
     
+@api.route('/session/<int:session_id>/confirm-mentor/<int:mentor_id>', methods=['PUT'])
+@customer_required
+def confirm_mentor_for_session(session_id, mentor_id):
+    customer_id = get_jwt_identity()
+
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+
+    if session.customer_id != customer_id:
+        return jsonify({"msg": "You are not authorized to modify this session"}), 403
+
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+
+    # Confirm mentor for session
+    session.mentor_id = mentor_id
+    session.is_active = False  # Marking the session as inactive once a mentor is confirmed
+
+    # Add an appointment
+    # Assuming the request includes start_time and end_time in the JSON body
+    data = request.get_json()
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+
+    if start_time and end_time:
+        new_appointment = {
+            "start_time": start_time,
+            "end_time": end_time
+        }
+        if session.appointments is None:
+            session.appointments = []
+        session.appointments.append(new_appointment)
+    else:
+        return jsonify({"msg": "Start time and end time are required for the appointment"}), 400
+
+    db.session.commit()
+    db.session.refresh(session)
+
+    response_body = {
+        "msg": "Mentor successfully confirmed for session and appointment added!",
+        "session": session.serialize()
+    }
+    return jsonify(response_body), 200
+    
 
 # Message routes Start # Message routes Start # Message routes Start
 # Message routes Start # Message routes Start # Message routes Start
@@ -772,3 +824,59 @@ def get_messages(session_id):
         return jsonify({"msg": "No messages found for this session"}), 404
 
     return jsonify([message.serialize() for message in messages]), 200
+
+
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes
+
+
+
+@api.route('/meet/auth', methods=['GET'])
+def start_oauth():
+    try:
+        auth_url = meet_service.get_oauth_url()
+        return jsonify({'authUrl': auth_url})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    
+
+@api.route('/meet/oauth-callback', methods=['GET'])
+def oauth_callback():
+    code = request.args.get('code')
+    if not code:
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        error_params = urlencode({'error': 'No authorization code received'})
+        return redirect(f"{frontend_url}?{error_params}")
+
+    try:
+        credentials = meet_service.handle_oauth_callback(code)
+        # Save credentials in session or database if needed
+        
+        # Redirect to frontend with success parameter
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        success_params = urlencode({'auth': 'success'})
+        return redirect(f"{frontend_url}?{success_params}")
+    except Exception as e:
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        error_params = urlencode({'error': str(e)})
+        return redirect(f"{frontend_url}?{error_params}")
+
+@api.route('/meet/create-meeting', methods=['POST'])
+def create_meeting():
+    try:
+        meeting_data = meet_service.create_meeting()
+        return jsonify(meeting_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Add a new endpoint to fetch meetings
+@api.route('/meet/meetings', methods=['GET'])
+def get_meetings():
+    try:
+        meetings = meet_service.get_meetings()  # You'll need to implement this in your meet_service
+        return jsonify(meetings)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

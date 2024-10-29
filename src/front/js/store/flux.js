@@ -34,16 +34,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                             currentUserData: data,
                             mentorId: data.user_data.id
                         })
+                        return true
                     }
                     if (data.role == "customer") {
                         setStore({
                             isCustomerLoggedIn: true,
                             currentUserData: data
                         })
+                        return true
                     }
                 } else {
                     console.error("Login failed with status:", response.status);
                     getActions().logOut()
+                    return false
                 }
             },
             checkStorage: () => {
@@ -421,6 +424,52 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Failed to fetch customer sessions with status:", response.status);
                 }
             },
+
+            confirmMentorForSession: async (sessionId, mentorId, startTime, endTime) => {
+                try {
+                    const store = getStore();
+                    const token = sessionStorage.getItem("token");
+            
+                    if (!token) {
+                        console.error("No token found, user must be logged in");
+                        return false;
+                    }
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/confirm-mentor/${mentorId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ start_time: startTime, end_time: endTime })
+                    });
+            
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Mentor confirmed for session:", data);
+            
+                        // Update the relevant store properties
+                        const updatedSessions = store.customerSessions.map(session => 
+                            session.id === sessionId ? data.session : session
+                        );
+            
+                        setStore({ 
+                            customerSessions: updatedSessions
+                        });
+            
+                        return true;
+                    } else {
+                        console.error("Failed to confirm mentor with status:", response.status);
+                        const errorData = await response.json();
+                        console.error("Error details:", errorData);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error("Error confirming mentor for session:", error);
+                    return false;
+                }
+            },
+            
             sendMessageMentor: async (sessionId, text) => {
                 const token = sessionStorage.getItem("token");
                 if (!token) {
