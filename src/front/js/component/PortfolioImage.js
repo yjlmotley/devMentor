@@ -77,9 +77,8 @@ const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
               </button>
             </div>
           ))}
-          {/* Render empty preview placeholders if less than 12 images */}
         </div>
-        
+
         {editMode &&
           <>
             <input
@@ -98,26 +97,57 @@ const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
             >
               Upload Portfolio Images
             </button>
-         </> 
+          </>
         }
       </div>
 
       <div className="container-flex">
         <div className="row gap-1 justify-content-center">
           {portfolioImgs && portfolioImgs.map((image, index) => {
-            return <div class="col-3 p-0 d-flex justify-content-center align-items-center">
-              <img
-                key={index}
-                className="img-fluid"
-                src={image.image_url || image}
-                alt="Random"
-              // style={{
-              //   maxHeight: "500px",
-              //   width: "auto",
-              //   objectFit: "cover"
-              // }}
-              />
-            </div>
+            return (
+              <div key={index} className="col-3 p-0 d-flex justify-content-center align-items-center">
+                <img
+                  key={index}
+                  className="img-fluid cursor-pointer"
+                  src={image.image_url || image}
+                  alt={`Portfolio ${index}`}
+                  data-bs-toggle="modal"
+                  data-bs-target={`#portfolioModal${index}`}
+                />
+
+                {/* Modal for each image */}
+                <div
+                  className="modal fade"
+                  id={`portfolioModal${index}`}
+                  tabIndex="-1"
+                  aria-labelledby={`portfolioModalLabel${index}`}
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+                    <div className="modal-content bg-transparent border-0">
+                      <button
+                        type="button"
+                        className="btn-close bg-white position-absolute top-4 end-4 z-10"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      />
+                      <div className="d-flex justify-content-center align-items-center min-vh-100">
+                        <img
+                          src={image.image_url || image}
+                          alt={`Portfolio ${index}`}
+                          className="img-fluid"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover"
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
           })}
         </div>
       </div>
