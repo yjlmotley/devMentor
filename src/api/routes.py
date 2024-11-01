@@ -210,6 +210,15 @@ def all_mentors():
    mentors = Mentor.query.all()
    return jsonify([mentor.serialize() for mentor in mentors]), 200
 
+@api.route('/mentorsnosession', methods=['GET'])
+def all_mentors_no_sessions():
+    mentors = Mentor.query.all()
+    serialized_mentors = [mentor.serialize() for mentor in mentors]
+    # Remove confirmed_sessions from each mentor's data
+    for mentor in serialized_mentors:
+        mentor.pop('confirmed_sessions', None)
+    return jsonify(serialized_mentors), 200
+
 @api.route('/mentor', methods=['GET'])
 @mentor_required
 def mentor_by_id():

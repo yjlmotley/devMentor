@@ -19,6 +19,7 @@ import { ResetPassword } from "./pages/ResetPassword.js";
 import { CustomerSignup } from "./pages/CustomerSignup.js";
 import { CustomerLogin } from "./component/CustomerLogin";
 import { CustomerDashboard } from "./pages/CustomerDashboard";
+import { MentorList } from "./pages/MentorList.js";
 
 import { CreateSession } from "./pages/CreateSession";
 import { EditSession } from "./pages/EditSession";
@@ -67,6 +68,7 @@ const Layout = () => {
                         <Route element={<CustomerSignup />} path="/customer-signup" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
+                        <Route element={<MentorList />} path="/mentor-list" />
                         
                         <Route element={<CreateSession />} path="/create-session" />
                         <Route element={<EditSession />} path="edit-session/:sessionId" />

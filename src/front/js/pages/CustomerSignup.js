@@ -136,7 +136,7 @@ export const CustomerSignup = () => {
                                     value={first_name}
                                     onChange={(event) => setFirst_name(event.target.value)}
                                     required
-                                />
+                                />f
                                 {invalidItems.includes("first_name") && <label className="error-label">First Name is required. Must be between 2 - 25 characters.</label>}
                             </div>
                             <div style={{ marginBottom: '20px' }}>

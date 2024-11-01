@@ -102,6 +102,32 @@ const getState = ({ getStore, getActions, setStore }) => {
                 return true;
             },
 
+            getMentors: async () => {
+                const store = getStore();
+                const token = sessionStorage.getItem("token");
+
+                if (!token) {
+                    console.error("No token found in sessionStorage");
+                    return false;
+                }
+
+                const response = await fetch(`${process.env.BACKEND_URL}/api/mentorsnosession`, {
+                    method:"GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+                if (response.ok) {
+                    const data = await response.json();
+                    setStore({...store, mentors: data});
+                    return true;
+                } else {
+                    console.error("Failed to fetch all Mentors:", response.status)
+                    return false;
+                }
+            },
+
             editMentor: async (mentor) => {
                 console.log("Updating mentor with data:", mentor);
                 const token = getStore().token;
