@@ -3,9 +3,11 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
 import { GoogleMeeting } from "../component/GoogleMeeting";
+import { useNavigate } from "react-router-dom";
 
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
+	const navigate = useNavigate()
 	const [messageInputs, setMessageInputs] = useState({});
 	const [activeSessionId, setActiveSessionId] = useState(null);
 	const [confirmModalData, setConfirmModalData] = useState({
@@ -15,6 +17,14 @@ export const CustomerDashboard = () => {
 		startTime: "",
 		endTime: ""
 	});
+
+	useEffect(() => {
+		actions.checkStorage();
+		if (!store.token) {
+			navigate("/customer-login")
+			
+		}
+	},[])
 
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
