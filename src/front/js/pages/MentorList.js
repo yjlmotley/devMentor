@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react"
 import { Context } from "../store/appContext"
-import { MapPin, Phone, Calendar, DollarSign, Award, User } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 export const MentorList = () => {
     const { store, actions } = useContext(Context)
@@ -121,15 +121,55 @@ export const MentorList = () => {
                                             </div>
                                         )}
 
-                                        {/* About Me */}
+                                        {/* About Me Section with Modal Trigger */}
                                         {mentor.about_me && (
                                             <div>
                                                 <label className="fw-bold mb-2 small">About</label>
-                                                <p className="card-text text-truncate small">
+                                                {/* Trigger Element for Modal */}
+                                                <p
+                                                    className="card-text text-truncate small"
+                                                    role="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target={`#aboutMeModal-${mentor.id}`}
+                                                    style={{ cursor: "pointer" }}
+                                                >
                                                     {mentor.about_me}
                                                 </p>
+
+                                                {/* Modal Structure */}
+                                                <div
+                                                    className="modal fade"
+                                                    id={`aboutMeModal-${mentor.id}`}
+                                                    tabIndex="-1"
+                                                    aria-labelledby={`aboutMeModalLabel-${mentor.id}`}
+                                                    aria-hidden="true"
+                                                >
+                                                    <div className="modal-dialog modal-dialog-centered">
+                                                        <div className="modal-content" style={{ borderRadius: "10px", backgroundColor: "#f8f9fa" }}>
+                                                            <div className="modal-header" style={{ borderBottom: "1px solid #dee2e6" }}>
+                                                                <h5 className="modal-title" id={`aboutMeModalLabel-${mentor.id}`} style={{ fontWeight: "bold", color: "#495057" }}>
+                                                                    Mentor {mentor.first_name} {mentor.last_name}'s About Me
+                                                                </h5>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn-close"
+                                                                    data-bs-dismiss="modal"
+                                                                    aria-label="Close"
+                                                                    style={{ outline: "none" }}
+                                                                ></button>
+                                                            </div>
+                                                            <div className="modal-body" style={{ fontSize: "0.9rem", color: "#343a40" }}>
+                                                                {mentor.about_me}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
+
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-primary" type="button">Book this Mentor Now!</button>
                                     </div>
                                 </div>
                             </div>
