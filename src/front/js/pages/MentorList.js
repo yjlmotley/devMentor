@@ -1,13 +1,20 @@
 import React, { useEffect, useContext } from "react"
 import { Context } from "../store/appContext"
 import { MapPin } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+
 
 export const MentorList = () => {
     const { store, actions } = useContext(Context)
+    const navigate = useNavigate()
 
     useEffect(() => {
         actions.getMentors();
     }, [])
+
+    const handleNavigateToInstantSession = (mentorId) => {
+        navigate(`/create-instant-session/${mentorId}`); // Navigate to new page with mentor ID
+    };
 
 
     return (
@@ -168,8 +175,12 @@ export const MentorList = () => {
                                         )}
 
                                     </div>
-                                    <div class="d-grid gap-2">
-                                        <button class="btn btn-primary" type="button">Book this Mentor Now!</button>
+                                    <div className="d-grid gap-2">
+                                        <button 
+                                        className="btn btn-primary" 
+                                        type="button"
+                                        onClick={() => handleNavigateToInstantSession(mentor.id)}
+                                        >Book this Mentor Now!</button>
                                     </div>
                                 </div>
                             </div>

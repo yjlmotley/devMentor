@@ -42,6 +42,10 @@ export const Navbar = () => {
 											<span className="navbarFont">Create Session</span>
 											<i className="fa-solid fa-folder-plus" />
 										</Link>
+										<Link to="/mentor-list" className="dropdown-item bold-text text-end">
+											<span className="navbarFont">Find A Mentor</span>
+											<i className="fa-solid fa-folder-plus" />
+										</Link>
 										<button className="dropdown-item bold-text text-end" onClick={handleLogout}>
 											<span className="navbarFont">Log Out</span>
 											<i className="fa-solid fa-right-from-bracket" />

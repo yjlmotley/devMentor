@@ -27,6 +27,7 @@ import { EditSession } from "./pages/EditSession";
 
 
 import { Navbar } from "./component/Navbar.js";
+import { CreateInstantSession } from "./pages/CreateInstantSession.js";
 // import { Footer } from "./component/footer";
 
 
@@ -71,6 +72,7 @@ const Layout = () => {
                         <Route element={<MentorList />} path="/mentor-list" />
                         
                         <Route element={<CreateSession />} path="/create-session" />
+                        <Route  element={<CreateInstantSession />} path="/create-instant-session/:mentorId" />
                         <Route element={<EditSession />} path="edit-session/:sessionId" />
 
                         <Route 
