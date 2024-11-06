@@ -97,8 +97,8 @@ export const Home = () => {
             <div className="mentor-profile-card">
               <img src="https://res.cloudinary.com/dufs8hbca/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1725936923/Saved/aimepic_fudlb7.jpg" alt="John Doe" className="mentor-image" />
               <h3 style={{ marginBottom: "1rem" }}>Michael Mirisciotta</h3>
-              <p className="mb-2">San Diego, CA. Full-Stack Developer.</p>
-              <p style={{ marginBottom: "1rem" }}>Experience mentoring junior developers and teaching coding bootcamps.</p>
+              <p className="mb-2">San Francisco, CA. Full-Stack Developer.</p>
+              <p style={{ marginBottom: "1rem" }}>Experience mentoring junior developers and teaching coding bootcamps. Specializing in complex React.js appllications.</p>
               {/* <button className="follow-button">Follow</button> */}
               <div className="social-icon-list social-links-footer">
                 <a href="/" className="social-icon-footer" target="_blank" rel="noopener noreferrer"><i className="fa-brands fa-linkedin-in"></i></a>

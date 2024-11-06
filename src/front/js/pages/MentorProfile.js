@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
-import { ValidatePrice, ValidateNumber, ValidatePhoneNumber } from "../component/Validators";
+import { ValidatePrice, ValidateNumber, ValidatePhoneNumber, ValidateFirstName, ValidateLastName } from "../component/Validators";
 import { skillsList, daysOfTheWeek, stateOptions, countryOptions } from "../store/data";
 
 import PhoneInput from 'react-phone-input-2'
@@ -53,8 +53,8 @@ export const MentorProfile = () => {
 
 	}, []);
 
-	const placeholderImage = 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg'; // Path to your placeholder image
-	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg']
+	const placeholderImage = 'https://res.cloudinary.com/dufs8hbca/image/upload/v1730340260/Saved/PlaceholderImg_augxly.png'; // Path to your placeholder image
+	const placeholderImages = ['https://res.cloudinary.com/dufs8hbca/image/upload/v1730340260/Saved/PlaceholderImg_augxly.png', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1730340260/Saved/PlaceholderImg_augxly.png', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1730340260/Saved/PlaceholderImg_augxly.png', 'https://res.cloudinary.com/dufs8hbca/image/upload/v1730340260/Saved/PlaceholderImg_augxly.png']
 	const profileImageUrl = mentor.profile_photo?.image_url || placeholderImage;
 	const portfolioImageUrls = mentor?.portfolio_photos?.length > 0 ? mentor.portfolio_photos : placeholderImages;
 
@@ -207,8 +207,10 @@ export const MentorProfile = () => {
 		setInvalidItems([]);
 		let isPriceValid = ValidatePrice(mentor.price, setInvalidItems, setMentor);
 		let isYearValid = ValidateNumber(mentor.years_exp, setInvalidItems);
+		let isFirstNameValid = ValidateFirstName(mentor.first_name, setInvalidItems)
+		let isLastNameValid = ValidateLastName(mentor.last_name, setInvalidItems)
 
-		if (isPriceValid && isYearValid) {
+		if (isPriceValid && isYearValid && isFirstNameValid && isLastNameValid) {
 			const success = await actions.editMentor(mentor);
 			if (success) {
 				alert('Mentor information updated sucessfully')
@@ -241,6 +243,12 @@ export const MentorProfile = () => {
 					<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} editMode={editMode} />
 				</div>
 				<div className="col-5" style={{ marginTop: "50px" }}>
+					{editMode &&
+						<>
+							<button onClick={handleCancelChanges}>Cancel Changes</button>
+							<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>
+						</>
+					}
 					<dl className="row">
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
@@ -254,16 +262,23 @@ export const MentorProfile = () => {
 						<dt className="col-sm-4">First Name:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="first_name" value={mentor.first_name} onChange={handleChange} className="form-control" />
+								<>
+									<input type="text" name="first_name" value={mentor.first_name} onChange={handleChange} className="form-control" />
+									{invalidItems.includes("first_name") && <label className="error-label">First Name is required</label>}
+								</>
 							) : (
 								mentor.first_name
 							)}
+
 						</dd>
 
 						<dt className="col-sm-4">Last Name:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="text" name="last_name" value={mentor.last_name} onChange={handleChange} className="form-control" />
+								<>
+									<input type="text" name="last_name" value={mentor.last_name} onChange={handleChange} className="form-control" />
+									{invalidItems.includes("last_name") && <label className="error-label">Last Name is required</label>}
+								</>
 							) : (
 								mentor.last_name
 							)}
@@ -497,12 +512,6 @@ export const MentorProfile = () => {
 			)} */}
 
 			<div className="d-flex justify-content-center gap-3">
-				{editMode &&
-					<>
-						<button onClick={handleCancelChanges}>Cancel Changes</button>
-						<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>
-					</>
-				}
 				{mentor.is_active ? (
 					<button onClick={handleDeactivate}>Deactivate Account</button>
 				) : (

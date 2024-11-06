@@ -5,6 +5,17 @@ import { Context } from "../store/appContext";
 import ReactSlider from "react-slider";
 import "../../styles/createSession.css";
 import { useNavigate } from "react-router-dom";
+import { 
+  ValidateTitle, 
+  ValidateDescription,
+  ValidateSchedule,
+  ValidateFocusAreas,
+  ValidateSkills,
+  ValidateResourceLink,
+  ValidateDuration,
+  ValidateTotalHours,
+  ValidateVisibility
+} from "../component/Validators";
 
 const TimeRangeSlider = ({ day, value, onChange }) => {
   const formatTime = (minutes) => {
@@ -43,7 +54,7 @@ export const CreateSession = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [is_active, setIs_Active] = useState(false);
+  const [is_active, setIs_Active] = useState("");
   const [schedule, setSchedule] = useState({
     monday: { checked: false, start: 540, end: 1020 },
     tuesday: { checked: false, start: 540, end: 1020 },
@@ -58,57 +69,85 @@ export const CreateSession = () => {
   const [resourceLink, setResourceLink] = useState("");
   const [duration, setDuration] = useState("");
   const [totalHours, setTotalHours] = useState(0);
+  const [invalidItems, setInvalidItems] = useState([]);
 
   useEffect(() => {
-    if(!store.token) {
-        navigate("/customer-login");
+    if (!store.token) {
+      navigate("/customer-login");
     }
-  }, [store.token])
+  }, [store.token]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setInvalidItems([]);
 
-    const customerId = store.currentUserData.user_data.id;
+    const customerId = store.currentUserData?.user_data?.id;
 
     if (!store.currentUserData) {
       alert("User data is not available. Please try again.");
       return;
     }
 
-    const success = await actions.createSession({
-      customer_id: customerId,
-      title: title,
-      description: description,
-      schedule: schedule,
-      is_active: is_active,
-      focus_areas: focus_areas,
-      skills: selectedSkills,
-      resourceLink: resourceLink,
-      duration: duration,
-      totalHours: totalHours
-    })
+    let isValid = true;
 
-    if (success) {
-      setTitle("");
-      setDescription("");
-      setIs_Active(false)
-      setSchedule({
-        monday: { checked: false, start: 540, end: 1020 },
-        tuesday: { checked: false, start: 540, end: 1020 },
-        wednesday: { checked: false, start: 540, end: 1020 },
-        thursday: { checked: false, start: 540, end: 1020 },
-        friday: { checked: false, start: 540, end: 1020 },
-        saturday: { checked: false, start: 540, end: 1020 },
-        sunday: { checked: false, start: 540, end: 1020 },
+    // Run all validations
+    const isTitleValid = ValidateTitle(title, setInvalidItems);
+    const isDescriptionValid = ValidateDescription(description, setInvalidItems);
+    const isScheduleValid = ValidateSchedule(schedule, setInvalidItems);
+    const isFocusAreasValid = ValidateFocusAreas(focus_areas, setInvalidItems);
+    const isSkillsValid = ValidateSkills(selectedSkills, setInvalidItems);
+    const isResourceLinkValid = ValidateResourceLink(resourceLink, setInvalidItems);
+    const isDurationValid = ValidateDuration(duration, setInvalidItems);
+    const isTotalHoursValid = ValidateTotalHours(totalHours, setInvalidItems);
+    const isVisibilityValid = ValidateVisibility(is_active, setInvalidItems);
+
+    isValid = isTitleValid && 
+              isDescriptionValid && 
+              isScheduleValid && 
+              isFocusAreasValid && 
+              isSkillsValid && 
+              isResourceLinkValid && 
+              isDurationValid && 
+              isTotalHoursValid &&
+              isVisibilityValid;
+
+    if (isValid) {
+      const success = await actions.createSession({
+        customer_id: customerId,
+        title: title,
+        description: description,
+        schedule: schedule,
+        is_active: is_active,
+        focus_areas: focus_areas,
+        skills: selectedSkills,
+        resourceLink: resourceLink,
+        duration: duration,
+        totalHours: totalHours
       });
-      setfocus_areas([])
-      setSelectedSkills([]);
-      setResourceLink("")
-      setDuration("")
-      setTotalHours(0)
-      
-    } else {
-      alert("Something went wrong creating a Mentor Session.");
+
+      if (success) {
+        setTitle("");
+        setDescription("");
+        setIs_Active("");
+        setSchedule({
+          monday: { checked: false, start: 540, end: 1020 },
+          tuesday: { checked: false, start: 540, end: 1020 },
+          wednesday: { checked: false, start: 540, end: 1020 },
+          thursday: { checked: false, start: 540, end: 1020 },
+          friday: { checked: false, start: 540, end: 1020 },
+          saturday: { checked: false, start: 540, end: 1020 },
+          sunday: { checked: false, start: 540, end: 1020 },
+        });
+        setfocus_areas([]);
+        setSelectedSkills([]);
+        setResourceLink("");
+        setDuration("");
+        setTotalHours(0);
+        alert("Session Successfully Created");
+        navigate("/customer-dashboard");
+      } else {
+        alert("Something went wrong creating a Mentor Session.");
+      }
     }
   };
 
@@ -132,10 +171,10 @@ export const CreateSession = () => {
   };
 
   const handleFocusAreaChange = (area) => {
-    setfocus_areas(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]);
+    setfocus_areas(prev => 
+      prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]
+    );
   };
-
-
 
   return (
     <div className="container mt-5">
@@ -145,30 +184,36 @@ export const CreateSession = () => {
           <label htmlFor="title" className="form-label">Title</label>
           <input
             type="text"
-            className="form-control"
+            className={`form-control ${invalidItems.includes("title") ? "is-invalid" : ""}`}
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
+          {invalidItems.includes("title") && 
+            <div className="invalid-feedback">Title must be between 5 and 125 characters</div>
+          }
         </div>
 
         <div className="mb-3">
           <label htmlFor="description" className="form-label">Description</label>
           <textarea
-            className="form-control"
+            className={`form-control ${invalidItems.includes("description") ? "is-invalid" : ""}`}
             id="description"
             rows="3"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
           ></textarea>
+          {invalidItems.includes("description") && 
+            <div className="invalid-feedback">Description must be between 5 and 125 characters</div>
+          }
         </div>
 
         <div className="mb-3">
           <label htmlFor="is_active" className="form-label">Visibility</label>
           <select
-            className="form-select"
+            className={`form-select ${invalidItems.includes("is_active") ? "is-invalid" : ""}`}
             id="is_active"
             value={is_active ? "True" : "False"}
             onChange={(e) => setIs_Active(e.target.value === "True")}
@@ -177,6 +222,9 @@ export const CreateSession = () => {
             <option value="True">Public</option>
             <option value="False">Private</option>
           </select>
+          {invalidItems.includes("is_active") && 
+            <div className="invalid-feedback">Please select visibility status</div>
+          }
         </div>
 
         <div className="mb-3">
@@ -204,6 +252,9 @@ export const CreateSession = () => {
               )}
             </div>
           ))}
+          {invalidItems.includes("schedule") && 
+            <div className="text-danger">Please select at least one day</div>
+          }
         </div>
 
         <div className="mb-3">
@@ -224,6 +275,9 @@ export const CreateSession = () => {
               </div>
             ))}
           </div>
+          {invalidItems.includes("focus_areas") && 
+            <div className="text-danger">Please select at least one focus area</div>
+          }
         </div>
 
         <div className="mb-3">
@@ -235,7 +289,11 @@ export const CreateSession = () => {
             value={selectedSkills.map(skill => ({ value: skill, label: skill }))}
             onChange={handleSelectChange}
             options={skillsList}
+            className={invalidItems.includes("skills") ? "is-invalid" : ""}
           />
+          {invalidItems.includes("skills") && 
+            <div className="text-danger">Please select at least one skill</div>
+          }
         </div>
 
         <div className="mb-3">
@@ -244,24 +302,23 @@ export const CreateSession = () => {
             <span className="input-group-text">https://</span>
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${invalidItems.includes("resourceLink") ? "is-invalid" : ""}`}
               placeholder="Enter resource link"
               value={resourceLink}
               onChange={(e) => setResourceLink(e.target.value)}
             />
           </div>
+          {invalidItems.includes("resourceLink") && 
+            <div className="text-danger">Please enter a valid URL</div>
+          }
         </div>
-
-        {/* <div className="mb-3">
-          <button type="button" className="btn btn-outline-secondary">Upload file</button>
-        </div> */}
 
         <h2 className="mb-3">Finalize session</h2>
 
         <div className="mb-3">
           <label htmlFor="duration" className="form-label">Duration</label>
           <select
-            className="form-select"
+            className={`form-select ${invalidItems.includes("duration") ? "is-invalid" : ""}`}
             id="duration"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
@@ -274,6 +331,9 @@ export const CreateSession = () => {
             <option value="150">2.5 hours</option>
             <option value="180">3 hours</option>
           </select>
+          {invalidItems.includes("duration") && 
+            <div className="invalid-feedback">Please select a session duration</div>
+          }
         </div>
 
         <div className="mb-3">
@@ -282,12 +342,15 @@ export const CreateSession = () => {
             <span className="input-group-text">#</span>
             <input
               type="number"
-              className="form-control"
+              className={`form-control ${invalidItems.includes("totalHours") ? "is-invalid" : ""}`}
               id="totalHours"
               value={totalHours}
               onChange={(e) => setTotalHours(Number(e.target.value))}
             />
           </div>
+          {invalidItems.includes("totalHours") && 
+            <div className="invalid-feedback">Please enter a valid number of hours (1-100)</div>
+          }
         </div>
 
         <button type="submit" className="btn btn-warning w-100 mt-1 mb-4">Preview</button>
