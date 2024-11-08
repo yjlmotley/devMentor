@@ -359,7 +359,7 @@ export const CustomerDashboard = () => {
 						{acceptedSessions.map((session) => (
 							<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
 								<div className="session-card card h-100">
-									<img variant="top" className="card-img-top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
+									<img variant="top" className="card-img-top" src={session.mentor_photo_url} alt="Session" />
 									<div className="card-body">
 										<div className="row align-items-center justify-content-center">
 											<label className="col-auto"><strong>Session with:</strong></label>

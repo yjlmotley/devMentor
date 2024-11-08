@@ -277,31 +277,41 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             createSession: async (session) => {
-                const response = await fetch(
-                    process.env.BACKEND_URL + "/api/session/create", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        customer_id: session.customer_id,
-                        title: session.title,
-                        description: session.description,
-                        is_active: session.is_active,
-                        schedule: session.schedule,
-                        focus_areas: session.focus_areas,
-                        skills: session.skills,
-                        resourceLink: session.resourceLink,
-                        duration: session.duration,
-                        totalHours: session.totalHours,
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
+                try {
+                    const response = await fetch(
+                        process.env.BACKEND_URL + "/api/session/create", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                customer_id: session.customer_id,
+                                title: session.title,
+                                description: session.description,
+                                is_active: session.is_active,
+                                schedule: session.schedule,
+                                focus_areas: session.focus_areas,
+                                skills: session.skills,
+                                resourceLink: session.resourceLink,
+                                duration: session.duration,
+                                totalHours: session.totalHours,
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        }
+                    );
+            
+                    if (response.status !== 201) {
+                        throw new Error("Failed to create session");
                     }
+            
+                    const responseBody = await response.json();
+                    console.log("Session creation response:", responseBody);
+            
+                    // Return the actual response data instead of just true
+                    return responseBody;
+                } catch (error) {
+                    console.error("Error creating session:", error);
+                    throw error;
                 }
-                );
-                if (response.status !== 201) return false;
-                const responseBody = await response.json();
-                console.log(responseBody)
-
-                return true;
             },
 
             editSession: async (sessionId, updatedSession, token) => {

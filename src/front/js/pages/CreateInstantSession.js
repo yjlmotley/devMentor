@@ -93,13 +93,13 @@ export const CreateInstantSession = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setInvalidItems([]);
-
+    
         const customerId = store.currentUserData?.user_data?.id;
         if (!customerId) {
             alert("User data is not available. Please try again.");
             return;
         }
-
+    
         // Validate the form
         const isValid = ValidateTitle(title, setInvalidItems) &&
             ValidateDescription(description, setInvalidItems) &&
@@ -109,7 +109,7 @@ export const CreateInstantSession = () => {
             ValidateResourceLink(resourceLink, setInvalidItems) &&
             ValidateDuration(duration, setInvalidItems) &&
             ValidateTotalHours(totalHours, setInvalidItems);
-
+    
         if (isValid) {
             const sessionData = {
                 customer_id: customerId,
@@ -123,42 +123,90 @@ export const CreateInstantSession = () => {
                 duration,
                 totalHours
             };
-
-            // Create the session
-            const createdSession = await actions.createSession(sessionData);
-
-            if (createdSession) {
-                setCreatedSessionId(createdSession.id);
+    
+            try {
+                const responseData = await actions.createSession(sessionData);
+                console.log("Create session response:", responseData);
+    
+                // Check if we have a valid response with session ID
+                if (!responseData || (!responseData.session_id && !responseData.session?.id)) {
+                    throw new Error("No session ID received");
+                }
+    
+                // Extract session ID from response
+                const sessionId = responseData.session_id || responseData.session?.id;
+                console.log("Session ID:", sessionId);
+    
+                // Get today's date in YYYY-MM-DD format
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Calculate default end time based on duration
+                const defaultStartTime = '09:00';
+                const durationInMinutes = parseInt(duration);
+                const [startHours, startMinutes] = defaultStartTime.split(':').map(Number);
+                const endDate = new Date(2000, 0, 1, startHours, startMinutes + durationInMinutes);
+                const defaultEndTime = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
+    
+                // Update modal data with session details
                 setConfirmModalData({
-                    ...confirmModalData,
-                    sessionId: createdSession.id,
-                    mentorId: mentorId
+                    sessionId: sessionId,
+                    mentorId: mentorId,
+                    date: today,
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime
                 });
-                // Show the confirmation modal
+                
+                setCreatedSessionId(sessionId);
                 setShowConfirmModal(true);
-            } else {
-                alert("Session creation failed.");
+    
+            } catch (error) {
+                console.error("Error creating session:", error);
+                alert(error.message || "Failed to create session. Please try again.");
             }
         }
     };
-
+    
     const handleConfirmMentor = async () => {
         const { sessionId, mentorId, date, startTime, endTime } = confirmModalData;
+        
         if (!sessionId || !mentorId || !date || !startTime || !endTime) {
-            alert("Please fill in all fields");
+            alert("Please fill in all required fields");
             return;
         }
+    
+        try {
+            const startDateTime = new Date(`${date}T${startTime}`);
+            const endDateTime = new Date(`${date}T${endTime}`);
+            
+            // Validate that end time is after start time
+            if (endDateTime <= startDateTime) {
+                alert("End time must be after start time");
+                return;
+            }
+            
+            // Validate that selected time matches duration
+            // const durationInMinutes = parseInt(duration);
+            // const selectedDurationInMinutes = (endDateTime - startDateTime) / (1000 * 60);
+            // if (selectedDurationInMinutes !== durationInMinutes) {
+            //     alert(`Please select a time slot that matches the session duration of ${durationInMinutes} minutes`);
+            //     return;
+            // }
 
-        const startDateTime = new Date(`${date}T${startTime}`).toISOString();
-        const endDateTime = new Date(`${date}T${endTime}`).toISOString();
-
-        const success = await actions.confirmMentorForSession(sessionId, mentorId, startDateTime, endDateTime);
-        if (success) {
-            console.log("Mentor confirmed successfully");
-            setShowConfirmModal(false);
-            navigate("/customer-dashboard");
-        } else {
-            console.error("Failed to confirm mentor");
+            const success = await actions.confirmMentorForSession(
+                sessionId,
+                mentorId,
+                startDateTime.toISOString(),
+                endDateTime.toISOString()
+            );
+    
+            if (success) {
+                setShowConfirmModal(false);
+                navigate("/customer-dashboard");
+            } else {
+                throw new Error("Failed to confirm mentor");
+            }
+        } catch (error) {
+            console.error("Error confirming mentor:", error);
             alert("Failed to confirm mentor. Please try again.");
         }
     };
