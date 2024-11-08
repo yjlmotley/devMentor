@@ -73,8 +73,6 @@
 		]
 	},
 	"dependencies": {
-		"@stripe/react-stripe-js": "^2.8.1",
-		"@stripe/stripe-js": "^4.9.0",
 		"libphonenumber-js": "^1.11.4",
 		"prop-types": "^15.6.1",
 		"react": "^16.8.4",

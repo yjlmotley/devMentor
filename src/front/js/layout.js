@@ -23,7 +23,7 @@ import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { CreateSession } from "./pages/CreateSession";
 import { EditSession } from "./pages/EditSession";
 
-import PaymentsPayouts from "./pages/PaymentsPayouts.js";
+
 
 import { Navbar } from "./component/Navbar.js";
 // import { Footer } from "./component/footer";
@@ -70,8 +70,6 @@ const Layout = () => {
                         
                         <Route element={<CreateSession />} path="/create-session" />
                         <Route element={<EditSession />} path="edit-session/:sessionId" />
-
-                        <Route element={<PaymentsPayouts />} path="payments-and-payouts" />
 
                         <Route 
                             path="*"
