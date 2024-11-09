@@ -1,48 +1,57 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
 import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
-from flask_jwt_extended import JWTManager
 
-# #######################################################################
-import cloudinary.uploader as uploader
-# #######################################################################
-
-# from models import Person
-
+# Environment configuration
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
+
+# Initialize Flask app
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = ""
 app.url_map.strict_slashes = False
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 7*24*60*60*52
-JWTManager(app)
 
-# Cloudinary 
+# JWT Configuration
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "your-secret-key")  
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 7*24*60*60*52  # 52 weeks
+jwt = JWTManager(app)
 
-# UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+# CORS Configuration - Simplified to fix fetch issue
+CORS(app, resources={r"/api/*": {
+    "origins": [
+        "https://psychic-spoon-jjjqjqqr5jp63p45p-3000.app.github.dev",
+        "https://psychic-spoon-jjjqjqqr5jp63p45p-3001.app.github.dev"
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"],
+    "supports_credentials": True
+}})
+
+# Handle CORS pre-flight requests
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
+# Secret key for session management
+app.secret_key = os.getenv("FLASK_APP_KEY", "default_secret_key")
+
+# Cloudinary Configuration
 app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 app.config.from_mapping(
     CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
 )
-          
-# cloudinary.config( 
-#   cloud_name = "dufs8hbca", 
-#   api_key = "442387455219856", 
-#   api_secret = "shYvKGsmGcMnNGftA-RK7Hy7eww" 
-# )
 
-# database condiguration
+# Database Configuration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(

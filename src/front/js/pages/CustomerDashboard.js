@@ -2,10 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
+import { GoogleMeeting } from "../component/GoogleMeeting";
+import { useNavigate } from "react-router-dom";
 
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
+	const navigate = useNavigate()
 	const [messageInputs, setMessageInputs] = useState({});
+	const [activeSessionId, setActiveSessionId] = useState(null);
 	const [confirmModalData, setConfirmModalData] = useState({
 		sessionId: null,
 		mentorId: null,
@@ -15,12 +19,67 @@ export const CustomerDashboard = () => {
 	});
 
 	useEffect(() => {
+		actions.checkStorage();
+		if (!store.token) {
+			navigate("/customer-login")
+			
+		}
+	},[])
+
+	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
 		actions.getCustomerSessions();
+
+		// Parse URL parameters
+		const params = new URLSearchParams(location.search);
+		const auth = params.get('auth');
+		const error = params.get('error');
+
+		// If we have successful authentication and an active session ID
+		if (auth === 'success' && activeSessionId) {
+			// Use setTimeout to ensure the modal is available in the DOM
+			setTimeout(() => {
+				const modalElement = document.querySelector(`#GoogleMeetModal${activeSessionId}`);
+				if (modalElement) {
+					const bsModal = new bootstrap.Modal(modalElement);
+					bsModal.show();
+				}
+			}, 500);
+		} else if (error) {
+			// Handle error case
+			console.error("Authentication error:", error);
+			// You might want to show an error message to the user
+		}
+	}, [location.search, activeSessionId]);
+
+	useEffect(() => {
+		const storedSessionId = localStorage.getItem('pendingMeetingSessionId');
+		if (storedSessionId) {
+			setActiveSessionId(storedSessionId);
+			// Clear the stored sessionId
+			localStorage.removeItem('pendingMeetingSessionId');
+		}
 	}, []);
+
+	// Function to handle opening the Google Meet modal
+	const handleGoogleMeetClick = (sessionId) => {
+		setActiveSessionId(sessionId);
+		// Store the sessionId in localStorage before redirecting to OAuth
+		localStorage.setItem('pendingMeetingSessionId', sessionId);
+	};
+
+	const cleanupModal = () => {
+		const backdrop = document.querySelector('.modal-backdrop');
+		if (backdrop) {
+			backdrop.remove();
+		}
+		document.body.classList.remove('modal-open');
+		document.body.style.removeProperty('padding-right');
+	};
 
 	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
 	const openSessions = store.customerSessions.filter(session => session.mentor_id == null && session.is_active);
+	const draftSessions = store.customerSessions.filter(session => session.mentor_id == null && !session.is_active)
 	const pastSessions = store.customerSessions.filter(session => session.is_completed);
 
 	const handleMessageInputChange = (sessionId, mentorId, value) => {
@@ -65,6 +124,7 @@ export const CustomerDashboard = () => {
 		if (success) {
 			console.log("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
+			cleanupModal()
 			// Close the modal
 		} else {
 			console.error("Failed to confirm mentor");
@@ -107,7 +167,7 @@ export const CustomerDashboard = () => {
 		return `${hours}:${minutes}${ampm}`;
 	};
 
-	const renderSessionMessages = (session) => {
+	const renderSessionMessages = (session, isInGoogleMeet = false) => {
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
 			const mentorId = msg.mentor_id;
 			if (!acc[mentorId]) {
@@ -161,8 +221,6 @@ export const CustomerDashboard = () => {
 															>
 																Mentor {allMessages[0]?.mentor_name || `#${index + 1}`} ({allMessages.length} message{allMessages.length !== 1 ? 's' : ''})
 															</button>
-
-
 														</h2>
 														<div
 															id={`mentor-collapse-${session.id}-${mentorId}`}
@@ -198,19 +256,23 @@ export const CustomerDashboard = () => {
 																>
 																	Send to Mentor {allMessages[0]?.mentor_name || `#${mentorId}`}
 																</button>
-																{/* # #### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START ##### Confirm Mentor Modal START ####  ##### Confirm Mentor Modal START #### */}
 
-																<button
-																	type="button"
-																	className="btn btn-success"
-																	data-bs-toggle="modal"
-																	data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
-																	onClick={() => setConfirmModalData({ ...confirmModalData, sessionId: session.id, mentorId: mentorId })}
-																>
-																	Confirm Mentor
-																</button>
+																{/* Only show Confirm Mentor button if not in Google Meet modal */}
+																{!isInGoogleMeet && (
+																	<button
+																		type="button"
+																		className="btn btn-success"
+																		data-bs-toggle="modal"
+																		data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
+																		onClick={() => setConfirmModalData({ ...confirmModalData, sessionId: session.id, mentorId: mentorId })}
+																	>
+																		Confirm Mentor
+																	</button>
+																)}
 
-																<div
+																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
+																{!isInGoogleMeet && (
+																	<div
 																	className="modal fade"
 																	id={`ConfirmMentorModal${session.id}${mentorId}`}
 																	tabIndex="-1"
@@ -268,8 +330,7 @@ export const CustomerDashboard = () => {
 
 																</div>
 
-																{/* ##### Confirm Mentor Modal END ####  ##### Confirm Mentor Modal END ##### Confirm Mentor Modal END ####  ##### Confirm Mentor Modal END #### */}
-
+																)}
 															</div>
 														</div>
 													</div>
@@ -298,7 +359,7 @@ export const CustomerDashboard = () => {
 						{acceptedSessions.map((session) => (
 							<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
 								<div className="session-card card h-100">
-									<img variant="top" className="card-img-top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
+									<img variant="top" className="card-img-top" src={session.mentor_photo_url} alt="Session" />
 									<div className="card-body">
 										<div className="row align-items-center justify-content-center">
 											<label className="col-auto"><strong>Session with:</strong></label>
@@ -335,9 +396,63 @@ export const CustomerDashboard = () => {
 													<div >{formatTime(session.appointments[0].start_time) + "-" + formatTime(session.appointments[0].end_time)}</div>
 												</div>
 											</div>
+										</div>
 
+										<div className="row mt-3">
+											<div className="col text-center">
+
+												<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target={`#GoogleMeetModal${session.id}`}>
+													Launch Google Meet Now
+												</button>
+
+
+
+											</div>
+											<div className="container-fluid justify-content-between d-flex">
+												{/* MODAL FOR GOOGLEMEET */}
+
+												<div className="modal fade rounded-3xl shadow-2xl border-4 border-gray-300"
+													onClick={() => handleGoogleMeetClick(session.id)}
+													id={`GoogleMeetModal${session.id}`}
+													tabIndex="-1"
+													aria-labelledby={`GoogleMeetModal${session.id}`}
+													aria-hidden="true"
+												>
+													<div className="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+														<div className="modal-content rounded-3xl shadow-2xl border-4 border-gray-300">
+															<div className="modal-header">
+																<h1 className="modal-title fs-5 font-bold" id="exampleModalLabel">{`Meet with ${session.mentor_name
+																	.split(" ")
+																	.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+																	.join(" ")}`}</h1>
+																<button type="button" className="btn-close rounded-full p-2 hover:bg-gray-200 transition-colors" data-bs-dismiss="modal" aria-label="Close"></button>
+															</div>
+															<div className="modal-body">
+																<GoogleMeeting />
+																{renderSessionMessages(session, true)}
+															</div>
+															<div className="modal-footer">
+																<button
+																	type="button"
+																	data-bs-dismiss="modal"
+																	aria-label="Close"
+																	onClick={cleanupModal}
+																	className="btn rounded-full px-4 py-2 hover:bg-gray-200 transition-colors"
+																>
+																	Close
+																</button>
+																<button type="button" className="btn btn-primary rounded-full px-4 py-2">
+																	Save changes
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											{/* MODAL FOR GOOGLEMEET END */}
 
 										</div>
+
 									</div>
 								</div>
 							</div>
@@ -360,6 +475,43 @@ export const CustomerDashboard = () => {
 					</thead>
 					<tbody>
 						{openSessions.map((session) => (
+							<React.Fragment key={session.id}>
+								<tr>
+									<td>{session.title}</td>
+									<td>{session.description}</td>
+									<td>{session.skills.join(', ')}</td>
+									<td>{session.focus_areas.join(', ')}</td>
+									<td>
+										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+											{session.resourceLink}
+										</a>
+									</td>
+									<td>
+										<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
+										<button className="btn btn-danger mt-2" onClick={() => handleDeleteSession(session.id)}>
+											Delete Session
+										</button>
+									</td>
+								</tr>
+								{renderSessionMessages(session)}
+							</React.Fragment>
+						))}
+					</tbody>
+				</table>
+				<h2>Draft Sessions</h2>
+				<table className="striped bordered hover">
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Description</th>
+							<th>Skills</th>
+							<th>Focus Areas</th>
+							<th>Resource Link</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{draftSessions.map((session) => (
 							<React.Fragment key={session.id}>
 								<tr>
 									<td>{session.title}</td>
@@ -408,9 +560,7 @@ export const CustomerDashboard = () => {
 											{session.resourceLink}
 										</a>
 									</td>
-									<td>
-										<Link to="/" className="btn btn-primary btn-sm">Edit</Link>
-									</td>
+
 								</tr>
 								{renderSessionMessages(session)}
 							</React.Fragment>

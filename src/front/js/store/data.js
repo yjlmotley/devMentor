@@ -162,6 +162,7 @@ export const stateOptions = [
 
 // Country options
 export const countryOptions = [
+    { id: 196, label: 'United States of America (USA)' },
     { id: 1, label: 'Afghanistan' },
     { id: 2, label: 'Albania' },
     { id: 3, label: 'Algeria' },
@@ -357,7 +358,7 @@ export const countryOptions = [
     { id: 193, label: 'Ukraine' },
     { id: 194, label: 'United Arab Emirates' },
     { id: 195, label: 'United Kingdom of Great Britain and Northern Ireland' },
-    { id: 196, label: 'United States of America (USA)' },
+    
     { id: 197, label: 'Uruguay' },
     { id: 198, label: 'Uzbekistan' },
     { id: 199, label: 'Vanuatu' },

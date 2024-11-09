@@ -158,3 +158,79 @@ export const ValidateNumber = (years_exp, setInvalidItems) => {
     }
     return true;
 }
+
+export const ValidateTitle = (title, setInvalidItems) => {
+    if (title.trim() === "" || title.length < 5 || title.length > 125) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "title"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateDescription = (description, setInvalidItems) => {
+    if (description.trim() === "" || description.length < 5 || description.length > 125) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "description"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateSchedule = (schedule, setInvalidItems) => {
+    const hasSelectedDay = Object.values(schedule).some(day => day.checked);
+    if (!hasSelectedDay) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "schedule"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateFocusAreas = (focus_areas, setInvalidItems) => {
+    if (focus_areas.length === 0) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "focus_areas"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateSkills = (skills, setInvalidItems) => {
+    if (skills.length === 0) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "skills"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateResourceLink = (resourceLink, setInvalidItems) => {
+    // Check if resourceLink has more than 4 characters
+    if (resourceLink.trim().length > 4) {
+        return true;
+    } else {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "resourceLink"]);
+        return false;
+    }
+};
+
+export const ValidateDuration = (duration, setInvalidItems) => {
+    const validDurations = ["30", "60", "90", "120", "150", "180"];
+    if (!validDurations.includes(duration)) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "duration"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateTotalHours = (totalHours, setInvalidItems) => {
+    if (totalHours <= 0 || totalHours > 100 || !Number.isInteger(totalHours)) {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "totalHours"]);
+        return false;
+    }
+    return true;
+};
+
+export const ValidateVisibility = (is_active, setInvalidItems) => {
+    if (is_active === "") {
+        setInvalidItems(prevInvalidItems => [...prevInvalidItems, "is_active"]);
+        return false;
+    }
+    return true;
+};

@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 import stripe
 
-from flask import Flask, request, jsonify, url_for, Blueprint, current_app
+from flask import Flask, request, jsonify, url_for, Blueprint, current_app, redirect
 from flask_cors import CORS
 import jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
@@ -21,6 +21,9 @@ from api.utils import generate_sitemap, APIException
 from api.decorators import mentor_required, customer_required
 from api.send_email import send_email
 from enum import Enum as PyEnum
+
+from .googlemeet import meet_service
+from urllib.parse import urlencode
 
 
 api = Blueprint('api', __name__)
@@ -207,6 +210,15 @@ def change_password():
 def all_mentors():
    mentors = Mentor.query.all()
    return jsonify([mentor.serialize() for mentor in mentors]), 200
+
+@api.route('/mentorsnosession', methods=['GET'])
+def all_mentors_no_sessions():
+    mentors = Mentor.query.all()
+    serialized_mentors = [mentor.serialize() for mentor in mentors]
+    # Remove confirmed_sessions from each mentor's data
+    for mentor in serialized_mentors:
+        mentor.pop('confirmed_sessions', None)
+    return jsonify(serialized_mentors), 200
 
 @api.route('/mentor', methods=['GET'])
 @mentor_required
@@ -519,7 +531,10 @@ def delete_customer(cust_id):
 
     
 
-# Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
+# Session Routes Start Session Routes Start Session Routes Start Session Routes Start
 
 @api.route('/sessions', methods= ['GET'])
 def all_sessions():
@@ -549,12 +564,7 @@ def create_session():
     duration = request.json.get("duration", None)
     totalHours = request.json.get("totalHours", None)
     
-
-    # # Check if all required fields are present
-    # if title is None or description is None or is_active is None or schedule is None or focus_areas is None or skills is None or resourceLink is None or duration is None or totalHours is None:
-    #     return jsonify({"msg": "Some fields are missing in your request"}), 400
-    
-    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
+    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description", "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
 
     if missing_fields:
         return jsonify({"msg": f"Missing fields: {', '.join(missing_fields)}"}), 400
@@ -571,7 +581,6 @@ def create_session():
         if not isinstance(times, dict) or 'start' not in times or 'end' not in times:
             return jsonify({"msg": f"Invalid schedule format for {day}"}), 400
 
-
     # Create and save the new session
     session = Session(
         customer_id=customer_id,
@@ -582,16 +591,17 @@ def create_session():
         focus_areas=focus_areas,
         skills=skills,
         resourceLink=resourceLink,
-        duration = duration,
+        duration=duration,
         totalHours=totalHours
     )
     db.session.add(session)
     db.session.commit()
-    db.session.refresh(session)
-
+    
+    # Get the new session ID and include it in both the top level and session object
     response_body = {
         "msg": "Session successfully created!",
-        "session": session.serialize()
+        "session_id": session.id,  # Include ID at top level
+        "session": session.serialize()  # This also includes the ID
     }
     return jsonify(response_body), 201
 
@@ -672,6 +682,10 @@ def get_sessions_by_customer_id():
         return jsonify({"msg": "Customer not found"}), 404
     
     sessions = [session.serialize() for session in customer.sessions]
+    # for session in sessions:
+    #     mentor = Mentor.query.get(session.mentor_id)
+    #     session["mentor_image_url"] = mentor.profile_photo.image_url
+    
 
     return jsonify(sessions), 200
 
@@ -819,6 +833,62 @@ def get_messages(session_id):
         return jsonify({"msg": "No messages found for this session"}), 404
 
     return jsonify([message.serialize() for message in messages]), 200
+
+
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes 
+# Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes Google Meet Routes
+
+
+
+@api.route('/meet/auth', methods=['GET'])
+def start_oauth():
+    try:
+        auth_url = meet_service.get_oauth_url()
+        return jsonify({'authUrl': auth_url})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+    
+
+@api.route('/meet/oauth-callback', methods=['GET'])
+def oauth_callback():
+    code = request.args.get('code')
+    if not code:
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        error_params = urlencode({'error': 'No authorization code received'})
+        return redirect(f"{frontend_url}?{error_params}")
+
+    try:
+        credentials = meet_service.handle_oauth_callback(code)
+        # Save credentials in session or database if needed
+        
+        # Redirect to frontend with success parameter
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        success_params = urlencode({'auth': 'success'})
+        return redirect(f"{frontend_url}?{success_params}")
+    except Exception as e:
+        frontend_url = os.getenv('AFTER_AUTH_URL')
+        error_params = urlencode({'error': str(e)})
+        return redirect(f"{frontend_url}?{error_params}")
+
+@api.route('/meet/create-meeting', methods=['POST'])
+def create_meeting():
+    try:
+        meeting_data = meet_service.create_meeting()
+        return jsonify(meeting_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Add a new endpoint to fetch meetings
+@api.route('/meet/meetings', methods=['GET'])
+def get_meetings():
+    try:
+        meetings = meet_service.get_meetings()  # You'll need to implement this in your meet_service
+        return jsonify(meetings)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # Stripe routes Start # Stripe routes Start # Stripe routes Start
