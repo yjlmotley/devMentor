@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 87b2f70716db
+Revision ID: adefd9e92a7a
 Revises: 
-Create Date: 2024-10-17 17:51:37.615287
+Create Date: 2024-11-06 02:47:18.447393
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '87b2f70716db'
+revision = 'adefd9e92a7a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,10 +34,8 @@ def upgrade():
     sa.Column('about_me', sa.String(length=2500), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('customer', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_customer_email'), ['email'], unique=True)
-        batch_op.create_index(batch_op.f('ix_customer_phone'), ['phone'], unique=True)
-
+    op.create_index(op.f('ix_customer_email'), 'customer', ['email'], unique=True)
+    op.create_index(op.f('ix_customer_phone'), 'customer', ['phone'], unique=True)
     op.create_table('mentor',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
@@ -59,10 +57,8 @@ def upgrade():
     sa.Column('date_joined', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('mentor', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_mentor_email'), ['email'], unique=True)
-        batch_op.create_index(batch_op.f('ix_mentor_phone'), ['phone'], unique=False)
-
+    op.create_index(op.f('ix_mentor_email'), 'mentor', ['email'], unique=True)
+    op.create_index(op.f('ix_mentor_phone'), 'mentor', ['phone'], unique=False)
     op.create_table('customer_image',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('public_id', sa.String(length=500), nullable=False),
@@ -136,14 +132,10 @@ def downgrade():
     op.drop_table('portfolio_photo')
     op.drop_table('mentor_image')
     op.drop_table('customer_image')
-    with op.batch_alter_table('mentor', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mentor_phone'))
-        batch_op.drop_index(batch_op.f('ix_mentor_email'))
-
+    op.drop_index(op.f('ix_mentor_phone'), table_name='mentor')
+    op.drop_index(op.f('ix_mentor_email'), table_name='mentor')
     op.drop_table('mentor')
-    with op.batch_alter_table('customer', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_customer_phone'))
-        batch_op.drop_index(batch_op.f('ix_customer_email'))
-
+    op.drop_index(op.f('ix_customer_phone'), table_name='customer')
+    op.drop_index(op.f('ix_customer_email'), table_name='customer')
     op.drop_table('customer')
     # ### end Alembic commands ###

@@ -210,6 +210,15 @@ def all_mentors():
    mentors = Mentor.query.all()
    return jsonify([mentor.serialize() for mentor in mentors]), 200
 
+@api.route('/mentorsnosession', methods=['GET'])
+def all_mentors_no_sessions():
+    mentors = Mentor.query.all()
+    serialized_mentors = [mentor.serialize() for mentor in mentors]
+    # Remove confirmed_sessions from each mentor's data
+    for mentor in serialized_mentors:
+        mentor.pop('confirmed_sessions', None)
+    return jsonify(serialized_mentors), 200
+
 @api.route('/mentor', methods=['GET'])
 @mentor_required
 def mentor_by_id():
@@ -554,12 +563,7 @@ def create_session():
     duration = request.json.get("duration", None)
     totalHours = request.json.get("totalHours", None)
     
-
-    # # Check if all required fields are present
-    # if title is None or description is None or is_active is None or schedule is None or focus_areas is None or skills is None or resourceLink is None or duration is None or totalHours is None:
-    #     return jsonify({"msg": "Some fields are missing in your request"}), 400
-    
-    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description",  "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
+    missing_fields = [f for f, v in locals().items() if f in ["customer_id","title", "description", "is_active", "schedule", "focus_areas", "skills", "resourceLink", "duration", "totalHours"] and v is None]
 
     if missing_fields:
         return jsonify({"msg": f"Missing fields: {', '.join(missing_fields)}"}), 400
@@ -576,7 +580,6 @@ def create_session():
         if not isinstance(times, dict) or 'start' not in times or 'end' not in times:
             return jsonify({"msg": f"Invalid schedule format for {day}"}), 400
 
-
     # Create and save the new session
     session = Session(
         customer_id=customer_id,
@@ -587,16 +590,17 @@ def create_session():
         focus_areas=focus_areas,
         skills=skills,
         resourceLink=resourceLink,
-        duration = duration,
+        duration=duration,
         totalHours=totalHours
     )
     db.session.add(session)
     db.session.commit()
-    db.session.refresh(session)
-
+    
+    # Get the new session ID and include it in both the top level and session object
     response_body = {
         "msg": "Session successfully created!",
-        "session": session.serialize()
+        "session_id": session.id,  # Include ID at top level
+        "session": session.serialize()  # This also includes the ID
     }
     return jsonify(response_body), 201
 
@@ -677,6 +681,10 @@ def get_sessions_by_customer_id():
         return jsonify({"msg": "Customer not found"}), 404
     
     sessions = [session.serialize() for session in customer.sessions]
+    # for session in sessions:
+    #     mentor = Mentor.query.get(session.mentor_id)
+    #     session["mentor_image_url"] = mentor.profile_photo.image_url
+    
 
     return jsonify(sessions), 200
 

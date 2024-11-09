@@ -124,6 +124,7 @@ export const CustomerDashboard = () => {
 		if (success) {
 			console.log("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
+			cleanupModal()
 			// Close the modal
 		} else {
 			console.error("Failed to confirm mentor");
@@ -272,15 +273,63 @@ export const CustomerDashboard = () => {
 																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
 																{!isInGoogleMeet && (
 																	<div
-																		className="modal fade"
-																		id={`ConfirmMentorModal${session.id}${mentorId}`}
-																		tabIndex="-1"
-																		role="dialog"
-																		aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
-																		aria-hidden="true"
-																	>
-																		{/* ... (rest of the Confirm Mentor Modal code remains the same) ... */}
+																	className="modal fade"
+																	id={`ConfirmMentorModal${session.id}${mentorId}`}
+																	tabIndex="-1"
+																	role="dialog"
+																	aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
+																	aria-hidden="true"
+																>
+																	<div className="modal-dialog modal-dialog-centered" role="document">
+																		<div className="modal-content">
+																			<div className="modal-header">
+																				<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
+																				<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+																			</div>
+																			<div className="modal-body">
+																				<form>
+																					<div className="mb-3">
+																						<label htmlFor="date" className="form-label">Date</label>
+																						<input
+																							type="date"
+																							className="form-control"
+																							id="date"
+																							value={confirmModalData.date}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
+																						/>
+																					</div>
+																					<div className="mb-3">
+																						<label htmlFor="startTime" className="form-label">Start Time</label>
+																						<input
+																							type="time"
+																							className="form-control"
+																							id="startTime"
+																							value={confirmModalData.startTime}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, startTime: e.target.value })}
+																						/>
+																					</div>
+																					<div className="mb-3">
+																						<label htmlFor="endTime" className="form-label">End Time</label>
+																						<input
+																							type="time"
+																							className="form-control"
+																							id="endTime"
+																							value={confirmModalData.endTime}
+																							onChange={(e) => setConfirmModalData({ ...confirmModalData, endTime: e.target.value })}
+																						/>
+																					</div>
+																				</form>
+																			</div>
+																			<div className="modal-footer">
+																				<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																				<button type="button" className="btn btn-success" onClick={() => handleConfirmMentor(session.id, mentorId)}>Confirm Mentor</button>
+																			</div>
+																		</div>
 																	</div>
+
+
+																</div>
+
 																)}
 															</div>
 														</div>
@@ -310,7 +359,7 @@ export const CustomerDashboard = () => {
 						{acceptedSessions.map((session) => (
 							<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
 								<div className="session-card card h-100">
-									<img variant="top" className="card-img-top" src="https://res.cloudinary.com/dufs8hbca/image/upload/v1720223404/aimepic_vp0y0t.jpg" alt="Session" />
+									<img variant="top" className="card-img-top" src={session.mentor_photo_url} alt="Session" />
 									<div className="card-body">
 										<div className="row align-items-center justify-content-center">
 											<label className="col-auto"><strong>Session with:</strong></label>
