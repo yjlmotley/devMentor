@@ -58,8 +58,10 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
             <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div className="modal-content bg-dark">
                     <div className="modal-header border-0 p-0">
-                        <ul className="nav nav-tabs w-100 border-0">
+                        
+                        <ul className="nav nav-tabs w-100 border-0 d-flex">
                             <li className="nav-item w-50">
+                                {/* <li className="nav-item"> */}
                                 <button
                                     className={`nav-link w-100 rounded-0 border-0 ${activeTab === 'login' ? 'active' : ''}`}
                                     onClick={() => handleTabChange('login')}
@@ -72,7 +74,9 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
                                     Login
                                 </button>
                             </li>
+                            {/* <div className="border-end" style={{ height: '20px', marginTop: '10px' }}></div> */}
                             <li className="nav-item w-50">
+                                {/* <li className="nav-item"> */}
                                 <button
                                     className={`nav-link w-100 rounded-0 border-0 ${activeTab === 'signup' ? 'active' : ''}`}
                                     onClick={() => handleTabChange('signup')}

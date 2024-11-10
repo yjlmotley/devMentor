@@ -40,7 +40,7 @@ export const MentorLogin = () => {
             event.preventDefault();
             handleLogin();
         }}>
-            <div style={{ width: '100%', maxWidth: '1000px', marginTop: '10px', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
+            <div style={{ width: '100%', maxWidth: '1000px', margin: '30px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
                 <div className="row justify-content-center">
                     <div className="col-md-6 pb-5 text-light authDiv">
                         <div style={{ padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 50px rgba(255, 255, 255, 0.2)', border: '1px solid white' }}>
