@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Link, useNavigate } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators"; // Ensure path is correct
 
-export const CustomerLogin = () => {
+export const CustomerLogin = ({ onSuccess }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,6 +20,7 @@ export const CustomerLogin = () => {
         if (isEmailValid && isPasswordValid) {
             const success = await actions.logInCustomer({ email, password });
             if (success) {
+                if (onSuccess) onSuccess();
                 navigate("/customer-dashboard");
             } else {
                 alert("Email and or password incorrect");
@@ -73,7 +74,7 @@ export const CustomerLogin = () => {
                     </div>
                     <div className="text-center mt-3 mb-4">
                         <button
-                            type="button"
+                            type="submit"
                             className="btn btn-secondary w-100 py-2"
                             style={{
                                 backgroundColor: '#6c757d',
