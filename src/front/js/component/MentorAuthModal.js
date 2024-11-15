@@ -2,26 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MentorLogin } from "./MentorLogin.js";
 import { MentorSignup } from "../pages/MentorSignup.js";
 
+
 export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
     const [activeTab, setActiveTab] = useState(initialTab);
     const modalRef = useRef(null);
     const bsModalRef = useRef(null);
 
     useEffect(() => {
-        // Initialize modal when component mounts
         if (modalRef.current && !bsModalRef.current && window.bootstrap) {
             bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
                 keyboard: false,
                 backdrop: 'static'
             });
 
-            // Add even listener for when modal is hidden
             modalRef.current.addEventListener('hidden.bs.modal', () => {
                 if (onHide) onHide();
             });
         }
 
-        // Cleanup on unmount
         return () => {
             if (bsModalRef.current) {
                 bsModalRef.current.dispose();
@@ -52,69 +50,68 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
             className="modal fade"
             id="mentorAuthModal"
             tabIndex="-1"
-            aria-hiden="true"
+            aria-hidden="true"
             ref={modalRef}
         >
-            <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div className="modal-content bg-dark">
+            <div className="modal-dialog modal-dialog-centered">
+                {/* <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"> */}
+                <div
+                    className="modal-content bg-dark"
+                    style={{
+                        boxShadow: '0 0 30px rgba(0, 0, 0, 0.7)',
+                    }}
+                >
                     <div className="modal-header border-0 p-0">
-                        
-                        <ul className="nav nav-tabs w-100 border-0 d-flex">
-                            <li className="nav-item w-50">
-                                {/* <li className="nav-item"> */}
-                                <button
-                                    className={`nav-link w-100 rounded-0 border-0 ${activeTab === 'login' ? 'active' : ''}`}
-                                    onClick={() => handleTabChange('login')}
-                                    style={{
-                                        borderBottom: activeTab === 'login' ? '2px solid #6c757d' : '1px solid #dee2e6',
-                                        backgroundColor: 'transparent',
-                                        color: activeTab === 'login' ? '#fff' : '#6c757d'
-                                    }}
-                                >
-                                    Login
-                                </button>
-                            </li>
-                            {/* <div className="border-end" style={{ height: '20px', marginTop: '10px' }}></div> */}
-                            <li className="nav-item w-50">
-                                {/* <li className="nav-item"> */}
-                                <button
-                                    className={`nav-link w-100 rounded-0 border-0 ${activeTab === 'signup' ? 'active' : ''}`}
-                                    onClick={() => handleTabChange('signup')}
-                                    style={{
-                                        borderBottom: activeTab === 'signup' ? '2px solid #6c757d' : '1px solid #dee2e6',
-                                        backgroundColor: 'transparent',
-                                        color: activeTab === 'signup' ? '#fff' : '#6c757d'
-                                    }}
-                                >
-                                    Sign Up
-                                </button>
-                            </li>
-                        </ul>
-                        <button
-                            type="button"
-                            className="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                            onClick={() => {
-                                if (bsModalRef.current) {
-                                    bsModalRef.current.hide();
-                                }
-                            }}
-                        />
+                        <div className="d-flex w-100 position-relative">
+                            <button
+                                className={`flex-fill border-0 auth-tab login-tab ${activeTab === 'login'
+                                    ? 'active text-white'
+                                    : 'text-secondary'
+                                    }`}
+                                onClick={() => handleTabChange('login')}
+                            >
+                                Login
+                            </button>
+                            <div className="vr" style={{ backgroundColor: '#6c757d', marginTop: '15px', marginBottom: '15px' }}></div>
+                            <button
+                                className={`flex-fill border-0 auth-tab signup-tab ${activeTab === 'signup'
+                                    ? 'active text-white'
+                                    : 'text-secondary'
+                                    }`}
+                                onClick={() => handleTabChange('signup')}
+                            >
+                                Sign Up
+                            </button>
+                            <button
+                                type="button"
+                                className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
+                                onClick={() => {
+                                    if (bsModalRef.current) {
+                                        bsModalRef.current.hide();
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div className="modal-body p-0">
+                    <div className="modal-body p-4">
                         {activeTab === 'login' ? (
-                            <MentorLogin onSuccess={() => {
-                                if (bsModalRef.current) {
-                                    bsModalRef.current.hide();
-                                }
-                            }} />
+                            <MentorLogin
+                                onSuccess={() => {
+                                    if (bsModalRef.current) {
+                                        bsModalRef.current.hide();
+                                    }
+                                }}
+                            />
                         ) : (
-                            <MentorSignup onSuccess={() => {
-                                handleTabChange('login');
-                            }} />
+                            <MentorSignup
+                                onSuccess={() => {
+                                    handleTabChange('login');
+                                }}
+                            />
                         )}
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

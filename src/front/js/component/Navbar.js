@@ -112,7 +112,7 @@ export const Navbar = () => {
 											</Link>
 											<Link to="./mentor-profile" className="dropdown-item bold-text text-end">
 												<span className="navbarFont">Mentor Profile</span>
-												<i className="fa-solid fa-id-card-clip" />
+												<i className="fa-solid fa-user" />
 											</Link>
 											<Link to="/mentor-session-board" className="dropdown-item bold-text text-end">
 												<span className="navbarFont">Mentor Session Board</span>
