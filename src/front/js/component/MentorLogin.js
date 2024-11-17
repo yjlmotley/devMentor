@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators";
 
 
@@ -9,7 +9,6 @@ export const MentorLogin = ({ onSuccess }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [invalidItems, setInvalidItems] = useState([]);
-    const navigate = useNavigate();
 
     const handleLogin = async () => {
         setInvalidItems([]);
@@ -20,7 +19,6 @@ export const MentorLogin = ({ onSuccess }) => {
             const success = await actions.logInMentor({ email, password });
             if (success) {
                 if (onSuccess) onSuccess();
-                navigate("/mentor-dashboard");
             } else {
                 alert("Email and/or password is incorrect. Please try again.");
             }
@@ -32,8 +30,8 @@ export const MentorLogin = ({ onSuccess }) => {
             e.preventDefault();
             handleLogin();
         }}>
-            <div className="row justify-content-center">
-                <div className="col-12 text-light authDiv">
+            <div className="row justify-content-center authDiv">
+                <div className="col-12 text-light">
                     <h2 className="text-center mt-2 mb-4">Welcome Back Mentors!</h2>
                     <div className="mb-3">
                         <input

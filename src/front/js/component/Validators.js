@@ -34,6 +34,7 @@ export const ValidatePhone = (phoneNumber, countryCode, setInvalidItems) => {
     return true;
 };
 
+
 export const ValidatePhoneNumber = (phoneNumber, country) => {
     console.log(country);
     console.log(phoneNumber);

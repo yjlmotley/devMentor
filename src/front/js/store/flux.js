@@ -229,20 +229,35 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             signUpCustomer: async (customer) => {
-                const response = await fetch(
-                    process.env.BACKEND_URL + "/api/customer/signup", {
-                    method: "POST",
-                    body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password, city: customer.city, what_state: customer.what_state, country: customer.country }),
-                    headers: {
-                        "Content-Type": "application/json"
+                try {
+                    const response = await fetch(
+                        process.env.BACKEND_URL + "/api/customer/signup", {
+                        method: "POST",
+                        body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    const responseBody = await response.json();
+    
+                    if (response.status == 201) {
+                        return { 
+                            success: true, 
+                            message: responseBody.msg || "Account successfully created! Please log in."
+                        };
+                    } else {
+                        return { 
+                            success: false, 
+                            message: responseBody.msg || "An error occurred during signup"
+                        };
                     }
-                });
-                if (response.status !== 201) return false;
-
-                const responseBody = await response.json();
-                console.log(responseBody)
-
-                return true;
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    return { 
+                        success: false, 
+                        message: "An unexpected error occurred. Please try again later."
+                    }
+                }
             },
 
             logInCustomer: async (customerCredentials) => {

@@ -1,0 +1,99 @@
+.auth .btn-close {
+    transform: scale(0.8) !important;
+    z-index: 1;
+}
+
+.authDiv input {
+    text-align: center;
+}
+
+/* #mentorAuthModal .btn:focus, #customerAuthModal .btn:focus {
+    box-shadow: none;
+} */
+
+.auth .vr {
+    opacity: 0.3;
+}
+
+.auth .modal-dialog {
+    max-width: 450px;
+}
+
+/* Form styling */
+.authDiv .form-control {
+    transition: border-color 0.3s ease;
+}
+
+/* everything below needs to have an .auth or .authDiv so it's specific to the auth divs */
+/* everything below needs to have an .auth or .authDiv so it's specific to the auth divs */
+/* everything below needs to have an .auth or .authDiv so it's specific to the auth divs */
+.form-control:focus {
+    background-color: #2b2b2b !important;
+    border-color: #6c757d !important;
+    box-shadow: none !important;
+    color: white !important;
+}
+
+.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Button enhancements */
+.btn-secondary:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-secondary:active,
+.btn-secondary:focus:active,
+.btn-secondary.active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    background-color: #4a4f54 !important;
+    /* Slightly darker when pressed */
+}
+
+.btn-secondary:focus {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Link styling */
+.auth-link {
+    text-decoration: underline !important;
+}
+.auth-link:hover {
+    color: #b8b8b8 !important;
+    text-decoration: underline !important;
+    cursor: pointer;
+}
+
+
+/* Tab button styling */
+.modal .auth-tab {
+    position: relative;
+    border-bottom: 1px solid #464646 !important;
+    background-color: transparent;
+}
+
+.modal .login-tab {
+    margin-left: 1rem !important;
+}
+
+.modal .signup-tab {
+    margin-right: 1rem !important;
+}
+
+.modal .auth-tab.active {
+    border-bottom: 2px solid #6c757d !important;
+    margin-bottom: -1px;
+    /* To prevent layout shift */
+}
+
+/* This ensures the border will be sharp/straight */
+.modal .auth-tab::after {
+    display: none !important;
+    /* Removes any potential pseudo-elements that might round corners */
+}

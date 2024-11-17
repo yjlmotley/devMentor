@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerLogin } from './CustomerLogin.js';
 import { CustomerSignup } from '../pages/CustomerSignup.js';
+import "../../styles/accAuthorization.css";
 
 
 export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
@@ -44,13 +45,27 @@ export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
     setActiveTab(initialTab);
   }, [initialTab]);
 
+  const handleSignupSuccess = () => {
+    console.log('Signup success handler called');
+    setActiveTab('login');
+  };
+
+  const handleSwitchLogin = () => {
+    setActiveTab('login');
+  }
+
+  const handleSwitchSignUp = () => {
+    setActiveTab('signup');
+  }
+
   const handleTabChange = (tab) => {
+    console.log('Changing tab to:', tab);
     setActiveTab(tab);
   };
 
   return (
     <div
-      className="modal fade"
+      className="modal fade auth"
       id="customerAuthModal"
       tabIndex="-1"
       aria-hidden="true"
@@ -97,15 +112,17 @@ export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
           </div>
           <div className="modal-body p-4">
             {activeTab === 'login' ? (
-              <CustomerLogin onSuccess={() => {
-                if (bsModalRef.current) {
-                  bsModalRef.current.hide();
-                }
-              }} />
+              <CustomerLogin
+                onSuccess={() => {
+                  console.log('Login successful, rerouting to the customer dashboard page');
+                  if (bsModalRef.current) {
+                    bsModalRef.current.hide();
+                  }
+                }}
+                switchToSignUp={handleSwitchSignUp}
+              />
             ) : (
-              <CustomerSignup onSuccess={() => {
-                handleTabChange('login');
-              }} />
+              <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />  
             )}
           </div>
         </div>

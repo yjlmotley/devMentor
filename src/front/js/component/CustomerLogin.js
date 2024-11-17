@@ -1,14 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators"; // Ensure path is correct
 
-export const CustomerLogin = ({ onSuccess }) => {
+export const CustomerLogin = ({ onSuccess, switchToSignUp }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [invalidItems, setInvalidItems] = useState([]);
-    const navigate = useNavigate();
 
     const handleLogin = async () => {
         // Reset invalid items before validation
@@ -21,7 +20,6 @@ export const CustomerLogin = ({ onSuccess }) => {
             const success = await actions.logInCustomer({ email, password });
             if (success) {
                 if (onSuccess) onSuccess();
-                navigate("/customer-dashboard");
             } else {
                 alert("Email and or password incorrect");
             }
@@ -33,8 +31,8 @@ export const CustomerLogin = ({ onSuccess }) => {
             e.preventDefault();
             handleLogin();
         }}>
-            <div className="row justify-content-center">
-                <div className="col-12 text-light authDiv">
+            <div className="row justify-content-center authDiv">
+                <div className="col-12 text-light">
                     <h2 className="text-center mt-2 mb-4">Welcome Back!</h2>
                     <div className="mb-3">
                         <input
@@ -86,14 +84,16 @@ export const CustomerLogin = ({ onSuccess }) => {
                             Login
                         </button>
                     </div>
-                    {/* <div>
-                        <Link to='/forgot-password' className="forgot-password-link">Forgot Password?</Link>
-                    </div> */}
                     <div className="text-center text-secondary small-font">
-                        Need to create an account?
-                        <Link to='/customer-signup' className="ms-1 text-secondary auth-link">
-                            Sign up
-                        </Link>
+                        New to our platform?
+                        <span
+                            onClick={() => {
+                                switchToSignUp();
+                            }}
+                            className="ms-1 text-secondary auth-link"
+                        >
+                            Create an account
+                        </span>
                     </div>
                 </div>
             </div>

@@ -433,13 +433,10 @@ def customer_signup():
     password = request.json.get("password", None)
     first_name = request.json.get("first_name", None)
     last_name = request.json.get("last_name", None)
-    city = request.json.get("city", None)
-    what_state = request.json.get("what_state",None)
-    country = request.json.get("country",None)
     phone = request.json.get("phone", None)
     
     
-    if first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None or email is None or password is None:
+    if first_name is None or last_name is None  or phone is None or email is None or password is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
     customer = Customer.query.filter_by(email=email).one_or_none()
     if customer:
@@ -449,9 +446,6 @@ def customer_signup():
         password=generate_password_hash(password),
         first_name=first_name, 
         last_name=last_name, 
-        city=city, 
-        what_state=what_state, 
-        country=country, 
         phone=phone,
     ) 
     db.session.add(customer)

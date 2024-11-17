@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MentorLogin } from "./MentorLogin.js";
 import { MentorSignup } from "../pages/MentorSignup.js";
+import "../../styles/accAuthorization.css";
 
 
 export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
@@ -47,7 +48,7 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
 
     return (
         <div
-            className="modal fade"
+            className="modal fade auth"
             id="mentorAuthModal"
             tabIndex="-1"
             aria-hidden="true"
