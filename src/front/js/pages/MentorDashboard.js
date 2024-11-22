@@ -59,8 +59,11 @@ export const MentorDashboard = () => {
 
 
 	return (
-		<div className="text-center mt-5">
-			<h1>MENTOR DASHBOARD</h1>
+
+		<div className="container card  border-secondary shadow border-2 px-0 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+                        <h1 className="text-center mt-5">MENTOR DASHBOARD</h1>
+					</div>
 			<div className="open-sessions container">
 				<div className="row">
 					{confirmedSessions.map((session) => (
@@ -107,17 +110,19 @@ export const MentorDashboard = () => {
 										
 									</div>
 								</div>
-								<div>
-									<h5> Session Link </h5>
+								<div className="dflex align-items-center justify-content-middle  text-center" >
+									<h5> <strong>Session Link Active Join Now!</strong></h5>
 									{session.appointments[0].meetingUrl ? (
-										<a 
-											href={session.appointments[0].meetingUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="btn btn-primary btn-sm mb-3"
-										>
-											Join Meeting
-										</a>
+										<div className="w-100 px-2 pb-2">
+											<a 
+												href={session.appointments[0].meetingUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="btn btn-primary btn-sm w-100"
+											>
+												Join Meeting
+											</a>
+										</div>
 									) : (
 										<p className="text-muted mb-3">No meeting link yet</p>
 									)}
