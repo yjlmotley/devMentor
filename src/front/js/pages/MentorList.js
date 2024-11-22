@@ -21,8 +21,12 @@ export const MentorList = () => {
 
 
         <>
+        <div className="container card  border-secondary shadow border-2 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+                        <h1 className="text-center mt-5">Available Mentors</h1>
+					</div>
             <div className="sessions-dashboard">
-                <h1 className="text-center mt-5">Available Mentors</h1>
+               
                 <div className="container-fluid">
                     <div className="row">
                         {store.mentors.map((mentor) => (
@@ -188,6 +192,7 @@ export const MentorList = () => {
                     </div>
                 </div>
             </div>
+        </div>
         </>
 
     )

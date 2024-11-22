@@ -206,7 +206,7 @@ export const CreateSession = () => {
             required
           ></textarea>
           {invalidItems.includes("description") && 
-            <div className="invalid-feedback">Description must be between 5 and 125 characters</div>
+            <div className="invalid-feedback">Description must be between 5 and 750 characters</div>
           }
         </div>
 

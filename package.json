@@ -73,8 +73,8 @@
 		]
 	},
 	"dependencies": {
-		"@stripe/react-stripe-js": "^2.8.1",
-		"@stripe/stripe-js": "^4.9.0",
+		"@stripe/react-stripe-js": "^2.9.0",
+		"@stripe/stripe-js": "^4.10.0",
 		"googleapis": "^144.0.0",
 		"libphonenumber-js": "^1.11.4",
 		"lucide-react": "^0.453.0",

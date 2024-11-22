@@ -144,40 +144,52 @@ export const GoogleMeeting = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl border-4 border-gray-300 p-8">
-                <h1 className="text-3xl font-bold mb-2 text-center my-4 py-3">Google Meet Integration</h1>
-                <h5 className="mb-4">1. Authenticate with Google</h5>
-                <h5 className="mb-4">2. Create Meeting</h5>
-                <h5 className="mb-4">3. Message Mentor Meeting Link</h5>
-                <h5 className="mb-6">4. Join Meeting Link and meet mentor</h5>
+                <div className="row">
+                    <div className="col-6">
+                        <h1 className="text-3xl font-bold mb-2 text-center my-4 py-3">Google Meet Integration</h1>
+                        <h5 className="mb-4">1. Authenticate with Google</h5>
+                        <h5 className="mb-4">2. Create Meeting</h5>
+                        <h5 className="mb-4">3. Message Mentor Meeting Link</h5>
+                        <h5 className="mb-6">4. Join Meeting Link and meet mentor</h5>
+
+
+                    </div>
+                    <div className="col-6 py-5">
+                        <div className="mb-6 flex justify-center">
+                            <button
+                                className="btn btn-primary flex items-center justify-center shadow px-5 py-3 rounded-full hover:bg-blue-600 transition-colors"
+                                style={{width: '200px', height: '200px'}}
+                                onClick={startAuth}
+                                disabled={meetingInfo.loading}
+                            >
+                                {meetingInfo.loading ? (
+                                    <span className="spinner-border spinner-border-sm mr-2"></span>
+                                ) : (
+                                    <Users className="w-5 h-5 mr-2" />
+                                )}
+                                <p><strong>Authenticate with Google</strong></p>
+                            </button>
+                        </div>
+
+                    {/* Create Meeting Button */}
+                    <div className="mb-6 py-4 flex justify-center">
+                        <button
+                            className="btn btn-success flex items-center justify-center px-5 py-3 rounded-full hover:bg-green-600 transition-colors"
+                            onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            Create New Meeting
+                        </button>
+                    </div>
+
+                    </div>
+                </div>
+              
 
                 {/* Auth Section */}
-                <div className="mb-6 flex justify-center">
-                    <button
-                        className="btn btn-primary flex items-center justify-center px-5 py-3 rounded-full hover:bg-blue-600 transition-colors"
-                        onClick={startAuth}
-                        disabled={meetingInfo.loading}
-                    >
-                        {meetingInfo.loading ? (
-                            <span className="spinner-border spinner-border-sm mr-2"></span>
-                        ) : (
-                            <Users className="w-5 h-5 mr-2" />
-                        )}
-                        Authenticate with Google
-                    </button>
-                </div>
-
-                {/* Create Meeting Button */}
-                <div className="mb-6 py-4 flex justify-center">
-                    <button
-                        className="btn btn-success flex items-center justify-center px-5 py-3 rounded-full hover:bg-green-600 transition-colors"
-                        onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
-                    >
-                        <Plus className="w-5 h-5 mr-2" />
-                        Create New Meeting
-                    </button>
-                </div>
+                
 
                 {/* Meeting Form */}
                 {meetingForm.isFormVisible && (

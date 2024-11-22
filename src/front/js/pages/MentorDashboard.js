@@ -107,6 +107,21 @@ export const MentorDashboard = () => {
 										
 									</div>
 								</div>
+								<div>
+									<h5> Session Link </h5>
+									{session.appointments[0].meetingUrl ? (
+										<a 
+											href={session.appointments[0].meetingUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="btn btn-primary btn-sm mb-3"
+										>
+											Join Meeting
+										</a>
+									) : (
+										<p className="text-muted mb-3">No meeting link yet</p>
+									)}
+								</div>
 							</div>
 						</div>
 					))}
