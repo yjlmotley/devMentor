@@ -417,37 +417,49 @@ export const CustomerDashboard = () => {
 												<div className="container-fluid justify-content-between d-flex">
 													{/* MODAL FOR GOOGLEMEET */}
 
-													<div className="modal fade rounded-3xl shadow-2xl border-4 border-gray-300"
+													<div className="modal fade"
 														onClick={() => handleGoogleMeetClick(session.id)}
 														id={`GoogleMeetModal${session.id}`}
 														tabIndex="-1"
 														aria-labelledby={`GoogleMeetModal${session.id}`}
 														aria-hidden="true"
 													>
-														<div className="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-															<div className="modal-content rounded-3xl shadow-2xl border-4 border-gray-300">
-																<div className="modal-header">
-																	<h1 className="modal-title fs-5 font-bold" id="exampleModalLabel">{`Meet with ${session.mentor_name
-																		.split(" ")
-																		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-																		.join(" ")}`}</h1>
-																	<button type="button" className="btn-close rounded-full p-2 hover:bg-gray-200 transition-colors" data-bs-dismiss="modal" aria-label="Close"></button>
+														<div className="modal-dialog modal-dialog-centered modal-xl">
+															<div className="modal-content">
+																<div className="modal-header bg-light-subtle">
+																	<h1 className="modal-title fs-5" id="exampleModalLabel">
+																		{`Meet with ${session.mentor_name
+																			.split(" ")
+																			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+																			.join(" ")}`}
+																	</h1>
+																	<button
+																		type="button"
+																		className="btn-close"
+																		data-bs-dismiss="modal"
+																		aria-label="Close">
+																	</button>
 																</div>
 																<div className="modal-body">
-																	<GoogleMeeting />
-																	{renderSessionMessages(session, true)}
+																	<div className="container-fluid">
+																		<div className="row">
+																			<div className="col-12">
+																				<GoogleMeeting />
+																				{renderSessionMessages(session, true)}
+																			</div>
+																		</div>
+																	</div>
 																</div>
 																<div className="modal-footer">
 																	<button
 																		type="button"
+																		className="btn btn-secondary"
 																		data-bs-dismiss="modal"
-																		aria-label="Close"
 																		onClick={cleanupModal}
-																		className="btn rounded-full px-4 py-2 hover:bg-gray-200 transition-colors"
 																	>
 																		Close
 																	</button>
-																	<button type="button" className="btn btn-primary rounded-full px-4 py-2">
+																	<button type="button" className="btn btn-primary">
 																		Save changes
 																	</button>
 																</div>

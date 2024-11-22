@@ -173,7 +173,7 @@ class Session(db.Model):
             "mentor_photo_url": self.mentor.profile_photo.image_url if self.mentor else None, 
             "messages": [ message.serialize() for message in self.messages ],
             "appointments": [
-            {"start_time": app["start_time"], "end_time": app["end_time"]} 
+            {"start_time": app["start_time"], "end_time": app["end_time"],  "meetingUrl": app.get("meetingUrl", None)} 
             for app in self.appointments
             ]
         }
