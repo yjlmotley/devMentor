@@ -659,6 +659,32 @@ def edit_session(session_id):
         "session": session.serialize()
     }
     return jsonify(response_body), 200
+
+@api.route('/session/complete/<int:session_id>', methods=['PUT'])
+def complete_session(session_id):
+    session = Session.query.get(session_id)
+    
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+    
+    is_completed = request.json.get("is_completed")
+    
+    if is_completed is None:
+        return jsonify({"msg": "Missing field: is_completed"}), 400
+        
+    if not isinstance(is_completed, bool):
+        return jsonify({"msg": "is_completed must be a boolean value"}), 400
+    
+    session.is_completed = is_completed
+    
+    db.session.commit()
+    db.session.refresh(session)
+    
+    response_body = {
+        "msg": "Session completion status updated successfully!",
+        "session": session.serialize()
+    }
+    return jsonify(response_body), 200
     
 @api.route('/session/delete/<int:session_id>', methods =["DELETE"])
 def delete_session(session_id):

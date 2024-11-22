@@ -94,7 +94,7 @@ export const MentorSessionBoard = () => {
     }
 
     return (
-        <div className="session-board-container">
+        <div className="session-board-container container ">
             <div className="session-board card-custom">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h1 className="session-title">Sessions</h1>

@@ -122,7 +122,7 @@ export const CustomerDashboard = () => {
 
 		const success = await actions.confirmMentorForSession(sessionId, mentorId, startDateTime, endDateTime);
 		if (success) {
-			console.log("Mentor confirmed successfully");
+			alert("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
 			cleanupModal()
 			// Close the modal
@@ -586,39 +586,66 @@ export const CustomerDashboard = () => {
 
 
 
-
-				<h2>Past Sessions</h2>
-				<table className="striped bordered hover">
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Description</th>
-							<th>Skills</th>
-							<th>Focus Areas</th>
-							<th>Resource Link</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{pastSessions.map((session) => (
-							<React.Fragment key={session.id}>
+				<div className="card border-secondary shadow border-2 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+						<h2>Past Sessions</h2>
+					</div>
+					<div className="table-responsive">
+						<table className="table table-striped table-bordered table-hover">
+							<thead>
 								<tr>
-									<td>{session.title}</td>
-									<td>{session.description}</td>
-									<td>{session.skills.join(', ')}</td>
-									<td>{session.focus_areas.join(', ')}</td>
-									<td>
-										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-											{session.resourceLink}
-										</a>
-									</td>
-
+									<th scope="col">Title</th>
+									<th scope="col">Description</th>
+									<th scope="col">Skills</th>
+									<th scope="col">Focus Areas</th>
+									<th scope="col">Resource Link</th>
+									<th scope="col">Actions</th>
 								</tr>
-								{renderSessionMessages(session)}
-							</React.Fragment>
-						))}
-					</tbody>
-				</table>
+							</thead>
+							<tbody>
+								{pastSessions.map((session) => (
+									<React.Fragment key={session.id}>
+										<tr>
+											<td>{session.title}</td>
+											<td>{session.description}</td>
+											<td>{session.skills.join(', ')}</td>
+											<td>{session.focus_areas.join(', ')}</td>
+											<td>
+												<a
+													href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													aria-label={`Resource link for ${session.title}`}
+												>
+													{session.resourceLink}
+												</a>
+											</td>
+											<td>
+												<Link
+													to={`/edit-session/${session.id}`}
+													className="btn btn-primary btn-sm"
+													aria-label={`Edit session ${session.title}`}
+												>
+													Edit
+												</Link>
+												<button
+													className="btn btn-danger btn-sm mt-2"
+													onClick={() => handleDeleteSession(session.id)}
+													aria-label={`Delete session ${session.title}`}
+												>
+													Delete Session
+												</button>
+											</td>
+										</tr>
+										{renderSessionMessages(session)}
+									</React.Fragment>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+
 			</div>
 		</div>
 	);
