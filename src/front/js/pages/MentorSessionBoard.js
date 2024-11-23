@@ -98,12 +98,6 @@ export const MentorSessionBoard = () => {
             <div className="session-board card-custom">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h1 className="session-title">Sessions</h1>
-                    <div>
-                        <button className="btn btn-primary custom-create-btn">Create session</button>
-                        <button className="btn btn-link">
-                            <i className="bi bi-person-circle profile-icon"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <ul className="nav nav-tabs mb-3 custom-nav-tabs">
