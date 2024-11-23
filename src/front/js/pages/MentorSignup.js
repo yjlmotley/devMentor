@@ -312,7 +312,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                     <div>
                         <button
                             type="submit"
-                            className="btn btn-secondary w-100 py-2"
+                            className="btn btn-secondary w-100 py-2 mt-3 mb-4"
                             style={{
                                 backgroundColor: '#6c757d',
                                 border: 'none',
@@ -323,8 +323,17 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             Submit
                         </button>
                     </div>
-                    <div>
+                    {/* <div>
                         <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
+                    </div> */}
+                    <div className="text-center text-secondary small-font">
+                        Already have an account?
+                        <span
+                            onClick={() => switchToLogin()}
+                            className="ms-1 text-secondary auth-link"
+                        >
+                            Login
+                        </span>
                     </div>
                 </div>
             </div>

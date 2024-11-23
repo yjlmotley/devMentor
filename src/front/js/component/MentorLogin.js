@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators";
 
 
-export const MentorLogin = ({ onSuccess }) => {
+export const MentorLogin = ({ onSuccess, switchToSignUp }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -90,11 +90,20 @@ export const MentorLogin = ({ onSuccess }) => {
                             Forgot Password?
                         </Link>
                     </div> */}
-                    <div className="text-center text-secondary small-font">
+                    {/* <div className="text-center text-secondary small-font">
                         Need to create an account?
                         <Link to='/mentor-signup' className="ms-1 text-secondary auth-link">
                             Sign up
                         </Link>
+                    </div> */}
+                    <div className="text-center text-secondary small-font">
+                        New to our platform?
+                        <span
+                            onClick={() => switchToSignUp()}
+                            className="ms-1 text-secondary auth-link"
+                        >
+                            Create an account
+                        </span>
                     </div>
                 </div>
             </div>

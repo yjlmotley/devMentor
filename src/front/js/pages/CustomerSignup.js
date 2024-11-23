@@ -251,9 +251,7 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                     <div className="text-center text-secondary small-font">
                         Already have an account?
                         <span
-                            onClick={() => {
-                                switchToLogin();
-                            }}
+                            onClick={() => { switchToLogin() }}
                             className="ms-1 text-secondary auth-link"
                         >
                             Login

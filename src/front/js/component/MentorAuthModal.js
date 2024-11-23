@@ -42,6 +42,18 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
         setActiveTab(initialTab);
     }, [initialTab]);
 
+    const handleSignupSuccess = () => {
+        setActiveTab('login');
+    }
+
+    const handleSwitchLogin = () => {
+        setActiveTab('login');
+    }
+
+    const handleSwitchSignUp = () => {
+        setActiveTab('signup');
+    }
+
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
@@ -102,13 +114,10 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
                                         bsModalRef.current.hide();
                                     }
                                 }}
+                                switchToSignUp={handleSwitchSignUp}
                             />
                         ) : (
-                            <MentorSignup
-                                onSuccess={() => {
-                                    handleTabChange('login');
-                                }}
-                            />
+                            <MentorSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
                         )}
                     </div>
                 </div>

@@ -87,9 +87,7 @@ export const CustomerLogin = ({ onSuccess, switchToSignUp }) => {
                     <div className="text-center text-secondary small-font">
                         New to our platform?
                         <span
-                            onClick={() => {
-                                switchToSignUp();
-                            }}
+                            onClick={() => { switchToSignUp() }}
                             className="ms-1 text-secondary auth-link"
                         >
                             Create an account

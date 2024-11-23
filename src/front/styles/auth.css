@@ -221,3 +221,33 @@
 .authDiv .react-tel-input .form-control.is-invalid {
     background-position: calc(100% - 50px) end;
 }
+
+/* Autofill styling */
+/* Autofill styling */
+/* Autofill styling */
+/* Autofill styling */
+
+.authDiv input:-webkit-autofill,
+.authDiv input:-webkit-autofill:hover,
+.authDiv input:-webkit-autofill:focus,
+.authDiv input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #17191b inset !important;
+    -webkit-text-fill-color: #686868 !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: white;
+}
+
+/* For Firefox */
+.authDiv input:autofill {
+    background-color: #17191b !important;
+    /* color: white !important; */
+    color: #686868 !important;
+    box-shadow: 0 0 0 30px #cecece inset !important;
+}
+
+/* For Edge */
+/* .authDiv input:-internal-autofill-selected { */
+.authDiv input:-internal-autofill-selected {
+    background-color: #17191b !important;
+    color: #686868 !important;
+}
