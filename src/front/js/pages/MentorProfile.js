@@ -224,22 +224,34 @@ export const MentorProfile = () => {
 
 	return (
 
-		<div className="container mt-5">
-			<h2 className="mb-4 text-center">
-				Mentor Profile
-				{editMode == false
-					? (<button onClick={() => setEditMode(true)} className="btn btn-secondary fa-solid fa-pencil ms-4"></button>)
-					: ''
-				}
-			</h2>
-			{!mentor.is_active && (
-				<div className="alert alert-warning" role="alert">
-					Your account is currently deactivated, please reactivate your account if you would like to continue to offer your services.
-				</div>
-			)}
+		<div className="container card  border-secondary shadow border-2 px-0 mt-5">
+			<div id="header" className="card-header bg-light-subtle mb-5">
+				<h2 className="mb-4 text-center">
+					Mentor Profile
+					{editMode == false
+						? (<button onClick={() => setEditMode(true)} className="btn btn-secondary fa-solid fa-pencil ms-4"></button>)
+						: ''
+					}
+				</h2>
+				{!mentor.is_active && (
+					<div className="alert alert-warning" role="alert">
+						Your account is currently deactivated, please reactivate your account if you would like to continue to offer your services.
+					</div>
+				)}
+			</div>
+
+
+
 			<div className="row">
 				<div className="col-7 mb-4">
-					<ProfilePhoto url={profileImageUrl} setMentor={setMentor} editMode={editMode} />
+					<div className=" ps-5">
+						<div className=" ps-5">
+							<div className="dflex ps-5">
+								<ProfilePhoto  url={profileImageUrl} setMentor={setMentor} editMode={editMode} />
+							</div>
+						</div>
+					</div>
+					
 					<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} editMode={editMode} />
 				</div>
 				<div className="col-5" style={{ marginTop: "50px" }}>
