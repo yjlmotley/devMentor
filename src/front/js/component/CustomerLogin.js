@@ -1,9 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators"; // Ensure path is correct
 
-export const CustomerLogin = ({ onSuccess, switchToSignUp }) => {
+export const CustomerLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -68,30 +67,39 @@ export const CustomerLogin = ({ onSuccess, switchToSignUp }) => {
                         {invalidItems.includes("password") && (
                             <div className="invalid-feedback">Password must be 5-20 characters</div>
                         )}
-                        <Link to='/forgot-password' className="text-secondary auth-link small-font">Forgot Password?</Link>
-                    </div>
-                    <div className="text-center mt-3 mb-4">
-                        <button
-                            type="submit"
-                            className="btn btn-secondary w-100 py-2"
-                            style={{
-                                backgroundColor: '#6c757d',
-                                border: 'none',
-                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-                                transition: 'all 0.3s ease',
-                            }}
-                        >
-                            Login
-                        </button>
-                    </div>
-                    <div className="text-center text-secondary small-font">
-                        New to our platform?
-                        <span
-                            onClick={() => { switchToSignUp() }}
-                            className="ms-1 text-secondary auth-link"
-                        >
-                            Create an account
-                        </span>
+                        {/* <Link to='/forgot-password' className="text-secondary auth-link small-font">Forgot Password?</Link> */}
+                        <div>
+                            <span
+                                onClick={() => onForgotPs()}
+                                className="text-secondary auth-link small-font"
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Forgot Password?
+                            </span>
+                        </div>
+                        <div className="text-center mt-3 mb-4">
+                            <button
+                                type="submit"
+                                className="btn btn-secondary w-100 py-2"
+                                style={{
+                                    backgroundColor: '#6c757d',
+                                    border: 'none',
+                                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+                                    transition: 'all 0.3s ease',
+                                }}
+                            >
+                                Login
+                            </button>
+                        </div>
+                        <div className="text-center text-secondary small-font">
+                            New to our platform?
+                            <span
+                                onClick={() => { switchToSignUp() }}
+                                className="ms-1 text-secondary auth-link"
+                            >
+                                Create an account
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

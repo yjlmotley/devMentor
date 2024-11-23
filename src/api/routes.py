@@ -135,6 +135,46 @@ def forgot_password():
     send_email(email, email_value, "Subject: Password recovery for devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
 
+# @api.route("/reset-password/<token>", methods=["PUT"])
+# def reset_password(token):
+#     data = request.get_json()
+#     password = data.get("password")
+
+#     if not password:
+#         return jsonify({"message": "Please provide a new password."}), 400
+
+#     try:
+#         decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
+#         email = decoded_token.get("email")
+#     # except Exception as e:
+#     #     return jsonify({"message": "Invalid or expired token."}), 400
+#     except jwt.ExpiredSignatureError:
+#         return jsonify({"message": "Token has expired"}), 400
+#     except jwt.InvalidTokenError:
+#         return jsonify({"message": "Invalid token"}), 400
+
+#     # email = json_secret.get('email')
+#     # if not email:
+#     #     return jsonify({"message": "Invalid token data."}), 400
+
+#     mentor = Mentor.query.filter_by(email=email).first()
+#     customer = Customer.query.filter_by(email=email).first()
+
+#     user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+#     if not user:
+#         return jsonify({"message": "Email does not exist"}), 400
+
+#     # user.password = hashlib.sha256(password.encode()).hexdigest()
+#     user.password = generate_password_hash(password)
+#     db.session.commit()
+
+#     send_email(email, "Your password has been changed successfully.", "Password Change Notification")
+
+#     return jsonify({
+#         "message": "Password successfully changed.", 
+#         "role": "mentor" if mentor else "customer" if customer else None
+#     }), 200
+
 @api.route("/reset-password/<token>", methods=["PUT"])
 def reset_password(token):
     data = request.get_json()
@@ -146,33 +186,43 @@ def reset_password(token):
     try:
         decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
         email = decoded_token.get("email")
-    # except Exception as e:
-    #     return jsonify({"message": "Invalid or expired token."}), 400
     except jwt.ExpiredSignatureError:
         return jsonify({"message": "Token has expired"}), 400
     except jwt.InvalidTokenError:
         return jsonify({"message": "Invalid token"}), 400
 
-    # email = json_secret.get('email')
-    # if not email:
-    #     return jsonify({"message": "Invalid token data."}), 400
-
+    # Query both tables
     mentor = Mentor.query.filter_by(email=email).first()
     customer = Customer.query.filter_by(email=email).first()
 
-    user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
-    if not user:
+    # Check if email exists in either table
+    if not mentor and not customer:
         return jsonify({"message": "Email does not exist"}), 400
 
-    # user.password = hashlib.sha256(password.encode()).hexdigest()
-    user.password = generate_password_hash(password)
+    # Generate hashed password once
+    hashed_password = generate_password_hash(password)
+
+    # Update password in relevant table(s)
+    if mentor:
+        mentor.password = hashed_password
+    if customer:
+        customer.password = hashed_password
+
     db.session.commit()
+
+    # Determine roles for response
+    roles = []
+    if mentor:
+        roles.append("mentor")
+    if customer:
+        roles.append("customer")
 
     send_email(email, "Your password has been changed successfully.", "Password Change Notification")
 
     return jsonify({
         "message": "Password successfully changed.", 
-        "role": "mentor" if mentor else "customer" if customer else None
+        "roles": roles,
+        "email": email
     }), 200
 
 

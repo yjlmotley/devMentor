@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerLogin } from './CustomerLogin.js';
 import { CustomerSignup } from '../pages/CustomerSignup.js';
+import { ForgotPsModal } from './ForgotPsModal.js';
 import "../../styles/auth.css";
 
 
 export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [showForgotPs, setShowForgotPs] = useState(false);
   const modalRef = useRef(null);
   const bsModalRef = useRef(null);
 
@@ -14,7 +16,6 @@ export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
     if (modalRef.current && !bsModalRef.current && window.bootstrap) {
       bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
         keyboard: false,
-        backdrop: 'static'
       });
 
       // Add event listener for when modal is hidden
@@ -78,53 +79,66 @@ export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
             boxShadow: '0 0 30px rgba(0, 0, 0, 0.7)',
           }}
         >
-          <div className="modal-header border-0 p-0">
-            <div className="d-flex w-100 position-relative">
-              <button
-                className={`flex-fill border-0 auth-tab login-tab ${activeTab === 'login'
-                  ? 'active text-white'
-                  : 'text-secondary'
-                  }`}
-                onClick={() => handleTabChange('login')}
-              >
-                Login
-              </button>
-              <div className="vr" style={{ backgroundColor: '#6c757d', marginTop: '15px', marginBottom: '15px' }}></div>
-              <button
-                className={`flex-fill border-0 auth-tab signup-tab ${activeTab === 'signup'
-                  ? 'active text-white'
-                  : 'text-secondary'
-                  }`}
-                onClick={() => handleTabChange('signup')}
-              >
-                Sign Up
-              </button>
-            </div>
-            <button
-              type="button"
-              className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
-              onClick={() => {
-                if (bsModalRef.current) {
-                  bsModalRef.current.hide();
-                }
+          {!showForgotPs ? (
+            <>
+              <div className="modal-header border-0 p-0">
+                <div className="d-flex w-100 position-relative">
+                  <button
+                    className={`flex-fill border-0 auth-tab login-tab ${activeTab === 'login'
+                      ? 'active text-white'
+                      : 'text-secondary'
+                      }`}
+                    onClick={() => handleTabChange('login')}
+                  >
+                    Login
+                  </button>
+                  <div className="vr" style={{ backgroundColor: '#6c757d', marginTop: '15px', marginBottom: '15px' }}></div>
+                  <button
+                    className={`flex-fill border-0 auth-tab signup-tab ${activeTab === 'signup'
+                      ? 'active text-white'
+                      : 'text-secondary'
+                      }`}
+                    onClick={() => handleTabChange('signup')}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
+                  onClick={() => {
+                    if (bsModalRef.current) {
+                      bsModalRef.current.hide();
+                    }
+                  }}
+                />
+              </div>
+              <div className="modal-body p-4">
+                {activeTab === 'login' ? (
+                  <CustomerLogin
+                    onSuccess={() => {
+                      console.log('Login successful, rerouting to the customer dashboard page');
+                      if (bsModalRef.current) {
+                        bsModalRef.current.hide();
+                      }
+                    }}
+                    switchToSignUp={handleSwitchSignUp}
+                    onForgotPs={() => setShowForgotPs(true)}
+                  />
+                ) : (
+                  <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
+                )}
+              </div>
+            </>
+          ) : (
+            <ForgotPsModal
+              onClose={() => setShowForgotPs(false)}
+              onSuccess={() => {
+                setShowForgotPs(false);
+                setActiveTab('login');
               }}
             />
-          </div>
-          <div className="modal-body p-4">
-            {activeTab === 'login' ? (
-              <CustomerLogin
-                onSuccess={() => {
-                  console.log('Login successful, rerouting to the customer dashboard page');
-                  if (bsModalRef.current) {
-                    bsModalRef.current.hide();
-                  }
-                }}
-                switchToSignUp={handleSwitchSignUp}
-              />
-            ) : (
-              <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

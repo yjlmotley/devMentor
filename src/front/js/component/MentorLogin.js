@@ -1,10 +1,9 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
 import { ValidateEmail, ValidatePassword } from "./Validators";
 
 
-export const MentorLogin = ({ onSuccess, switchToSignUp }) => {
+export const MentorLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -67,9 +66,18 @@ export const MentorLogin = ({ onSuccess, switchToSignUp }) => {
                         {invalidItems.includes("password") && (
                             <div className="invalid-feedback">Password must be 5-20 characters</div>
                         )}
-                        <Link to='/forgot-password' className="text-secondary auth-link small-font">
+                        {/* <Link to='/forgot-password' className="text-secondary auth-link small-font">
                             Forgot Password?
-                        </Link>
+                        </Link> */}
+                        <div>
+                            <span
+                                onClick={() => onForgotPs()}
+                                className="text-secondary auth-link small-font"
+                                style={{ cursor: 'pointer' }}
+                            >
+                                Forgot Password?
+                            </span>
+                        </div>
                     </div>
                     <div className="text-center mt-3 mb-4">
                         <button
