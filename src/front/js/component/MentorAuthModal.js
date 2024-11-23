@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MentorLogin } from "./MentorLogin.js";
 import { MentorSignup } from "../pages/MentorSignup.js";
-import "../../styles/accAuthorization.css";
+import "../../styles/auth.css";
 
 
 export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {

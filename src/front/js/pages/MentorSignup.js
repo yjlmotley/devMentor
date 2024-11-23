@@ -1,16 +1,14 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PhoneInput from 'react-phone-input-2'
-import 'react-phone-input-2/lib/style.css'
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidatePhone, ValidateWhatState, ValidateCountry } from "../component/Validators";
 import Select from 'react-select';
 import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
 
 
-export const MentorSignup = () => {
-    const navigate = useNavigate();
+export const MentorSignup = ({ onSuccess, switchToLogin }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,7 +22,9 @@ export const MentorSignup = () => {
     const [countryCode, setCountryCode] = useState("us");
     const [invalidItems, setInvalidItems] = useState([]);
 
-    const handleSignup = async () => {
+    const handleSignup = async (e) => {
+        if (e) e.preventDefault();
+
         if (password !== confirmPassword) {
             alert("Passwords do not match!");
             return;
@@ -39,25 +39,35 @@ export const MentorSignup = () => {
         let isWhatStateValid = ValidateWhatState(what_state, setInvalidItems);
         let isCountryValid = ValidateCountry(country, setInvalidItems);
         let isPhoneValid = ValidatePhone(phone, countryCode, setInvalidItems);
-        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhatStateValid && isCountryValid && isPhoneValid) {
-            const success = await actions.signUpMentor({
-                email: email,
-                password: password,
-                first_name: first_name,
-                last_name: last_name,
-                phone: phone,
-                city: city,
-                what_state: what_state,
-                country: country
-            });
-            if (success) {
-                navigate("/mentor-login");
-            } else {
-                alert("something went wrong");
-            }
-        } else {
-            console.log("Invalid inputs:", invalidItems);
 
+        if (isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && isCityValid && isWhatStateValid && isCountryValid && isPhoneValid) {
+
+            const result = await actions.signUpMentor({
+                email, password, first_name, last_name, phone, city, what_state, country
+            });
+
+            if (result.success) {
+                setEmail("");
+                setPassword("");
+                setConfirmPassword();
+                setFirst_name("");
+                setLast_name("");
+                setPhone("");
+                setCountry("");
+                setWhat_state("");
+                setCity("");
+
+                if (typeof onSuccess === 'function') {
+                    // console.log("Calling onSucess from MentorSignUp");
+                    onSuccess();
+                }
+
+                setTimeout(() => {
+                    alert(result.message || "Account successfully created! Please log in.");
+                }, 100)
+            } else {
+                alert(result.message || "An error occurred during signup");
+            }
         }
     }
 
@@ -70,192 +80,231 @@ export const MentorSignup = () => {
     };
 
     const handlePhoneChange = (value, countryData) => {
-        const countryCode = countryData?.countryCode || "us";
+        setPhone(value);
         setCountryCode(countryData?.countryCode || "us");
 
-        setPhone(value);
-
         // comment out the bottom 4 lines if you do not want to see the phone error before form submission
-        const isPhoneValid = ValidatePhone(value, countryCode, setInvalidItems);
-        if (isPhoneValid) {
-            setInvalidItems(prevInvalidItems => prevInvalidItems.filter(item => item !== "phone"));
-        }
+        // const isPhoneValid = ValidatePhone(value, countryCode, setInvalidItems);
+        // if (isPhoneValid) {
+        //     setInvalidItems(prevInvalidItems => prevInvalidItems.filter(item => item !== "phone"));
+        // }
     };
 
 
     return (
 
-        <form onSubmit={(event) => {
-            event.preventDefault();
-            handleSignup();
-        }}>
-            <div style={{ width: '100%', maxWidth: '1000px', margin: '30px auto', padding: '30px', backgroundColor: '#2b2a2a', borderRadius: '10px', boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)', textAlign: 'center' }}>
-                <div className="row justify-content-center">
-                    <div className="col-md-6 pb-5 text-light authDiv" >
-                        <div style={{ padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 50px rgba(255, 255, 255, 0.2)', border: '1px solid white' }}>
-                            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome Mentors!</h2>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="email"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Email"
-                                    value={email}
-                                    onChange={(event) => setEmail(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("email") && <label className="error-label">Invalid email format (must be similar to this example: example@domain.com)</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="password"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(event) => setPassword(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format. Must be between 5 and 20 characters.</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="password"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Confirm Password"
-                                    value={confirmPassword}
-                                    onChange={(event) => setConfirmPassword(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("password") && <label className="error-label">Invalid Password format. Must be between 5 and 20 characters.</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="first_name"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="First Name"
-                                    value={first_name}
-                                    onChange={(event) => setFirst_name(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("first_name") && <label className="error-label">First Name is required. Must be between 2 - 25 characters.</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="last_name"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="Last Name"
-                                    value={last_name}
-                                    onChange={(event) => setLast_name(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("last_name") && <label className="error-label">Last Name is required. Must be between 2 - 25 characters.</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <PhoneInput
-                                    country={'us'}
-                                    value={phone}
-                                    onChange={handlePhoneChange}
-                                    inputClass="form-control"
-                                    inputStyle={{
-                                        width: '100%'
-                                    }}
-                                    inputProps={{
-                                        name: 'phone',
-                                        required: true,
-                                        autoFocus: true
-                                    }}
-                                    required
-                                />
-                                {invalidItems.includes("phone") && <label className="error-label">Invalid phone format. Please put in a valid phone number.</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                                <Select
-                                    isClearable
-                                    name="country"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    styles={{
-                                        menu: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            color: 'black',
-                                        }),
-                                    }}
-                                    options={countryOptions}
-                                    className="basic-single-select"
-                                    classNamePrefix="select"
-                                    onChange={handleCountryChange}
-                                    defaultValue={countryOptions[195]}
-                                    value={
-                                        country
-                                            ? { label: country, value: country }
-                                            : ''
-                                    }
-                                    placeholder="Select a Country..."
-                                    required
-                                />
-                                {invalidItems.includes("country") && <label className="error-label">Country is required</label>}
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <CreatableSelect
-                                    isClearable
-                                    name="what_state"
-                                    styles={{
-                                        menu: (baseStyles, state) => ({
-                                            ...baseStyles,
-                                            color: 'black',
-                                        }),
-                                    }}
-                                    options={country === "United States of America (USA)" ? stateOptions : []}
-                                    className="basic-single-select"
-                                    classNamePrefix="select"
-                                    onChange={handleStateChange}
-                                    value={
-                                        what_state
-                                            ? { value: what_state, label: what_state }
-                                            : ''
-                                    }
-                                    placeholder="Select or Type a State/ Providence..."
-                                />
-                                {invalidItems.includes("what_state") && <label className="error-label">State/Providence is required. Must be between 2-80 characters.</label>}
-                            </div>
+        <form onSubmit={handleSignup}>
+            <div className="row justify-content-center authDiv">
+                <div className="col-12 text-light" >
+                    <h2 className="text-center mt-2 mb-4">Welcome Mentors!</h2>
 
+                    <div className="mb-3">
+                        <input
+                            type="email"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("email") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("email") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="Email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("email") &&
+                            <div className="invalid-feedback">Invalid email format (e.g.: example@domain.com)</div>
+                        }
+                    </div>
 
+                    <div className="mb-3">
+                        <input
+                            type="password"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("password") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("password") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("password") &&
+                            <div className="invalid-feedback">Password must be 5-20 characters.</div>
+                        }
+                    </div>
 
-                            <div style={{ marginBottom: '20px' }}>
-                                <input
-                                    type="city"
-                                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ced4da' }}
-                                    placeholder="City"
-                                    value={city}
-                                    onChange={(event) => setCity(event.target.value)}
-                                    required
-                                />
-                                {invalidItems.includes("city") && <label className="error-label">City is required. Must be between 2 - 80 characters.</label>}
-                            </div>
-                            {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, CustomerLogin, Forgot/Reset/Change Password pages) */}
-                            <div style={{ textAlign: 'center' }}>
-                                <button
-                                    type="button"
-                                    style={{
-                                        backgroundColor: '#6c757d',
-                                        marginBottom: '10px',
-                                        color: '#fff',
-                                        border: 'none',
-                                        borderRadius: '5px',
-                                        padding: '10px 20px',
-                                        cursor: 'pointer',
-                                        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
-                                        transition: 'box-shadow 0.3s ease',
-                                        outline: 'none',
-                                    }}
-                                    onClick={handleSignup}
+                    <div className="mb-3">
+                        <input
+                            type="password"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("password") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("password") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(event) => setConfirmPassword(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("password") &&
+                            <div className="invalid-feedback">Password must be 5-20 characters.</div>
+                        }
+                    </div>
 
-                                >
-                                    Submit
-                                </button>
+                    <div className="mb-3">
+                        <input
+                            type="first_name"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("first_name") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("first_name") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="First Name"
+                            value={first_name}
+                            onChange={(event) => setFirst_name(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("first_name") && (
+                            <div className="invalid-feedback">First Name is required. Must be between 2 - 25 characters.</div>
+                        )}
+                    </div>
+
+                    <div className="mb-3">
+                        <input
+                            type="last_name"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("last_name") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("last_name") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="Last Name"
+                            value={last_name}
+                            onChange={(event) => setLast_name(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("last_name") && (
+                            <div className="invalid-feedback">Last Name is required. Must be between 2 - 25 characters.</div>
+                        )}
+                    </div>
+
+                    <div className="mb-3">
+                        <PhoneInput
+                            country={'us'}
+                            value={phone}
+                            onChange={handlePhoneChange}
+                            inputClass={`form-control ${invalidItems.includes("phone") ? "is-invalid" : ""}`}
+                            inputStyle={{
+                                width: '100%',
+                                backgroundColor: "#212529",
+                                color: 'white',
+                                border: invalidItems.includes("phone") ? '1px solid red' : '1px solid #414549',
+                                height: '50px',
+                            }}
+                            containerStyle={{
+                                width: '100%',
+                                marginBottom: invalidItems.includes("phone") ? '24px' : '0'
+                            }}
+                            buttonStyle={{
+                                backgroundColor: "#212529",
+                                border: invalidItems.includes("phone") ? '1px solid red' : '1px solid #414549'
+                            }}
+                            dropdownStyle={{
+                                backgroundColor: "#212529",
+                                color: 'white'
+                            }}
+                            required
+                        />
+                        {invalidItems.includes("phone") && (
+                            <div
+                                className="invalid-feedback d-block"
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '-25px',
+                                    left: '0'
+                                }}
+                            >
+                                Invalid phone number
                             </div>
-                            <div>
-                                <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
-                            </div>
-                        </div>
+                        )}
+                    </div>
+
+                    <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                        <Select
+                            isClearable
+                            name="country"
+                            options={countryOptions}
+                            className={`basic-single-select ${invalidItems.includes("country") ? "is-invalid" : ""}`}
+                            classNamePrefix="select"
+                            onChange={handleCountryChange}
+                            defaultValue={countryOptions[195]}
+                            value={country ? { label: country, value: country } : ''}
+                            placeholder="Select a Country..."
+                            required
+                        />
+                        {invalidItems.includes("country") && (
+                            <div className="invalid-feedback">Country is required. Must be between 2 - 80 characters.</div>
+                        )}
+                    </div>
+
+                    <div className="mb-3">
+                        <CreatableSelect
+                            isClearable
+                            name="what_state"
+                            options={country === "United States of America (USA)" ? stateOptions : []}
+                            className="basic-single-select"
+                            classNamePrefix="select"
+                            onChange={handleStateChange}
+                            value={what_state ? { value: what_state, label: what_state } : ''}
+                            placeholder="Select or Type a State/ Providence..."
+                        />
+                        {invalidItems.includes("what_state") && (
+                            <div className="invalid-feedback">State/Providence is required. Must be between 2-80 characters.</div>
+                        )}
+                    </div>
+
+                    <div className="mb-3">
+                        <input
+                            type="city"
+                            className={`form-control bg-dark text-light ${invalidItems.includes("city") ? "is-invalid" : ""}`}
+                            style={{
+                                border: invalidItems.includes("city") ? '1px solid red' : '1px solid #414549',
+                                padding: '12px'
+                            }}
+                            placeholder="City"
+                            value={city}
+                            onChange={(event) => setCity(event.target.value)}
+                            required
+                        />
+                        {invalidItems.includes("city") && (
+                            <div className="invalid-feedback">City is required. Must be between 2 - 80 characters..</div>
+                        )}
+                    </div>
+
+                    {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, CustomerLogin, Forgot/Reset/Change Password pages) */}
+                    <div style={{ textAlign: 'center' }}>
+                        <button
+                            type="button"
+                            style={{
+                                backgroundColor: '#6c757d',
+                                marginBottom: '10px',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '10px 20px',
+                                cursor: 'pointer',
+                                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                                transition: 'box-shadow 0.3s ease',
+                                outline: 'none',
+                            }}
+                            onClick={handleSignup}
+
+                        >
+                            Submit
+                        </button>
+                    </div>
+                    <div>
+                        <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,5 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate, Link } from "react-router-dom";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidatePhone, } from "../component/Validators";
@@ -47,7 +46,7 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                     setPhone("");
 
                     if (typeof onSuccess === 'function') {
-                        console.log("Calling onSuccess from CustomerSignUp");
+                        // console.log("Calling onSuccess from CustomerSignUp");
                         onSuccess();
                     }
 
@@ -75,7 +74,6 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
         //         setInvalidItems(prevInvalidItems => prevInvalidItems.filter(item => item !== "phone"));
         //     }
     };
-
 
 
     return (

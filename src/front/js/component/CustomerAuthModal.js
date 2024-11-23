@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerLogin } from './CustomerLogin.js';
 import { CustomerSignup } from '../pages/CustomerSignup.js';
-import "../../styles/accAuthorization.css";
+import "../../styles/auth.css";
 
 
 export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
@@ -122,7 +122,7 @@ export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
                 switchToSignUp={handleSwitchSignUp}
               />
             ) : (
-              <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />  
+              <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
             )}
           </div>
         </div>
