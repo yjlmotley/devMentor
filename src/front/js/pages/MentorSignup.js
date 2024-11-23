@@ -100,7 +100,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
 
                     <div className="mb-3">
                         <input
-                            type="email"
+                            type="text"
                             className={`form-control bg-dark text-light ${invalidItems.includes("email") ? "is-invalid" : ""}`}
                             style={{
                                 border: invalidItems.includes("email") ? '1px solid red' : '1px solid #414549',
@@ -263,7 +263,10 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             required
                         />
                         {invalidItems.includes("country") && (
-                            <div className="invalid-feedback">Country is required. Must be between 2 - 80 characters.</div>
+                            <div className="invalid-feedback">
+                                <i className="fas fa-circle-exclamation me-2" />
+                                Country is required. Must be between 2 - 80 characters.
+                            </div>
                         )}
                     </div>
 
@@ -272,14 +275,17 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             isClearable
                             name="what_state"
                             options={country === "United States of America (USA)" ? stateOptions : []}
-                            className="basic-single-select"
+                            className={`basic-single-select ${invalidItems.includes("what_state") ? "is-invalid" : ""}`}
                             classNamePrefix="select"
                             onChange={handleStateChange}
                             value={what_state ? { value: what_state, label: what_state } : ''}
                             placeholder="Select or Type a State/ Providence..."
                         />
                         {invalidItems.includes("what_state") && (
-                            <div className="invalid-feedback">State/Providence is required. Must be between 2-80 characters.</div>
+                            <div className="invalid-feedback">
+                                <i className="fas fa-circle-exclamation me-2" />
+                                State is required. Must be between 2-80 characters.
+                            </div>
                         )}
                     </div>
 
@@ -302,23 +308,17 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                     </div>
 
                     {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, CustomerLogin, Forgot/Reset/Change Password pages) */}
-                    <div style={{ textAlign: 'center' }}>
+                    {/* <div style={{ textAlign: 'center' }}> */}
+                    <div>
                         <button
-                            type="button"
+                            type="submit"
+                            className="btn btn-secondary w-100 py-2"
                             style={{
                                 backgroundColor: '#6c757d',
-                                marginBottom: '10px',
-                                color: '#fff',
                                 border: 'none',
-                                borderRadius: '5px',
-                                padding: '10px 20px',
-                                cursor: 'pointer',
-                                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.2)',
+                                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
                                 transition: 'box-shadow 0.3s ease',
-                                outline: 'none',
                             }}
-                            onClick={handleSignup}
-
                         >
                             Submit
                         </button>

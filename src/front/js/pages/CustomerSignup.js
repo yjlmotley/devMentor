@@ -85,7 +85,7 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
 
                     <div className="mb-3">
                         <input
-                            type="email"
+                            type="text"
                             className={`form-control bg-dark text-light ${invalidItems.includes("email") ? "is-invalid" : ""}`}
                             style={{
                                 border: invalidItems.includes("email") ? '1px solid red' : '1px solid #414549',
