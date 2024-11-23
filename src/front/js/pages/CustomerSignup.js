@@ -195,8 +195,8 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                                 border: invalidItems.includes("phone") ? '1px solid red' : '1px solid #414549'
                             }}
                             dropdownStyle={{
-                                backgroundColor: "#212529",
-                                color: 'white'
+                                backgroundColor: "#2b2b2b",
+                                color: 'white',
                             }}
                             required
                         />

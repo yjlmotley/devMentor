@@ -203,15 +203,15 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             containerStyle={{
                                 width: '100%',
-                                marginBottom: invalidItems.includes("phone") ? '24px' : '0'
+                                marginBottom: invalidItems.includes("phone") ? '24px' : '0',
                             }}
                             buttonStyle={{
                                 backgroundColor: "#212529",
                                 border: invalidItems.includes("phone") ? '1px solid red' : '1px solid #414549'
                             }}
                             dropdownStyle={{
-                                backgroundColor: "#212529",
-                                color: 'white'
+                                backgroundColor: "#2b2b2b",
+                                color: 'white',
                             }}
                             required
                         />

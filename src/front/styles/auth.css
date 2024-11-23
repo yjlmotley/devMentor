@@ -89,6 +89,38 @@
     display: none !important;
 }
 
+
+/* Phone input styling - flag button and dropdown */
+/* Phone input styling - flag button and dropdown */
+/* Phone input styling - flag button and dropdown */
+.authDiv .react-tel-input .selected-flag {
+    background-color: #212529 !important;
+    /* border: 1px solid #414549; */
+    border: 1px solid #212529;
+    transition: border-color 0.3s ease;
+}
+
+.authDiv .react-tel-input .selected-flag:hover,
+.authDiv .react-tel-input .selected-flag:focus,
+.authDiv .react-tel-input .selected-flag:active {
+    background-color: #2b2b2b !important;
+    border-color: #6c757d;
+}
+
+/* When flag dropdown is open */
+.authDiv .react-tel-input .selected-flag.open {
+    background-color: #2b2b2b !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 3px !important;
+}
+
+/* Hover state for country options */
+.authDiv .react-tel-input .country-list .country:hover,
+.authDiv .react-tel-input .country-list .country.highlight {
+    background-color: #1e2225 !important;
+}
+
+
 /* React-select custom styling for auth pages */
 /* React-select custom styling for auth pages */
 /* React-select custom styling for auth pages */
@@ -154,8 +186,8 @@
 
 /* react selects li hover */
 .authDiv .basic-single-select .select__option--is-focused {
-    /* background-color: #2b2b2b; */
-    background-color: #212529;
+    /* background-color: #212529; */
+    background-color: #1e2225;
 }
 
 /* Center the content inside the select - not needed rn but good to have just in case */
