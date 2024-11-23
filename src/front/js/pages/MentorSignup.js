@@ -111,9 +111,16 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             onChange={(event) => setEmail(event.target.value)}
                             required
                         />
-                        {invalidItems.includes("email") &&
-                            <div className="invalid-feedback">Invalid email format (e.g.: example@domain.com)</div>
-                        }
+                        {invalidItems.includes("email") && (
+                            <div className="invalid-feedback d-block" style={{
+                                textAlign: 'left',
+                                marginTop: '0.25rem',
+                                marginBottom: '0',
+                                color: '#dc3545'
+                            }}>
+                                Invalid email format (e.g.: example@domain.com)
+                            </div>
+                        )}
                     </div>
 
                     <div className="mb-3">
@@ -188,7 +195,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                         )}
                     </div>
 
-                    <div className="mb-3">
+                    <div className="mb-3 position-relative">
                         <PhoneInput
                             country={'us'}
                             value={phone}
@@ -203,7 +210,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             containerStyle={{
                                 width: '100%',
-                                marginBottom: invalidItems.includes("phone") ? '24px' : '0',
+                                marginBottom: invalidItems.includes("phone") ? '38px' : '0',
                             }}
                             buttonStyle={{
                                 backgroundColor: "#212529",
@@ -215,13 +222,26 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             required
                         />
+                        {/* {invalidItems.includes("phone") && (
+                            <div className="invalid-feedback d-block" style={{
+                                position: 'absolute',
+                                bottom: '-25px',
+                                left: '0',
+                                marginTop: '0.25rem',
+                                marginBottom: '0',
+                                color: '#dc3545'
+                            }}>
+                                Invalid phone number
+                            </div>
+                        )} */}
                         {invalidItems.includes("phone") && (
                             <div
                                 className="invalid-feedback d-block"
                                 style={{
                                     position: 'absolute',
-                                    bottom: '-25px',
-                                    left: '0'
+                                    bottom: '-23px',
+                                    left: '0',
+                                    marginTop: '0.25rem',
                                 }}
                             >
                                 Invalid phone number
@@ -229,7 +249,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                         )}
                     </div>
 
-                    <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                    <div className="mb-3">
                         <Select
                             isClearable
                             name="country"
@@ -277,7 +297,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             required
                         />
                         {invalidItems.includes("city") && (
-                            <div className="invalid-feedback">City is required. Must be between 2 - 80 characters..</div>
+                            <div className="invalid-feedback">City is required. Must be between 2 - 80 characters.</div>
                         )}
                     </div>
 
@@ -311,5 +331,3 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
         </form>
     );
 }
-
-// TODO: When first going to the page, the user is taken straight to the phone number. Please fix this bug so that the user is taken to the top of the page on window.onload

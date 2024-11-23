@@ -97,7 +97,14 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                             required
                         />
                         {invalidItems.includes("email") && (
-                            <div className="invalid-feedback">Invalid email format (e.g.: example@domain.com)</div>
+                            <div className="invalid-feedback d-block" style={{
+                                textAlign: 'left',
+                                marginTop: '0.25rem',
+                                marginBottom: '0',
+                                color: '#dc3545'
+                            }}>
+                                Invalid email format (e.g.: example@domain.com)
+                            </div>
                         )}
                     </div>
 
@@ -200,7 +207,7 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             required
                         />
-                        {invalidItems.includes("phone") && (
+                        {/* {invalidItems.includes("phone") && (
                             <div
                                 className="invalid-feedback d-block"
                                 style={{
@@ -209,6 +216,18 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                                     left: '0'
                                 }}
                             >
+                                Invalid phone number
+                            </div>
+                        )} */}
+                        {invalidItems.includes("phone") && (
+                            <div className="invalid-feedback d-block" style={{
+                                position: 'absolute',
+                                bottom: '-25px',
+                                left: '0',
+                                marginTop: '0.25rem',
+                                marginBottom: '0',
+                                color: '#dc3545'
+                            }}>
                                 Invalid phone number
                             </div>
                         )}
