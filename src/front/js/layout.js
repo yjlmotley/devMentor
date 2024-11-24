@@ -15,6 +15,8 @@ import { MentorSessionBoard } from "./pages/MentorSessionBoard";
 
 import { ForgotPassword } from "./pages/ForgotPassword.js";
 import { ResetPassword } from "./pages/ResetPassword.js";
+// import ResetPasswordModal from './component/ResetPasswordModal.js';
+
 
 import { CustomerSignup } from "./pages/CustomerSignup.js";
 import { CustomerLogin } from "./component/CustomerLogin";
@@ -92,6 +94,7 @@ const Layout = () => {
                         />
                     </Routes>
                     {/* <Footer /> */}
+                    {/* <ResetPasswordModal /> */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>
