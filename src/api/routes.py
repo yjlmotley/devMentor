@@ -221,6 +221,14 @@ def all_mentors_no_sessions():
         mentor.pop('confirmed_sessions', None)
     return jsonify(serialized_mentors), 200
 
+@api.route('/mentor/<int:mentor_id>', methods=['GET'])
+def get_mentor_by_id(mentor_id):
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+    
+    return jsonify(mentor.serialize()), 200
+
 @api.route('/mentor', methods=['GET'])
 @mentor_required
 def mentor_by_id():
@@ -698,7 +706,7 @@ def delete_session(session_id):
     db.session.commit()
     return jsonify({"msg": "Session Sucessfully Deleted"}), 200
 
-@api.route('/sessions/customer', methods=['GET'])
+@api.route('/sessions/customer-sessions', methods=['GET'])
 @customer_required
 def get_sessions_by_customer_id():
     cust_id = get_jwt_identity()

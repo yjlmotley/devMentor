@@ -18,6 +18,7 @@ export const CustomerDashboard = () => {
 		endTime: ""
 	});
 
+	// Token Check Auth or login
 	useEffect(() => {
 		actions.checkStorage();
 		if (!store.token) {
@@ -26,6 +27,7 @@ export const CustomerDashboard = () => {
 		}
 	}, [])
 
+	// Fetch All Customer Sessions
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
 		actions.getCustomerSessions();
@@ -52,6 +54,7 @@ export const CustomerDashboard = () => {
 		}
 	}, [location.search, activeSessionId]);
 
+	// Set Active Session For Google Meet Customized
 	useEffect(() => {
 		const storedSessionId = localStorage.getItem('pendingMeetingSessionId');
 		if (storedSessionId) {
@@ -60,6 +63,7 @@ export const CustomerDashboard = () => {
 			localStorage.removeItem('pendingMeetingSessionId');
 		}
 	}, []);
+
 
 	// Function to handle opening the Google Meet modal
 	const handleGoogleMeetClick = (sessionId) => {
@@ -168,6 +172,7 @@ export const CustomerDashboard = () => {
 	};
 
 	const renderSessionMessages = (session, isInGoogleMeet = false) => {
+
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
 			const mentorId = msg.mentor_id;
 			if (!acc[mentorId]) {
@@ -258,6 +263,10 @@ export const CustomerDashboard = () => {
 																</button>
 
 																{/* Only show Confirm Mentor button if not in Google Meet modal */}
+																{/* Confirm Mentor Modal Button */}
+																{/* Confirm Mentor Modal Button */}
+																{/* Confirm Mentor Modal Button */}
+
 																{!isInGoogleMeet && (
 																	<button
 																		type="button"
@@ -271,6 +280,9 @@ export const CustomerDashboard = () => {
 																)}
 
 																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
+																{/* Confirm Mentor Modal */}
+																{/* Confirm Mentor Modal */}
+																{/* Confirm Mentor Modal */}
 																{!isInGoogleMeet && (
 																	<div
 																		className="modal fade"
@@ -331,6 +343,9 @@ export const CustomerDashboard = () => {
 																	</div>
 
 																)}
+																{/* Confirm Mentor Modal End */}
+																{/* Confirm Mentor Modal End */}
+																{/* Confirm Mentor Modal End */}
 															</div>
 														</div>
 													</div>
@@ -407,7 +422,19 @@ export const CustomerDashboard = () => {
 											<div className="row mt-3">
 												<div className="col text-center">
 
-													<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target={`#GoogleMeetModal${session.id}`}>
+													<button
+														type="button"
+														className="btn btn-primary"
+														data-bs-toggle="modal"
+														data-bs-target={`#GoogleMeetModal${session.id}`}
+														onClick={async () => {
+															const success = await actions.getMentorById(session.mentor_id);
+															if (!success) {
+																console.error("Failed to fetch mentor details");
+																// Optionally show an error message to the user
+															}
+														}}
+													>
 														Launch Google Meet Now
 													</button>
 
@@ -415,6 +442,9 @@ export const CustomerDashboard = () => {
 
 												</div>
 												<div className="container-fluid justify-content-between d-flex">
+													{/* MODAL FOR GOOGLEMEET */}
+													{/* MODAL FOR GOOGLEMEET */}
+													{/* MODAL FOR GOOGLEMEET */}
 													{/* MODAL FOR GOOGLEMEET */}
 
 													<div className="modal fade"
@@ -433,6 +463,7 @@ export const CustomerDashboard = () => {
 																			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 																			.join(" ")}`}
 																	</h1>
+																	<h2>{session.mentor_id}</h2>
 																	<button
 																		type="button"
 																		className="btn-close"
@@ -444,7 +475,7 @@ export const CustomerDashboard = () => {
 																	<div className="container-fluid">
 																		<div className="row">
 																			<div className="col-12">
-																				<GoogleMeeting />
+																				<GoogleMeeting mentor={store.selectedMentor} />
 																				{renderSessionMessages(session, true)}
 																			</div>
 																		</div>
@@ -467,6 +498,9 @@ export const CustomerDashboard = () => {
 														</div>
 													</div>
 												</div>
+												{/* MODAL FOR GOOGLEMEET END */}
+												{/* MODAL FOR GOOGLEMEET END */}
+												{/* MODAL FOR GOOGLEMEET END */}
 												{/* MODAL FOR GOOGLEMEET END */}
 
 											</div>

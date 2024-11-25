@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Calendar, Clock, Users, X, Edit2, Trash2, Plus, Link as LinkIcon } from "lucide-react";
+import { Calendar, DollarSign, Clock, Users, X, Edit2, Trash2, Plus, Link as LinkIcon } from "lucide-react";
 
-export const GoogleMeeting = () => {
+export const GoogleMeeting = ({ mentor }) => {
     const { store, actions } = useContext(Context);
     const [meetingInfo, setMeetingInfo] = useState({
         link: "",
@@ -18,6 +18,7 @@ export const GoogleMeeting = () => {
         attendees: "",
         isFormVisible: false,
     });
+    const [sessionTotal, setSessionTotal] = useState("60");
 
     const startAuth = async () => {
         try {
@@ -49,6 +50,14 @@ export const GoogleMeeting = () => {
             ...prev,
             [name]: value,
         }));
+    
+        // Calculate session total when duration changes
+        if (name === 'duration') {
+            const hourlyRate = mentor?.price || 0;
+            const durationInHours = value / 60;
+            const total = Math.round(hourlyRate * durationInHours);
+            setSessionTotal(total);
+        }
     };
 
     const createMeeting = async (e) => {
@@ -143,6 +152,25 @@ export const GoogleMeeting = () => {
         }
     };
 
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(price);
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+
     return (
         <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl border-4 border-gray-300 p-8">
@@ -160,7 +188,7 @@ export const GoogleMeeting = () => {
                         <div className="mb-6 flex justify-center">
                             <button
                                 className="btn btn-primary flex items-center justify-center shadow px-5 py-3 rounded-full hover:bg-blue-600 transition-colors"
-                                style={{width: '200px', height: '200px'}}
+                                style={{ width: '200px', height: '200px' }}
                                 onClick={startAuth}
                                 disabled={meetingInfo.loading}
                             >
@@ -173,23 +201,23 @@ export const GoogleMeeting = () => {
                             </button>
                         </div>
 
-                    {/* Create Meeting Button */}
-                    <div className="mb-6 py-4 flex justify-center">
-                        <button
-                            className="btn btn-success flex items-center justify-center px-5 py-3 rounded-full hover:bg-green-600 transition-colors"
-                            onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
-                        >
-                            <Plus className="w-5 h-5 mr-2" />
-                            Create New Meeting
-                        </button>
-                    </div>
+                        {/* Create Meeting Button */}
+                        <div className="mb-6 py-4 flex justify-center">
+                            <button
+                                className="btn btn-success flex items-center justify-center px-5 py-3 rounded-full hover:bg-green-600 transition-colors"
+                                onClick={() => setMeetingForm((prev) => ({ ...prev, isFormVisible: true }))}
+                            >
+                                <Plus className="w-5 h-5 mr-2" />
+                                Create New Meeting
+                            </button>
+                        </div>
 
                     </div>
                 </div>
-              
+
 
                 {/* Auth Section */}
-                
+
 
                 {/* Meeting Form */}
                 {meetingForm.isFormVisible && (
@@ -250,7 +278,60 @@ export const GoogleMeeting = () => {
                                     placeholder="email1@example.com, email2@example.com"
                                 />
                             </div>
-
+                            {/* Mentor Price and Pay */}
+                            {/* Mentor Price and Pay */}
+                            {/* Mentor Price and Pay */}
+                            {/* Mentor Price and Pay */}
+                            <div className="container-fluid">
+                                <div className="row">
+                                    <div className="col-6">
+                                        {mentor ? (
+                                            <div className="mb-4">
+                                                <h2 className="text-xl font-bold">Mentor Details</h2>
+                                                <p>
+                                                    <strong>Name:</strong> {mentor.first_name} {mentor.last_name}
+                                                </p>
+                                                <p>
+                                                    <strong>Price:</strong> {formatPrice(mentor.price)} <strong>/hr</strong>
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <p className="text-red-500 text-center font-semibold">Mentor data not available</p>
+                                        )}
+                                    </div>
+                                    <div className="col-6">
+                                        {/* Add Stripe Here */}
+                                        {/* Add Stripe Here */}
+                                        {/* Add Stripe Here */}
+                                        {/* Add Stripe Here */}
+                                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <DollarSign className="w-5 h-5 text-gray-600" />
+                                                <h3 className="font-medium text-gray-900">Session Total</h3>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <p className="text-sm text-gray-600">
+                                                    Duration: {meetingForm.duration} minutes ({(meetingForm.duration / 60).toFixed(1)} hours)
+                                                </p>
+                                                <p className="text-sm text-gray-600">
+                                                    Rate: {formatPrice(mentor?.price || 0)}/hour
+                                                </p>
+                                                <p className="text-lg font-bold text-gray-900">
+                                                    <h3 className="font-medium text-gray-900">Session Total: ${sessionTotal}</h3>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {/* End Stripe Payments */}
+                                        {/* End Stripe Payments */}
+                                        {/* End Stripe Payments */}
+                                        {/* End Stripe Payments */}
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Mentor Price and Pay End */}
+                            {/* Mentor Price and Pay End */}
+                            {/* Mentor Price and Pay End */}
+                            {/* Mentor Price and Pay End */}
                             <div className="flex justify-end space-x-3">
                                 <button
                                     type="button"
@@ -268,6 +349,7 @@ export const GoogleMeeting = () => {
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 )}
 
@@ -328,6 +410,7 @@ export const GoogleMeeting = () => {
                                     </button>
                                 </div>
                             </div>
+
 
                             <div className="mt-3">
                                 <a
