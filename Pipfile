@@ -12,7 +12,7 @@ flask-sqlalchemy = "==2.5.1"
 flask-migrate = "==3.1.0"
 flask-swagger = "==0.2.14"
 flask-cors = "==3.0.10"
-flask-jwt-extended = "==4.3.1"
+flask-jwt-extended = "*"
 flask-admin = "*"
 flask-mail = "*"
 # Database and ORM
