@@ -28,8 +28,8 @@ jwt = JWTManager(app)
 
 # CORS Configuration
 allowed_origins = [
-    "https://psychic-spoon-jjjqjqqr5jp63p45p-3000.app.github.dev",
-    "https://psychic-spoon-jjjqjqqr5jp63p45p-3001.app.github.dev"
+    "https://special-computing-machine-x55v5vvrw5rrcv64v-3000.app.github.dev",
+    "https://special-computing-machine-x55v5vvrw5rrcv64v-3001.app.github.dev"
 ]
 CORS(app, resources={r"/api/*": {
     "origins": allowed_origins,
