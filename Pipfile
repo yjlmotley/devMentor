@@ -15,25 +15,20 @@ flask-cors = "==3.0.10"
 flask-jwt-extended = "==4.3.1"
 flask-admin = "*"
 flask-mail = "*"
-
 # Database and ORM
 sqlalchemy = "<2.0.0"
 psycopg2-binary = "==2.9.3"
 alembic = "==1.7.6"
-
 # Cloudinary for media management
 cloudinary = "==1.29.0"
-
 # Payment and Authentication
 stripe = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
 google-auth-httplib2 = "*"
 google-api-python-client = "*"
-
 # Email and Communication
 sendgrid = "*"
-
 # Utility libraries
 python-dotenv = "==0.19.2"
 requests = "*"
@@ -45,7 +40,6 @@ jinja2 = "==3.0.3"
 markupsafe = "==2.0.1"
 werkzeug = "==2.0.3"
 wtforms = "==3.0.1"
-
 # Serialization, Parsing, and Helper Libraries
 six = "==1.16.0"
 python-dateutil = "==2.8.2"
@@ -54,6 +48,7 @@ urllib3 = "==1.26.8"
 mako = "==1.1.6"
 python-editor = "==1.0.4"
 typing-extensions = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.10"
