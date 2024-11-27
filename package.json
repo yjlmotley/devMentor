@@ -1,7 +1,7 @@
 {
 	"name": "react-hello-webapp",
 	"engines": {
-		"node": "16.x"
+		"node": ">=18.x"
 	},
 	"version": "1.0.1",
 	"description": "",
@@ -75,6 +75,8 @@
 	"dependencies": {
 		"@stripe/react-stripe-js": "^2.9.0",
 		"@stripe/stripe-js": "^4.10.0",
+		"cors": "^2.8.5",
+		"express": "^4.21.1",
 		"googleapis": "^144.0.0",
 		"libphonenumber-js": "^1.11.4",
 		"lucide-react": "^0.453.0",
