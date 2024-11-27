@@ -121,8 +121,8 @@ importers:
         specifier: ^3.0.1
         version: 3.1.2(webpack@5.93.0)
       html-webpack-plugin:
-        specifier: ^5.5.0
-        version: 5.6.0(webpack@5.93.0)
+        specifier: ^5.6.3
+        version: 5.6.3(webpack@5.93.0)
       parse-github-url:
         specifier: ^1.0.2
         version: 1.0.3
@@ -2155,8 +2155,8 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
-  html-webpack-plugin@5.6.0:
-    resolution: {integrity: sha512-iwaY4wzbe48AfKLZ/Cc8k0L+FKG6oSNRaZ8x5A/T/IVDGyXcbHncM9TdDa93wn0FsSm82FhTKW7f3vS61thXAw==}
+  html-webpack-plugin@5.6.3:
+    resolution: {integrity: sha512-QSf1yjtSAsmf7rYBV7XX86uua4W/vkhIt0xNXKbsi2foEeW7vjJQz4bhnpL3xH+l1ryl1680uNv968Z+X6jSYg==}
     engines: {node: '>=10.13.0'}
     peerDependencies:
       '@rspack/core': 0.x || 1.x
@@ -6225,7 +6225,7 @@ snapshots:
       relateurl: 0.2.7
       terser: 5.31.4
 
-  html-webpack-plugin@5.6.0(webpack@5.93.0):
+  html-webpack-plugin@5.6.3(webpack@5.93.0):
     dependencies:
       '@types/html-minifier-terser': 6.1.0
       html-minifier-terser: 6.1.0
