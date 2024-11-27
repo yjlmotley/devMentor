@@ -28,8 +28,8 @@ jwt = JWTManager(app)
 
 # CORS Configuration
 allowed_origins = [
-    "https://opulent-journey-x55v5vvrwr672v5q6-3000.app.github.dev",
-    "https://opulent-journey-x55v5vvrwr672v5q6-3001.app.github.dev"
+    "https://devmentor-frontend.onrender.com",
+    "https://devmentorbackend.onrender.com"
 ]
 CORS(app, resources={r"/api/*": {
     "origins": allowed_origins,
