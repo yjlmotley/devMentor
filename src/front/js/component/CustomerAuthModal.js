@@ -12,26 +12,56 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
   const modalRef = useRef(null);
   const bsModalRef = useRef(null);
 
+  // useEffect(() => {
+  //   // Initialize modal when component mounts
+  //   if (modalRef.current && !bsModalRef.current && window.bootstrap) {
+  //     bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
+  //       keyboard: false,
+  //     });
+
+  //     // Add event listener for when modal is hidden
+  //     modalRef.current.addEventListener('hidden.bs.modal', () => {
+  //       if (onHide) onHide();
+  //     });
+  //   }
+
+  //   // Cleanup on unmount
+  //   return () => {
+  //     if (bsModalRef.current) {
+  //       bsModalRef.current.dispose();
+  //     }
+  //   };
+  // }, []);
+
   useEffect(() => {
-    // Initialize modal when component mounts
-    if (modalRef.current && !bsModalRef.current && window.bootstrap) {
+    if (modalRef.current && window.bootstrap) {
       bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
-        keyboard: false,
+        keyboard: !showForgotPs,
+        backdrop: showForgotPs ? 'static' : true,
       });
 
-      // Add event listener for when modal is hidden
       modalRef.current.addEventListener('hidden.bs.modal', () => {
         if (onHide) onHide();
       });
+
+      // Show modal if needed
+      if (show) {
+        setActiveTab(initialTab);
+        bsModalRef.current.show();
+      }
     }
 
-    // Cleanup on unmount
     return () => {
-      if (bsModalRef.current) {
-        bsModalRef.current.dispose();
+      try {
+        if (bsModalRef.current?.dispose) {
+          bsModalRef.current.dispose();
+        }
+      } catch (error) {
+        console.error('Error disposing modal:', error);
       }
+      bsModalRef.current = null;
     };
-  }, []);
+  }, [showForgotPs]);
 
   useEffect(() => {
     if (bsModalRef.current) {
@@ -56,7 +86,7 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
     //   bsModalRef.current.hide();
     // }
     // if (onHide) onHide();
-    onHide();
+    // onHide();
   };
 
   const handleSwitchLogin = () => {
