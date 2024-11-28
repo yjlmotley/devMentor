@@ -32,16 +32,14 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
     useEffect(() => {
         if (bsModalRef.current) {
             if (show) {
+                setActiveTab(initialTab);
                 bsModalRef.current.show();
             } else {
                 bsModalRef.current.hide();
             }
         }
-    }, [show]);
+    }, [show, initialTab]);
 
-    useEffect(() => {
-        setActiveTab(initialTab);
-    }, [initialTab]);
 
     const handleSignupSuccess = () => {
         setActiveTab('login');
