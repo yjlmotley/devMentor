@@ -983,8 +983,6 @@ def start_oauth():
         return jsonify({'authUrl': auth_url})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-    
 
 @api.route('/meet/oauth-callback', methods=['GET'])
 def oauth_callback():
