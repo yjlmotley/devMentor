@@ -545,6 +545,14 @@ export const CustomerDashboard = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 													aria-label={`Resource link for ${session.title}`}
+													style={{
+														display: 'inline-block',
+														width: '10ch',
+														whiteSpace: 'nowrap',
+														overflow: 'hidden',
+														textOverflow: 'ellipsis'
+													}}
+													title={session.resourceLink}
 												>
 													{session.resourceLink}
 												</a>
