@@ -2,8 +2,9 @@ import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Calendar, DollarSign, Clock, Users, X, Edit2, Trash2, Plus, Link as LinkIcon } from "lucide-react";
 
-export const GoogleMeeting = ({ mentor }) => {
+export const GoogleMeeting = ({ mentor, session }) => {
     const { store, actions } = useContext(Context);
+    const [sessionId, setSessionId ] = useState(session.id);
     const [meetingInfo, setMeetingInfo] = useState({
         link: "",
         loading: false,
@@ -60,16 +61,68 @@ export const GoogleMeeting = ({ mentor }) => {
         }
     };
 
+    // const createMeeting = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         setMeetingInfo((prev) => ({ ...prev, loading: true, error: "" }));
+
+    //         const attendeesList = meetingForm.attendees
+    //             .split(",")
+    //             .map((email) => email.trim())
+    //             .filter((email) => email);
+
+    //         const response = await fetch(`${process.env.BACKEND_URL}/api/meet/create-meeting`, {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify({
+    //                 summary: meetingForm.summary,
+    //                 duration_minutes: parseInt(meetingForm.duration),
+    //                 description: meetingForm.description,
+    //                 attendees: attendeesList,
+    //             }),
+    //             credentials: "include",
+    //         });
+
+    //         if (!response.ok) {
+    //             const errorData = await response.json();
+    //             throw new Error(errorData.error || "Failed to create meeting");
+    //         }
+
+    //         const data = await response.json();
+    //         setMeetingInfo((prev) => ({
+    //             ...prev,
+    //             meetings: [...prev.meetings, data],
+    //             loading: false,
+    //         }));
+    //         setMeetingForm((prev) => ({
+    //             ...prev,
+    //             isFormVisible: false,
+    //             summary: "New Meeting",
+    //             duration: 60,
+    //             description: "",
+    //             attendees: "",
+    //         }));
+    //     } catch (error) {
+    //         setMeetingInfo((prev) => ({
+    //             ...prev,
+    //             error: error.message,
+    //             loading: false,
+    //         }));
+    //     }
+    // };
+
     const createMeeting = async (e) => {
         e.preventDefault();
         try {
             setMeetingInfo((prev) => ({ ...prev, loading: true, error: "" }));
-
+    
             const attendeesList = meetingForm.attendees
                 .split(",")
                 .map((email) => email.trim())
                 .filter((email) => email);
-
+    
             const response = await fetch(`${process.env.BACKEND_URL}/api/meet/create-meeting`, {
                 method: "POST",
                 headers: {
@@ -83,18 +136,41 @@ export const GoogleMeeting = ({ mentor }) => {
                 }),
                 credentials: "include",
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || "Failed to create meeting");
             }
-
+    
             const data = await response.json();
+            
+            // Determine the appointment index dynamically
+            if (session) {
+                let newAppointmentIndex = 0;
+                
+                // Find the first available/unused appointment index
+                while (session.appointments[newAppointmentIndex] && 
+                       session.appointments[newAppointmentIndex].meetingUrl) {
+                    newAppointmentIndex++;
+                }
+    
+                const addMeetingResult = await actions.addMeetingToAppointment(
+                    session.id, 
+                    newAppointmentIndex, 
+                    data.meetingUrl
+                );
+    
+                if (!addMeetingResult) {
+                    throw new Error("Failed to add meeting URL to appointment");
+                }
+            }
+    
             setMeetingInfo((prev) => ({
                 ...prev,
                 meetings: [...prev.meetings, data],
                 loading: false,
             }));
+            
             setMeetingForm((prev) => ({
                 ...prev,
                 isFormVisible: false,
@@ -181,6 +257,8 @@ export const GoogleMeeting = ({ mentor }) => {
                         <h5 className="mb-4">2. Create Meeting</h5>
                         <h5 className="mb-4">3. Message Mentor Meeting Link</h5>
                         <h5 className="mb-6">4. Join Meeting Link and meet mentor</h5>
+                        <h5 className="mb-6">5. Your Session id is {session.id}</h5>
+                        <h5 className="mb-6">6. Your Mentor id is {session.mentor_id}</h5>
 
 
                     </div>

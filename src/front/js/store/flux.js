@@ -571,6 +571,66 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
+
+            addMeetingToAppointment: async (sessionId, appointmentIndex, meetingUrl) => {
+                try {
+                    const store = getStore();
+                    const token = sessionStorage.getItem("token");
+            
+                    if (!token) {
+                        console.error("No token found, user must be logged in");
+                        return false;
+                    }
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/appointment/meeting`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            appointment_index: appointmentIndex, 
+                            meetingUrl: meetingUrl 
+                        })
+                    });
+            
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Meeting URL added to appointment:", data);
+            
+                        // Update the relevant store properties if needed
+                        // This might involve updating customerSessions or other state
+                        const updatedSessions = store.customerSessions.map(session => {
+                            if (session.id === sessionId) {
+                                // Create a new session object with updated appointments
+                                return {
+                                    ...session,
+                                    appointments: session.appointments.map((appointment, index) => 
+                                        index === appointmentIndex 
+                                            ? { ...appointment, meetingUrl: meetingUrl }
+                                            : appointment
+                                    )
+                                };
+                            }
+                            return session;
+                        });
+            
+                        setStore({ 
+                            customerSessions: updatedSessions
+                        });
+            
+                        return data;
+                    } else {
+                        console.error("Failed to add meeting URL with status:", response.status);
+                        const errorData = await response.json();
+                        console.error("Error details:", errorData);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error("Error adding meeting URL to appointment:", error);
+                    return false;
+                }
+            },
             
             sendMessageMentor: async (sessionId, text) => {
                 const token = sessionStorage.getItem("token");
