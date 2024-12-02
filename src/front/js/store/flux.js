@@ -5,6 +5,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             isMentorLoggedIn: false,
             isCustomerLoggedIn: false,
             mentors: [],
+            mentor: null,
+            selectedSession: null,
             currentUserData: null,
             sessionRequests: [],
             customerId: undefined,
@@ -124,6 +126,44 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return true;
                 } else {
                     console.error("Failed to fetch all Mentors:", response.status)
+                    return false;
+                }
+            },
+
+            getMentorById: async (mentorId) => {
+                try {
+                    const store = getStore();
+                    const token = sessionStorage.getItem("token");
+
+                    if (!token) {
+                        console.error("No token found in sessionStorage");
+                        return false;
+                    }
+
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/mentor/${mentorId}`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Update both mentor and selectedMentor in the store
+                    setStore({
+                        ...store,
+                        mentor: data,
+                        selectedMentor: data
+                    });
+
+                    return true;
+                } catch (error) {
+                    console.error("Error fetching mentor:", error);
                     return false;
                 }
             },
@@ -403,34 +443,60 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            // getSessionById: async (sessionId) => {
+            //     const token = sessionStorage.getItem("token"); // or however you're storing the token
+            //     if (!token) {
+            //         console.error("No token found");
+            //         return false;
+            //     }
+            
+            //     try {
+            //         const response = await fetch(
+            //             process.env.BACKEND_URL + `/api/session/${sessionId}`, {
+            //             method: "GET",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //                 "Authorization": `Bearer ${token}`
+            //             }
+            //         });
+            
+            //         if (!response.ok) {
+            //             console.error("Response not OK:", response.status, response.statusText);
+            //             return false;
+            //         }
+            
+            //         const sessionData = await response.json();
+            //         console.log("Session data received:", sessionData);
+            //         return sessionData;
+            //     } catch (error) {
+            //         console.error("Error fetching session data:", error);
+            //         return false;
+            //     }
+            // },
+
             getSessionById: async (sessionId) => {
-                const token = sessionStorage.getItem("token"); // or however you're storing the token
+                const token = sessionStorage.getItem("token"); // Retrieve the token
                 if (!token) {
-                    console.error("No token found");
-                    return false;
+                    console.error("No token found. Please log in.");
+                    return null;
                 }
             
                 try {
-                    const response = await fetch(
-                        process.env.BACKEND_URL + `/api/session/${sessionId}`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}`, {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        }
+                            "Authorization": `Bearer ${token}`, // Include the token in the Authorization header
+                        },
                     });
             
-                    if (!response.ok) {
-                        console.error("Response not OK:", response.status, response.statusText);
-                        return false;
-                    }
+                    if (!response.ok) throw new Error(`Failed to fetch session. Status: ${response.status}`);
             
-                    const sessionData = await response.json();
-                    console.log("Session data received:", sessionData);
-                    return sessionData;
+                    const data = await response.json();
+                    setStore({ selectedSession: data }); // Save the fetched data in the global store
+                    console.log("Session data retrieved successfully:", data);
                 } catch (error) {
                     console.error("Error fetching session data:", error);
-                    return false;
                 }
             },
 
@@ -444,7 +510,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
                 const response = await fetch(
-                    process.env.BACKEND_URL + "/api/sessions/customer", {
+                    process.env.BACKEND_URL + "/api/sessions/customer-sessions", {
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
@@ -502,6 +568,66 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
                 } catch (error) {
                     console.error("Error confirming mentor for session:", error);
+                    return false;
+                }
+            },
+
+            addMeetingToAppointment: async (sessionId, appointmentIndex, meetingUrl) => {
+                try {
+                    const store = getStore();
+                    const token = sessionStorage.getItem("token");
+            
+                    if (!token) {
+                        console.error("No token found, user must be logged in");
+                        return false;
+                    }
+            
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/appointment/meeting`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            appointment_index: appointmentIndex, 
+                            meetingUrl: meetingUrl 
+                        })
+                    });
+            
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Meeting URL added to appointment:", data);
+            
+                        // Update the relevant store properties if needed
+                        // This might involve updating customerSessions or other state
+                        const updatedSessions = store.customerSessions.map(session => {
+                            if (session.id === sessionId) {
+                                // Create a new session object with updated appointments
+                                return {
+                                    ...session,
+                                    appointments: session.appointments.map((appointment, index) => 
+                                        index === appointmentIndex 
+                                            ? { ...appointment, meetingUrl: meetingUrl }
+                                            : appointment
+                                    )
+                                };
+                            }
+                            return session;
+                        });
+            
+                        setStore({ 
+                            customerSessions: updatedSessions
+                        });
+            
+                        return data;
+                    } else {
+                        console.error("Failed to add meeting URL with status:", response.status);
+                        const errorData = await response.json();
+                        console.error("Error details:", errorData);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error("Error adding meeting URL to appointment:", error);
                     return false;
                 }
             },
