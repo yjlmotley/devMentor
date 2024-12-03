@@ -15,7 +15,7 @@ export const ForgotPsModal = ({ onClose, switchToLogin }) => {
             });
 
             if (response.ok) {
-                alert("An email has been sent to reset your password.");
+                alert("An email has been sent to reset your password. If you do not see the email from devMentor in your inbox, please check your spam/junk folder.");
                 // onSuccess(); // This will close the forgot password modal and show the login modal
                 switchToLogin();
             } else {

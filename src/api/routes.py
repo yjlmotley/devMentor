@@ -115,11 +115,32 @@ def mentor_login():
     )
     return jsonify(access_token=access_token), 200
 
+# @api.route("/forgot-password", methods=["POST"])
+# def forgot_password():
+#     data=request.json
+#     email=data.get("email")
+#     # want to get user type in the same fashion as email
+#     if not email:
+#         return jsonify({"message": "Email is required"}), 400
+    
+#     user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+#     if user is None:
+#         return jsonify({"message": "Email does not exist"}), 400
+    
+#     expiration_time = datetime.utcnow() + timedelta(hours=1)
+#     token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
+
+#     # /?userType = {usertype} in the email value
+#     # email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
+#     email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/?token={token}"
+#     send_email(email, email_value, "Subject: Password recovery for devMentor")
+#     return jsonify({"message": "Recovery password email has been sent!"}), 200
+
 @api.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data=request.json
-    email=data.get("email")
-    # want to get user type in the same fashion as email
+    data = request.json
+    email = data.get("email")
+    
     if not email:
         return jsonify({"message": "Email is required"}), 400
     
@@ -130,10 +151,39 @@ def forgot_password():
     expiration_time = datetime.utcnow() + timedelta(hours=3)
     token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
 
-    # /?userType = {usertype} in the email value
-    # email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
-    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/?token={token}"
-    send_email(email, email_value, "Subject: Password recovery for devMentor")
+    reset_link = f"{os.getenv('FRONTEND_URL')}/?token={token}"
+    
+    email_html = f"""
+    <html>
+    <body style="color: #333;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Password Reset Request</h2>
+            <p>Hello {user.first_name},</p>
+            <p>We received a request to reset your password for your devMentor account. If you didn't make this request, you can safely ignore this email.</p>
+            <p>To reset your password, please click the button below:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{reset_link}" 
+                   style="background-color: #4CAF50; 
+                          color: white; 
+                          padding: 12px 24px; 
+                          text-decoration: none; 
+                          border-radius: 4px; 
+                          display: inline-block;">
+                    Reset Password
+                </a>
+            </div>
+            <p>This link will expire in 1 hour for security reasons.</p>
+            <p>If you're having trouble clicking the button, you can also copy and paste the link from the button into your browser.</p>
+            <p style="margin-top: 30px; color: #666; font-size: 12px;">
+                Best regards,<br>
+                The devMentor Team
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    send_email(email, email_html, "Password Reset Request: devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
 
 # @api.route("/reset-password/<token>", methods=["PUT"])
