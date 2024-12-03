@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export const ForgotPsModal = ({ onClose, onSuccess }) => {
+export const ForgotPsModal = ({ onClose, switchToLogin }) => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
 
@@ -16,7 +16,8 @@ export const ForgotPsModal = ({ onClose, onSuccess }) => {
 
             if (response.ok) {
                 alert("An email has been sent to reset your password.");
-                onSuccess(); // This will close the forgot password modal and show the login modal
+                // onSuccess(); // This will close the forgot password modal and show the login modal
+                switchToLogin();
             } else {
                 const data = await response.json();
                 setError(data.message || "Something went wrong.");
@@ -71,8 +72,7 @@ export const ForgotPsModal = ({ onClose, onSuccess }) => {
                     </div>
                     <div className="text-center text-secondary small-font">
                         <span
-                            // onClick={onClose}
-                            onClick={() => onSuccess()}
+                            onClick={switchToLogin}
                             className="ms-1 text-secondary auth-link"
                         >
                             Back to Login

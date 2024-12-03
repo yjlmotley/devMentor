@@ -66,9 +66,6 @@ export const MentorLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
                         {invalidItems.includes("password") && (
                             <div className="invalid-feedback">Password must be 5-20 characters</div>
                         )}
-                        {/* <Link to='/forgot-password' className="text-secondary auth-link small-font">
-                            Forgot Password?
-                        </Link> */}
                         <div>
                             <span
                                 onClick={() => onForgotPs()}
@@ -93,17 +90,6 @@ export const MentorLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
                             Login
                         </button>
                     </div>
-                    {/* <div className="text-center mb-1">
-                        <Link to='/forgot-password' className="text-secondary text-decoration-none">
-                            Forgot Password?
-                        </Link>
-                    </div> */}
-                    {/* <div className="text-center text-secondary small-font">
-                        Need to create an account?
-                        <Link to='/mentor-signup' className="ms-1 text-secondary auth-link">
-                            Sign up
-                        </Link>
-                    </div> */}
                     <div className="text-center text-secondary small-font">
                         New to our platform?
                         <span

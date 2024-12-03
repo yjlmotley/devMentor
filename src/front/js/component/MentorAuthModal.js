@@ -5,29 +5,42 @@ import { ForgotPsModal } from './ForgotPsModal.js';
 import "../../styles/auth.css";
 
 
-export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
+export const MentorAuthModal = ({ initialTab, show, onHide }) => {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [showForgotPs, setShowForgotPs] = useState(false);
     const modalRef = useRef(null);
     const bsModalRef = useRef(null);
 
     useEffect(() => {
-        if (modalRef.current && !bsModalRef.current && window.bootstrap) {
+        if (modalRef.current && window.bootstrap) {
             bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
-                keyboard: false,
+                keyboard: !showForgotPs,
+                backdrop: showForgotPs ? 'static' : true,
             });
 
             modalRef.current.addEventListener('hidden.bs.modal', () => {
                 if (onHide) onHide();
+                setShowForgotPs(false);
             });
+
+            if (show) {
+                setActiveTab(initialTab);
+                bsModalRef.current.show();
+            }
         }
 
         return () => {
-            if (bsModalRef.current) {
-                bsModalRef.current.dispose();
+            try {
+                if (bsModalRef.current?.dispose) {
+                    bsModalRef.current.dispose();
+                }
+            } catch (error) {
+                console.error('Error disposing modal:', error);
             }
+            bsModalRef.current = null;
         };
-    }, []);
+    }, [showForgotPs]);
+
 
     useEffect(() => {
         if (bsModalRef.current) {
@@ -40,10 +53,23 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
         }
     }, [show, initialTab]);
 
+    useEffect(() => {
+        if (!showForgotPs) {  // When forgot password modal closes
+            setActiveTab('login');  // Switch to login tab
+        }
+    }, [showForgotPs]);
 
-    const handleSignupSuccess = () => {
-        setActiveTab('login');
-    }
+    const handleClose = () => {
+        if (bsModalRef.current) {
+            bsModalRef.current.hide();
+        }
+    };
+
+    const handleForgotPsReturn = () => {
+        setShowForgotPs(false);
+        // await setActiveTab('login'); // Always force login tab
+    };
+
 
     const handleSwitchLogin = () => {
         setActiveTab('login');
@@ -65,8 +91,8 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
             aria-hidden="true"
             ref={modalRef}
         >
-            <div className="modal-dialog modal-dialog-centered">
-                {/* <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"> */}
+            {/* <div className="modal-dialog modal-dialog-centered"> */}
+            <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                 <div
                     className="modal-content bg-dark"
                     style={{
@@ -99,37 +125,26 @@ export const MentorAuthModal = ({ initialTab = 'login', show, onHide }) => {
                                     <button
                                         type="button"
                                         className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
-                                        onClick={() => {
-                                            if (bsModalRef.current) {
-                                                bsModalRef.current.hide();
-                                            }
-                                        }}
+                                        onClick={handleClose}
                                     />
                                 </div>
                             </div>
                             <div className="modal-body p-4">
                                 {activeTab === 'login' ? (
                                     <MentorLogin
-                                        onSuccess={() => {
-                                            if (bsModalRef.current) {
-                                                bsModalRef.current.hide();
-                                            }
-                                        }}
+                                        onSuccess={handleClose}
                                         switchToSignUp={handleSwitchSignUp}
                                         onForgotPs={() => setShowForgotPs(true)}
                                     />
                                 ) : (
-                                    <MentorSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
+                                    <MentorSignup switchToLogin={handleSwitchLogin} />
                                 )}
                             </div>
                         </>
                     ) : (
                         <ForgotPsModal
-                            onClose={() => setShowForgotPs(false)}
-                            onSuccess={() => {
-                                setShowForgotPs(false);
-                                setActiveTab('login');
-                            }}
+                            onClose={handleClose}
+                            switchToLogin={handleForgotPsReturn}
                         />
                     )}
                 </div>

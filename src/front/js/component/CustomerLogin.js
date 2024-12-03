@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { ValidateEmail, ValidatePassword } from "./Validators"; // Ensure path is correct
 
+
 export const CustomerLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");

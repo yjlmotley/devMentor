@@ -5,7 +5,7 @@ import 'react-phone-input-2/lib/style.css'
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidatePhone, } from "../component/Validators";
 
 
-export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
+export const CustomerSignup = ({ switchToLogin }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -46,8 +46,7 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                     setPhone("");
 
                     if (typeof onSuccess === 'function') {
-                        // console.log("Calling onSuccess from CustomerSignUp");
-                        onSuccess();
+                        switchToLogin();
                     }
 
                     setTimeout(() => {
@@ -207,18 +206,6 @@ export const CustomerSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             required
                         />
-                        {/* {invalidItems.includes("phone") && (
-                            <div
-                                className="invalid-feedback d-block"
-                                style={{
-                                    position: 'absolute',
-                                    bottom: '-25px',
-                                    left: '0'
-                                }}
-                            >
-                                Invalid phone number
-                            </div>
-                        )} */}
                         {invalidItems.includes("phone") && (
                             <div className="invalid-feedback d-block" style={{
                                 position: 'absolute',

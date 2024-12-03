@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
 import PhoneInput from 'react-phone-input-2'
 import { ValidateEmail, ValidateFirstName, ValidateLastName, ValidatePassword, ValidateCity, ValidatePhone, ValidateWhatState, ValidateCountry } from "../component/Validators";
 import Select from 'react-select';
@@ -8,7 +7,7 @@ import CreatableSelect from "react-select/creatable";
 import { stateOptions, countryOptions } from "../store/data";
 
 
-export const MentorSignup = ({ onSuccess, switchToLogin }) => {
+export const MentorSignup = ({ switchToLogin }) => {
     const { actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -59,7 +58,7 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
 
                 if (typeof onSuccess === 'function') {
                     // console.log("Calling onSucess from MentorSignUp");
-                    onSuccess();
+                    switchToLogin();
                 }
 
                 setTimeout(() => {
@@ -222,18 +221,6 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             }}
                             required
                         />
-                        {/* {invalidItems.includes("phone") && (
-                            <div className="invalid-feedback d-block" style={{
-                                position: 'absolute',
-                                bottom: '-25px',
-                                left: '0',
-                                marginTop: '0.25rem',
-                                marginBottom: '0',
-                                color: '#dc3545'
-                            }}>
-                                Invalid phone number
-                            </div>
-                        )} */}
                         {invalidItems.includes("phone") && (
                             <div
                                 className="invalid-feedback d-block"
@@ -307,8 +294,6 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                         )}
                     </div>
 
-                    {/* TODO: The button's active/focused styling needs to be addressed (also check MentorLogin, CustomerSignup, CustomerLogin, Forgot/Reset/Change Password pages) */}
-                    {/* <div style={{ textAlign: 'center' }}> */}
                     <div>
                         <button
                             type="submit"
@@ -323,9 +308,6 @@ export const MentorSignup = ({ onSuccess, switchToLogin }) => {
                             Submit
                         </button>
                     </div>
-                    {/* <div>
-                        <Link to='/mentor-login' className="mentor-login-link">Already have an account?</Link>
-                    </div> */}
                     <div className="text-center text-secondary small-font">
                         Already have an account?
                         <span

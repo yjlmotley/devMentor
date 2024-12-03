@@ -1,7 +1,7 @@
 
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
-import ResetPasswordModal from '../component/ResetPasswordModal.js';
+import ResetPsModal from '../component/ResetPsModal.js';
 import "../../styles/home.css";
 
 
@@ -111,7 +111,7 @@ export const Home = () => {
           </div>
         </div>
       </section>
-      <ResetPasswordModal />
+      <ResetPsModal />
     </div>
   );
 };

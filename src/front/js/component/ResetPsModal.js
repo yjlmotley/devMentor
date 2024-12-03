@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ForgotPsModal } from './ForgotPsModal';
+import { LogIn } from 'lucide-react';
+import { MentorSignup } from '../pages/MentorSignup';
 
-const ResetPasswordModal = () => {
+const ResetPsModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +16,7 @@ const ResetPasswordModal = () => {
     // Get token from URL parameters
     const params = new URLSearchParams(window.location.search);
     const resetToken = params.get('token');
-    
+
     if (resetToken) {
       setToken(resetToken);
       setIsOpen(true);
@@ -64,66 +67,74 @@ const ResetPasswordModal = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div className="modal show d-block auth authDiv" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Reset Password</h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+        <div className="modal-content bg-dark" style={{ boxShadow: '0 0 30px rgba(0, 0, 0, 0.7)' }}>
+          <div className="modal-header border-0 p-0">
+            <button
+              type="button"
+              className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
               onClick={() => {
                 setIsOpen(false);
                 navigate('/');
               }}
               aria-label="Close"
-            ></button>
+            />
           </div>
-          
-          <div className="modal-body">
-            <p className="text-muted mb-4">Enter your new password below</p>
-            
+
+          <div className="modal-body pt-0 p-4">
+            <h2 className="modal-title text-light text-center mt-5 mb-4">Reset Password</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <input
                   type="password"
-                  className="form-control"
+                  className={`form-control bg-dark text-light ${error ? 'is-invalid' : ''}`}
+                  style={{
+                    border: '1px solid #414549',
+                    padding: '12px'
+                  }}
                   placeholder="New Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
-              
+
               <div className="mb-3">
                 <input
                   type="password"
-                  className="form-control"
+                  className={`form-control bg-dark text-white ${error ? 'is-invalid' : ''}`}
+                  style={{
+                    border: '1px solid #414549',
+                    padding: '12px'
+                  }}
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
+                {error && (
+                  <div className="invalid-feedback">
+                    {error}
+                  </div>
+                )}
               </div>
-              
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
-              
-              <div className="modal-footer px-0 pb-0">
-                <button
+
+              {/* <div className="d-grid gap-2"> */}
+              <div className="text-center mt-5 mb-3">
+                <button type="submit" className="btn btn-secondary w-100 py-2">
+                  Reset Password
+                </button>
+                {/* <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-outline-secondary"
                   onClick={() => {
                     setIsOpen(false);
                     navigate('/');
                   }}
                 >
                   Cancel
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Reset Password
-                </button>
+                </button> */}
               </div>
             </form>
           </div>
@@ -133,4 +144,6 @@ const ResetPasswordModal = () => {
   );
 };
 
-export default ResetPasswordModal;
+export default ResetPsModal;
+
+// TODO: ADD EYE (TO SEE PS: ResetPsModal, LogIn, Signup)

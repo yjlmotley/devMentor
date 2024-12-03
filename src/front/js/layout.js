@@ -15,7 +15,7 @@ import { MentorSessionBoard } from "./pages/MentorSessionBoard";
 
 import { ForgotPassword } from "./pages/ForgotPassword.js";
 import { ResetPassword } from "./pages/ResetPassword.js";
-// import ResetPasswordModal from './component/ResetPasswordModal.js';
+// import ResetPsModal from './component/ResetPsModal.js';
 
 
 import { CustomerSignup } from "./pages/CustomerSignup.js";
@@ -39,10 +39,10 @@ const Layout = () => {
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     const { actions } = useContext(Context);
-    
+
     useEffect(() => {
         setInterval(() => {
             actions.getCurrentUser()
@@ -62,24 +62,24 @@ const Layout = () => {
                         <Route element={<MentorProfile />} path="/mentor-profile" />
                         <Route element={<MentorDashboard />} path="/mentor-dashboard" />
                         <Route element={<MentorSessionBoard />} path="/mentor-session-board" />
-                        
+
                         <Route element={<ForgotPassword />} path="/forgot-password" />
                         {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" /> */}
                         {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password/:userType" /> */}
-                        <Route element={<ResetPassword />} path="/reset-password"/>
+                        <Route element={<ResetPassword />} path="/reset-password" />
 
                         <Route element={<CustomerSignup />} path="/customer-signup" />
                         <Route element={<CustomerLogin />} path="/customer-login" />
                         <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<MentorList />} path="/mentor-list" />
-                        
+
                         <Route element={<CreateSession />} path="/create-session" />
-                        <Route  element={<CreateInstantSession />} path="/create-instant-session/:mentorId" />
+                        <Route element={<CreateInstantSession />} path="/create-instant-session/:mentorId" />
                         <Route element={<EditSession />} path="edit-session/:sessionId" />
 
                         <Route element={<PaymentsPayouts />} path="payments-and-payouts" />
 
-                        <Route 
+                        <Route
                             path="*"
                             element={
                                 <React.Fragment>
@@ -94,7 +94,7 @@ const Layout = () => {
                         />
                     </Routes>
                     {/* <Footer /> */}
-                    {/* <ResetPasswordModal /> */}
+                    {/* <ResetPsModal /> */}
                 </ScrollToTop>
             </BrowserRouter>
         </div>

@@ -5,33 +5,11 @@ import { ForgotPsModal } from './ForgotPsModal.js';
 import "../../styles/auth.css";
 
 
-// export const CustomerAuthModal = ({ initialTab = 'login', show, onHide }) => {
 export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showForgotPs, setShowForgotPs] = useState(false);
   const modalRef = useRef(null);
   const bsModalRef = useRef(null);
-
-  // useEffect(() => {
-  //   // Initialize modal when component mounts
-  //   if (modalRef.current && !bsModalRef.current && window.bootstrap) {
-  //     bsModalRef.current = new window.bootstrap.Modal(modalRef.current, {
-  //       keyboard: false,
-  //     });
-
-  //     // Add event listener for when modal is hidden
-  //     modalRef.current.addEventListener('hidden.bs.modal', () => {
-  //       if (onHide) onHide();
-  //     });
-  //   }
-
-  //   // Cleanup on unmount
-  //   return () => {
-  //     if (bsModalRef.current) {
-  //       bsModalRef.current.dispose();
-  //     }
-  //   };
-  // }, []);
 
   useEffect(() => {
     if (modalRef.current && window.bootstrap) {
@@ -42,9 +20,9 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
 
       modalRef.current.addEventListener('hidden.bs.modal', () => {
         if (onHide) onHide();
+        setShowForgotPs(false);
       });
 
-      // Show modal if needed
       if (show) {
         setActiveTab(initialTab);
         bsModalRef.current.show();
@@ -74,19 +52,20 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
     }
   }, [show, initialTab]);
 
-
-  const handleSignupSuccess = () => {
-    console.log('Signup success handler called');
-    setActiveTab('login');
-  };
+  useEffect(() => {
+    if (!showForgotPs) {  // When forgot password modal closes
+      setActiveTab('login');  // Switch to login tab
+    }
+  }, [showForgotPs]);
 
   const handleClose = () => {
+    if (bsModalRef.current) {
+      bsModalRef.current.hide();
+    }
+  };
+
+  const handleForgotPsReturn = () => {
     setShowForgotPs(false);
-    // if (bsModalRef.current) {
-    //   bsModalRef.current.hide();
-    // }
-    // if (onHide) onHide();
-    // onHide();
   };
 
   const handleSwitchLogin = () => {
@@ -110,7 +89,8 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
       aria-hidden="true"
       ref={modalRef}
     >
-      <div className="modal-dialog modal-dialog-centered">
+      {/* <div className="modal-dialog modal-dialog-centered"> */}
+      <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div
           className="modal-content bg-dark"
           style={{
@@ -144,11 +124,7 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
                 <button
                   type="button"
                   className="btn-close btn-close-white position-absolute top-0 end-0 m-1"
-                  onClick={() => {
-                    if (bsModalRef.current) {
-                      bsModalRef.current.hide();
-                    }
-                  }}
+                  onClick={handleClose}
                 />
               </div>
               <div className="modal-body p-4">
@@ -156,31 +132,20 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
                   <CustomerLogin
                     onSuccess={() => {
                       console.log('Login successful, rerouting to the customer dashboard page');
-                      if (bsModalRef.current) {
-                        bsModalRef.current.hide();
-                      }
+                      handleClose();
                     }}
                     switchToSignUp={handleSwitchSignUp}
                     onForgotPs={() => setShowForgotPs(true)}
                   />
                 ) : (
-                  <CustomerSignup onSuccess={handleSignupSuccess} switchToLogin={handleSwitchLogin} />
+                  <CustomerSignup switchToLogin={handleSwitchLogin} />
                 )}
               </div>
             </>
           ) : (
             <ForgotPsModal
-              // onClose={() => {
-              //   setShowForgotPs(false);
-              //   if (bsModalRef.current) {
-              //     bsModalRef.current.hide();
-              //   }
-              // }}
               onClose={handleClose}
-              onSuccess={() => {
-                setShowForgotPs(false);
-                setActiveTab('login');
-              }}
+              switchToLogin={handleForgotPsReturn}
             />
           )}
         </div>
