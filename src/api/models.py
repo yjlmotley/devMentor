@@ -165,9 +165,10 @@ class Session(db.Model):
             "mentor_id": self.mentor_id,
             "mentor_name": f"{self.mentor.first_name} {self.mentor.last_name}" if self.mentor else None,
             "mentor_photo_url": self.mentor.profile_photo.image_url if self.mentor else None, 
+            "mentor_price": str(self.mentor.price) if self.mentor and self.mentor.price else None,
             "messages": [ message.serialize() for message in self.messages ],
             "appointments": [
-            {"start_time": app["start_time"], "end_time": app["end_time"]} 
+            {"start_time": app["start_time"], "end_time": app["end_time"],  "meetingUrl": app.get("meetingUrl", None)} 
             for app in self.appointments
             ]
         }

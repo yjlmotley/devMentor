@@ -169,7 +169,7 @@ export const ValidateTitle = (title, setInvalidItems) => {
 };
 
 export const ValidateDescription = (description, setInvalidItems) => {
-    if (description.trim() === "" || description.length < 5 || description.length > 125) {
+    if (description.trim() === "" || description.length < 5 || description.length > 750) {
         setInvalidItems(prevInvalidItems => [...prevInvalidItems, "description"]);
         return false;
     }

@@ -18,6 +18,7 @@ export const CustomerDashboard = () => {
 		endTime: ""
 	});
 
+	// Token Check Auth or login
 	useEffect(() => {
 		actions.checkStorage();
 		if (!store.token) {
@@ -27,6 +28,7 @@ export const CustomerDashboard = () => {
 		}
 	}, [])
 
+	// Fetch All Customer Sessions
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
 		actions.getCustomerSessions();
@@ -53,6 +55,7 @@ export const CustomerDashboard = () => {
 		}
 	}, [location.search, activeSessionId]);
 
+	// Set Active Session For Google Meet Customized
 	useEffect(() => {
 		const storedSessionId = localStorage.getItem('pendingMeetingSessionId');
 		if (storedSessionId) {
@@ -61,6 +64,7 @@ export const CustomerDashboard = () => {
 			localStorage.removeItem('pendingMeetingSessionId');
 		}
 	}, []);
+
 
 	// Function to handle opening the Google Meet modal
 	const handleGoogleMeetClick = (sessionId) => {
@@ -123,7 +127,7 @@ export const CustomerDashboard = () => {
 
 		const success = await actions.confirmMentorForSession(sessionId, mentorId, startDateTime, endDateTime);
 		if (success) {
-			console.log("Mentor confirmed successfully");
+			alert("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
 			cleanupModal()
 			// Close the modal
@@ -169,6 +173,7 @@ export const CustomerDashboard = () => {
 	};
 
 	const renderSessionMessages = (session, isInGoogleMeet = false) => {
+
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
 			const mentorId = msg.mentor_id;
 			if (!acc[mentorId]) {
@@ -259,6 +264,10 @@ export const CustomerDashboard = () => {
 																</button>
 
 																{/* Only show Confirm Mentor button if not in Google Meet modal */}
+																{/* Confirm Mentor Modal Button */}
+																{/* Confirm Mentor Modal Button */}
+																{/* Confirm Mentor Modal Button */}
+
 																{!isInGoogleMeet && (
 																	<button
 																		type="button"
@@ -272,6 +281,9 @@ export const CustomerDashboard = () => {
 																)}
 
 																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
+																{/* Confirm Mentor Modal */}
+																{/* Confirm Mentor Modal */}
+																{/* Confirm Mentor Modal */}
 																{!isInGoogleMeet && (
 																	<div
 																		className="modal fade"
@@ -332,6 +344,9 @@ export const CustomerDashboard = () => {
 																	</div>
 
 																)}
+																{/* Confirm Mentor Modal End */}
+																{/* Confirm Mentor Modal End */}
+																{/* Confirm Mentor Modal End */}
 															</div>
 														</div>
 													</div>
@@ -352,222 +367,335 @@ export const CustomerDashboard = () => {
 
 	return (
 		<div className="sessions-dashboard">
-			<h1 className="text-center mt-5">Your Sessions</h1>
+			<h1 className="text-center mt-5">Welcome to the Student Dashboard</h1>
 			<div>
-				<h2>Accepted Sessions</h2>
-				<div className="open-sessions container">
-					<div className="row">
-						{acceptedSessions.map((session) => (
-							<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
-								<div className="session-card card h-100">
-									<img variant="top" className="card-img-top" src={session.mentor_photo_url} alt="Session" />
-									<div className="card-body">
-										<div className="row align-items-center justify-content-center">
-											<label className="col-auto"><strong>Session with:</strong></label>
-											<div className="col-auto sessionTitle">
-												<strong>{session.customer_name
-													.split(' ')
-													.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-													.join(' ')}</strong>
-											</div>
-										</div>
-
-										<div className="text-center">
-											<div className="sessionTitle"><h4>{session.title}</h4></div>
-										</div>
-										<div className="sessionDescription">{session.description}</div>
-										<div className="container-fluid justify-content-between d-flex">
-											<div className="row">
-												<div className="col-5 ">
-													<label ><strong>Duration:</strong></label>
-													<div>{session.duration + " Minutes"}</div>
-
-													<div className="text-secondary-emphasis rounded" >
-														<label><strong>Total Hours:</strong> {session.totalHours} </label>
-													</div>
-												</div>
-												<div className="col-7">
-													<div className="text-secondary-emphasis rounded" >
-														<div><strong>Date:</strong></div>
-														<div >{formatDate(session.appointments[0].start_time)}</div>
-													</div>
 
 
-													<div ><strong>Time:</strong></div>
-													<div >{formatTime(session.appointments[0].start_time) + "-" + formatTime(session.appointments[0].end_time)}</div>
+				<div className="card border-secondary shadow border-2" >
+					<div id="Header" className="card-header bg-light-subtle mb-5  " >
+						<h2>Accepted Sessions</h2>
+					</div>
+
+					<div className="open-sessions container mb-3 ">
+						<div className="row">
+							{acceptedSessions.map((session) => (
+								<div key={session.id} className="col-12 col-md-6 col-lg-4 mb-4">
+									<div className="session-card card h-100">
+										<img variant="top" className="card-img-top" src={session.mentor_photo_url} alt="Session" />
+										<div className="card-body">
+											<div className="row align-items-center justify-content-center">
+												<label className="col-auto"><strong>Session with:</strong></label>
+												<div className="col-auto sessionTitle">
+													<strong>{session.mentor_name
+														.split(' ')
+														.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+														.join(' ')}</strong>
 												</div>
 											</div>
-										</div>
 
-										<div className="row mt-3">
-											<div className="col text-center">
-
-												<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target={`#GoogleMeetModal${session.id}`}>
-													Launch Google Meet Now
-												</button>
-
-
-
+											<div className="text-center">
+												<div className="sessionTitle"><h4>{session.title}</h4></div>
 											</div>
+											<div className="sessionDescription">{session.description}</div>
 											<div className="container-fluid justify-content-between d-flex">
-												{/* MODAL FOR GOOGLEMEET */}
+												<div className="row">
+													<div className="col-5 ">
+														<label ><strong>Duration:</strong></label>
+														<div>{session.duration + " Minutes"}</div>
 
-												<div className="modal fade rounded-3xl shadow-2xl border-4 border-gray-300"
-													onClick={() => handleGoogleMeetClick(session.id)}
-													id={`GoogleMeetModal${session.id}`}
-													tabIndex="-1"
-													aria-labelledby={`GoogleMeetModal${session.id}`}
-													aria-hidden="true"
-												>
-													<div className="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-														<div className="modal-content rounded-3xl shadow-2xl border-4 border-gray-300">
-															<div className="modal-header">
-																<h1 className="modal-title fs-5 font-bold" id="exampleModalLabel">{`Meet with ${session.mentor_name
-																	.split(" ")
-																	.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-																	.join(" ")}`}</h1>
-																<button type="button" className="btn-close rounded-full p-2 hover:bg-gray-200 transition-colors" data-bs-dismiss="modal" aria-label="Close"></button>
-															</div>
-															<div className="modal-body">
-																<GoogleMeeting />
-																{renderSessionMessages(session, true)}
-															</div>
-															<div className="modal-footer">
-																<button
-																	type="button"
-																	data-bs-dismiss="modal"
-																	aria-label="Close"
-																	onClick={cleanupModal}
-																	className="btn rounded-full px-4 py-2 hover:bg-gray-200 transition-colors"
-																>
-																	Close
-																</button>
-																<button type="button" className="btn btn-primary rounded-full px-4 py-2">
-																	Save changes
-																</button>
+														<div className="text-secondary-emphasis rounded" >
+															<label><strong>Total Hours:</strong> {session.totalHours} </label>
+														</div>
+													</div>
+													<div className="col-7">
+														<div className="text-secondary-emphasis rounded" >
+															<div><strong>Date:</strong></div>
+															<div >{formatDate(session.appointments[0].start_time)}</div>
+														</div>
+
+
+														<div ><strong>Time:</strong></div>
+														<div >{formatTime(session.appointments[0].start_time) + "-" + formatTime(session.appointments[0].end_time)}</div>
+													</div>
+												</div>
+											</div>
+
+											<div className="row mt-3">
+												<div className="col text-center">
+
+													<button
+														type="button"
+														className="btn btn-primary"
+														data-bs-toggle="modal"
+														data-bs-target={`#GoogleMeetModal${session.id}`}
+														onClick={async () => {
+															const success = await actions.getMentorById(session.mentor_id);
+															if (!success) {
+																console.error("Failed to fetch mentor details");
+																// Optionally show an error message to the user
+															}
+														}}
+													>
+														Launch Google Meet Now
+													</button>
+
+
+
+												</div>
+												<div className="container-fluid justify-content-between d-flex">
+													{/* MODAL FOR GOOGLEMEET */}
+													{/* MODAL FOR GOOGLEMEET */}
+													{/* MODAL FOR GOOGLEMEET */}
+													{/* MODAL FOR GOOGLEMEET */}
+
+													<div className="modal fade"
+														onClick={() => handleGoogleMeetClick(session.id)}
+														id={`GoogleMeetModal${session.id}`}
+														tabIndex="-1"
+														aria-labelledby={`GoogleMeetModal${session.id}`}
+														aria-hidden="true"
+													>
+														<div className="modal-dialog modal-dialog-centered modal-xl">
+															<div className="modal-content">
+																<div className="modal-header bg-light-subtle">
+																	<h1 className="modal-title fs-5" id="exampleModalLabel">
+																		{`Meet with ${session.mentor_name
+																			.split(" ")
+																			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+																			.join(" ")}`}
+																	</h1>
+																	<h2>{session.mentor_id}</h2>
+																	<button
+																		type="button"
+																		className="btn-close"
+																		data-bs-dismiss="modal"
+																		aria-label="Close">
+																	</button>
+																</div>
+																<div className="modal-body">
+																	<div className="container-fluid">
+																		<div className="row">
+																			<div className="col-12">
+																				<GoogleMeeting
+																					mentor={store.selectedMentor}
+																					session={session}
+																				/>
+																				{renderSessionMessages(session, true)}
+																			</div>
+																		</div>
+																	</div>
+																</div>
+																<div className="modal-footer">
+																	<button
+																		type="button"
+																		className="btn btn-secondary"
+																		data-bs-dismiss="modal"
+																		onClick={cleanupModal}
+																	>
+																		Close
+																	</button>
+																	<button type="button" className="btn btn-primary">
+																		Save changes
+																	</button>
+																</div>
 															</div>
 														</div>
 													</div>
 												</div>
+												{/* MODAL FOR GOOGLEMEET END */}
+												{/* MODAL FOR GOOGLEMEET END */}
+												{/* MODAL FOR GOOGLEMEET END */}
+												{/* MODAL FOR GOOGLEMEET END */}
+
 											</div>
-											{/* MODAL FOR GOOGLEMEET END */}
 
 										</div>
-
 									</div>
 								</div>
-							</div>
-						))}
+							))}
+						</div>
 					</div>
 				</div>
 
 
-				<h2>Open Sessions</h2>
-				<table className="striped bordered hover">
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Description</th>
-							<th>Skills</th>
-							<th>Focus Areas</th>
-							<th>Resource Link</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{openSessions.map((session) => (
-							<React.Fragment key={session.id}>
-								<tr>
-									<td>{session.title}</td>
-									<td>{session.description}</td>
-									<td>{session.skills.join(', ')}</td>
-									<td>{session.focus_areas.join(', ')}</td>
-									<td>
-										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-											{session.resourceLink}
-										</a>
-									</td>
-									<td>
-										<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
-										<button className="btn btn-danger mt-2" onClick={() => handleDeleteSession(session.id)}>
-											Delete Session
-										</button>
-									</td>
-								</tr>
-								{renderSessionMessages(session)}
-							</React.Fragment>
-						))}
-					</tbody>
-				</table>
-				<h2>Draft Sessions</h2>
-				<table className="striped bordered hover">
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Description</th>
-							<th>Skills</th>
-							<th>Focus Areas</th>
-							<th>Resource Link</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{draftSessions.map((session) => (
-							<React.Fragment key={session.id}>
-								<tr>
-									<td>{session.title}</td>
-									<td>{session.description}</td>
-									<td>{session.skills.join(', ')}</td>
-									<td>{session.focus_areas.join(', ')}</td>
-									<td>
-										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-											{session.resourceLink}
-										</a>
-									</td>
-									<td>
-										<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm">Edit</Link>
-										<button className="btn btn-danger mt-2" onClick={() => handleDeleteSession(session.id)}>
-											Delete Session
-										</button>
-									</td>
-								</tr>
-								{renderSessionMessages(session)}
-							</React.Fragment>
-						))}
-					</tbody>
-				</table>
-				<h2>Past Sessions</h2>
-				<table className="striped bordered hover">
-					<thead>
-						<tr>
-							<th>Title</th>
-							<th>Description</th>
-							<th>Skills</th>
-							<th>Focus Areas</th>
-							<th>Resource Link</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody>
-						{pastSessions.map((session) => (
-							<React.Fragment key={session.id}>
-								<tr>
-									<td>{session.title}</td>
-									<td>{session.description}</td>
-									<td>{session.skills.join(', ')}</td>
-									<td>{session.focus_areas.join(', ')}</td>
-									<td>
-										<a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
-											{session.resourceLink}
-										</a>
-									</td>
+				<div className="card border-secondary shadow border-2 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+						<h2>Open Sessions</h2>
+					</div>
 
+					<div className="table-responsive">
+						<table className="table table-striped table-bordered table-hover">
+							<thead className="border-bottom">
+								<tr>
+									<th scope="col">Title</th>
+									<th scope="col">Description</th>
+									<th scope="col">Skills</th>
+									<th scope="col">Focus Areas</th>
+									<th scope="col">Resource Link</th>
+									<th scope="col">Actions</th>
 								</tr>
-								{renderSessionMessages(session)}
-							</React.Fragment>
-						))}
-					</tbody>
-				</table>
+							</thead>
+							<tbody>
+								{openSessions.map((session) => (
+									<React.Fragment key={session.id}>
+										<tr>
+											<td>{session.title}</td>
+											<td>{session.description}</td>
+											<td>{session.skills.join(', ')}</td>
+											<td>{session.focus_areas.join(', ')}</td>
+											<td>
+												<a
+													href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													aria-label={`Resource link for ${session.title}`}
+												>
+													{session.resourceLink}
+												</a>
+											</td>
+											<td>
+												<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm" aria-label={`Edit session ${session.title}`}>
+													Edit
+												</Link>
+												<button
+													className="btn btn-danger mt-2"
+													onClick={() => handleDeleteSession(session.id)}
+													aria-label={`Delete session ${session.title}`}
+												>
+													Delete Session
+												</button>
+											</td>
+										</tr>
+										{renderSessionMessages(session)}
+									</React.Fragment>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+
+				<div className="card border-secondary shadow border-2 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+						<h2>Draft Sessions</h2>
+					</div>
+					<div className="table-responsive">
+						<table className="table table-striped table-bordered table-hover">
+							<thead>
+								<tr>
+									<th scope="col">Title</th>
+									<th scope="col">Description</th>
+									<th scope="col">Skills</th>
+									<th scope="col">Focus Areas</th>
+									<th scope="col">Resource Link</th>
+									<th scope="col">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{draftSessions.map((session) => (
+									<React.Fragment key={session.id}>
+										<tr>
+											<td>{session.title}</td>
+											<td>{session.description}</td>
+											<td>{session.skills.join(', ')}</td>
+											<td>{session.focus_areas.join(', ')}</td>
+											<td>
+												<a
+													href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													aria-label={`Resource link for ${session.title}`}
+												>
+													{session.resourceLink}
+												</a>
+											</td>
+											<td>
+												<Link
+													to={`/edit-session/${session.id}`}
+													className="btn btn-primary btn-sm"
+													aria-label={`Edit session ${session.title}`}
+												>
+													Edit
+												</Link>
+												<button
+													className="btn btn-danger mt-2"
+													onClick={() => handleDeleteSession(session.id)}
+													aria-label={`Delete session ${session.title}`}
+												>
+													Delete Session
+												</button>
+											</td>
+										</tr>
+										{renderSessionMessages(session)}
+									</React.Fragment>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+
+
+				<div className="card border-secondary shadow border-2 mt-5">
+					<div id="header" className="card-header bg-light-subtle mb-5">
+						<h2>Past Sessions</h2>
+					</div>
+					<div className="table-responsive">
+						<table className="table table-striped table-bordered table-hover">
+							<thead>
+								<tr>
+									<th scope="col">Title</th>
+									<th scope="col">Description</th>
+									<th scope="col">Skills</th>
+									<th scope="col">Focus Areas</th>
+									<th scope="col">Resource Link</th>
+									<th scope="col">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{pastSessions.map((session) => (
+									<React.Fragment key={session.id}>
+										<tr>
+											<td>{session.title}</td>
+											<td>{session.description}</td>
+											<td>{session.skills.join(', ')}</td>
+											<td>{session.focus_areas.join(', ')}</td>
+											<td>
+												<a
+													href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													aria-label={`Resource link for ${session.title}`}
+												>
+													{session.resourceLink}
+												</a>
+											</td>
+											<td>
+												<Link
+													to={`/edit-session/${session.id}`}
+													className="btn btn-primary btn-sm"
+													aria-label={`Edit session ${session.title}`}
+												>
+													Edit
+												</Link>
+												<button
+													className="btn btn-danger btn-sm mt-2"
+													onClick={() => handleDeleteSession(session.id)}
+													aria-label={`Delete session ${session.title}`}
+												>
+													Delete Session
+												</button>
+											</td>
+										</tr>
+										{renderSessionMessages(session)}
+									</React.Fragment>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+
 			</div>
 		</div>
 	);

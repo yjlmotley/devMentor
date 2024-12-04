@@ -11,6 +11,7 @@ from flask_cors import CORS
 import jwt
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm.attributes import flag_modified
 
 import cloudinary.uploader as uploader
 from cloudinary.uploader import destroy
@@ -327,6 +328,14 @@ def all_mentors_no_sessions():
     for mentor in serialized_mentors:
         mentor.pop('confirmed_sessions', None)
     return jsonify(serialized_mentors), 200
+
+@api.route('/mentor/<int:mentor_id>', methods=['GET'])
+def get_mentor_by_id(mentor_id):
+    mentor = Mentor.query.get(mentor_id)
+    if mentor is None:
+        return jsonify({"msg": "No mentor found"}), 404
+    
+    return jsonify(mentor.serialize()), 200
 
 @api.route('/mentor', methods=['GET'])
 @mentor_required
@@ -779,6 +788,32 @@ def edit_session(session_id):
         "session": session.serialize()
     }
     return jsonify(response_body), 200
+
+@api.route('/session/complete/<int:session_id>', methods=['PUT'])
+def complete_session(session_id):
+    session = Session.query.get(session_id)
+    
+    if session is None:
+        return jsonify({"msg": "No session found"}), 404
+    
+    is_completed = request.json.get("is_completed")
+    
+    if is_completed is None:
+        return jsonify({"msg": "Missing field: is_completed"}), 400
+        
+    if not isinstance(is_completed, bool):
+        return jsonify({"msg": "is_completed must be a boolean value"}), 400
+    
+    session.is_completed = is_completed
+    
+    db.session.commit()
+    db.session.refresh(session)
+    
+    response_body = {
+        "msg": "Session completion status updated successfully!",
+        "session": session.serialize()
+    }
+    return jsonify(response_body), 200
     
 @api.route('/session/delete/<int:session_id>', methods =["DELETE"])
 def delete_session(session_id):
@@ -791,7 +826,7 @@ def delete_session(session_id):
     db.session.commit()
     return jsonify({"msg": "Session Sucessfully Deleted"}), 200
 
-@api.route('/sessions/customer', methods=['GET'])
+@api.route('/sessions/customer-sessions', methods=['GET'])
 @customer_required
 def get_sessions_by_customer_id():
     cust_id = get_jwt_identity()
@@ -861,7 +896,106 @@ def confirm_mentor_for_session(session_id, mentor_id):
         "session": session.serialize()
     }
     return jsonify(response_body), 200
+
+# @api.route('/session/<int:session_id>/appointment/meeting', methods=['PUT'])
+# @customer_required
+# def add_meeting_to_appointment(session_id):
+#     # Get data from request
+#     appointment_index = request.json.get("appointment_index")
+#     meeting_url = request.json.get("meetingUrl")
     
+#     # Validate required fields
+#     if None in [appointment_index, meeting_url]:
+#         return jsonify({"msg": "Missing required fields"}), 400
+    
+#     # Get the session and verify it exists
+#     session = Session.query.get(session_id)
+#     if session is None:
+#         return jsonify({"msg": "Session not found"}), 404
+        
+#     # Get customer from JWT and verify they own this session
+#     customer = Customer.query.get(get_jwt_identity())
+#     if customer is None or customer.id != session.customer_id:
+#         return jsonify({"msg": "You are not authorized for this session"}), 403
+        
+#     try:
+#         # Verify appointment exists at given index
+#         if appointment_index >= len(session.appointments):
+#             return jsonify({"msg": "Appointment index out of range"}), 404
+            
+#         # Update the appointment with meeting URL
+#         session.appointments[appointment_index]["meetingUrl"] = meeting_url
+        
+#         # Commit changes to database
+#         db.session.commit()
+        
+#         response_body = {
+#             "msg": "Meeting URL successfully added to appointment!",
+#             "appointment": session.appointments[appointment_index]
+#         }
+        
+#         return jsonify(response_body), 200
+        
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"msg": f"An error occurred: {str(e)}"}), 500
+    
+@api.route('/session/<int:session_id>/appointment/meeting', methods=['PUT'])
+@customer_required
+def add_meeting_to_appointment(session_id):
+    # Get data from request body
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "No JSON data provided"}), 400
+        
+    appointment_index = data.get("appointment_index")
+    meeting_url = data.get("meetingUrl")
+    
+    # Validate required fields
+    if appointment_index is None or meeting_url is None:
+        return jsonify({"msg": "Missing required fields. Need appointment_index and meetingUrl"}), 400
+    
+    # Get the session and verify it exists
+    session = Session.query.get(session_id)
+    if session is None:
+        return jsonify({"msg": "Session not found"}), 404
+        
+    # Get customer from JWT and verify they own this session
+    customer = Customer.query.get(get_jwt_identity())
+    if customer is None or customer.id != session.customer_id:
+        return jsonify({"msg": "You are not authorized for this session"}), 403
+        
+    try:
+        # Verify appointment exists at given index
+        if appointment_index >= len(session.appointments):
+            return jsonify({"msg": "Appointment index out of range"}), 404
+            
+        # Create a new list with the updated appointment
+        updated_appointments = session.appointments.copy()
+        updated_appointments[appointment_index] = {
+            **updated_appointments[appointment_index],
+            "meetingUrl": meeting_url
+        }
+        
+        # Assign the new list to trigger the mutation tracking
+        session.appointments = updated_appointments
+        
+        # Flag the field as modified
+        flag_modified(session, "appointments")
+        
+        # Commit changes to database
+        db.session.commit()
+        
+        response_body = {
+            "msg": "Meeting URL successfully added to appointment!",
+            "appointment": session.appointments[appointment_index]
+        }
+        
+        return jsonify(response_body), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"An error occurred: {str(e)}"}), 500
 
 # Message routes Start # Message routes Start # Message routes Start
 # Message routes Start # Message routes Start # Message routes Start
