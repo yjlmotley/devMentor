@@ -12,12 +12,15 @@ import "../../styles/mentorProfile.css";
 
 import ProfilePhoto from "../component/ProfilePhoto";
 import PortfolioImage from "../component/PortfolioImage";
+import { ChangePsModal } from "../auth/ChangePsModal";
 
 
 export const MentorProfile = () => {
 	const { actions } = useContext(Context);
+	const [showChangePsModal, setShowChangePsModal] = useState(false);
 	const [editMode, setEditMode] = useState(false);
 	const [originalMentor, setOriginalMentor] = useState({});
+	const [selectedCountry, setSelectedCountry] = useState();
 	const [invalidItems, setInvalidItems] = useState([]);
 	const [phoneError, setPhoneError] = useState('');
 	const [CharacterCount, setCharacterCount] = useState(0);
@@ -124,7 +127,6 @@ export const MentorProfile = () => {
 	}
 
 
-	const [selectedCountry, setSelectedCountry] = useState();
 	const handlePhoneChange = (value, countryData) => {
 		const phoneValidation = ValidatePhoneNumber(value, countryData.countryCode);
 		setSelectedCountry(countryData.countryCode);
@@ -192,6 +194,10 @@ export const MentorProfile = () => {
 		} else {
 			alert('Failed to reactivate account');
 		}
+	}
+
+	const handleShowChangePsModal = () => {
+		setShowChangePsModal(true);
 	}
 
 	const handleSubmit = async (e) => {
@@ -506,7 +512,12 @@ export const MentorProfile = () => {
 							)}
 						</dd>
 					</dl>
-					<Link to="/forgot-password">Change My Password</Link>
+					<button
+						className="btn btn-light"
+						onClick={handleShowChangePsModal}
+					>
+						Change Password
+					</button>
 				</div>
 			</div>
 
@@ -531,8 +542,12 @@ export const MentorProfile = () => {
 				)}
 			</div>
 
+			{showChangePsModal && (
+				<ChangePsModal
+					show={showChangePsModal}
+					onHide={() => setShowChangePsModal(false)}
+				/>
+			)}
 		</div>
-
-
 	);
 };

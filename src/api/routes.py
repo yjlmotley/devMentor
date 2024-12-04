@@ -73,9 +73,13 @@ def mentor_signup():
 
     if email is None or password is None or first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
-    mentor = Mentor.query.filter_by(email=email).one_or_none()
-    if mentor:
+    existingMentorEmail = Mentor.query.filter_by(email=email).one_or_none()
+    if existingMentorEmail:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
+    existingMentorPhone = Mentor.query.filter_by(phone=phone).one_or_none()
+    if existingMentorPhone:
+        return jsonify({"msg": "An account associated with this number already exists. Please try a different phone number."}), 409
+
     mentor = Mentor(
         email=email, 
         password=generate_password_hash(password), 
@@ -113,15 +117,39 @@ def mentor_login():
     access_token = create_access_token(
         identity=mentor.id, 
         additional_claims={"role": "mentor"},
-        expires_delta=timedelta(hours=3)
     )
-    return jsonify(access_token=access_token), 200
+    return jsonify({
+        "access_token":access_token,
+        "mentor_id": mentor.id,
+        "mentor_data": mentor.serialize()
+    }), 200
+
+# @api.route("/forgot-password", methods=["POST"])
+# def forgot_password():
+#     data=request.json
+#     email=data.get("email")
+#     # want to get user type in the same fashion as email
+#     if not email:
+#         return jsonify({"message": "Email is required"}), 400
+    
+#     user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+#     if user is None:
+#         return jsonify({"message": "Email does not exist"}), 400
+    
+#     expiration_time = datetime.utcnow() + timedelta(hours=1)
+#     token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
+
+#     # /?userType = {usertype} in the email value
+#     # email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
+#     email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/?token={token}"
+#     send_email(email, email_value, "Subject: Password recovery for devMentor")
+#     return jsonify({"message": "Recovery password email has been sent!"}), 200
 
 @api.route("/forgot-password", methods=["POST"])
 def forgot_password():
-    data=request.json
-    email=data.get("email")
-    # want to get user type in the same fashion as email
+    data = request.json
+    email = data.get("email")
+    
     if not email:
         return jsonify({"message": "Email is required"}), 400
     
@@ -132,10 +160,80 @@ def forgot_password():
     expiration_time = datetime.utcnow() + timedelta(hours=3)
     token = jwt.encode({"email": email, "exp": expiration_time}, os.getenv("FLASK_APP_KEY"), algorithm="HS256")
 
-    # /?userType = {usertype} in the email value
-    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset-password?token={token}"
-    send_email(email, email_value, "Subject: Password recovery for devMentor")
+    reset_link = f"{os.getenv('FRONTEND_URL')}/?token={token}"
+    
+    email_html = f"""
+    <html>
+    <body style="color: #333;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Password Reset Request</h2>
+            <p>Hello {user.first_name},</p>
+            <p>We received a request to reset your password for your devMentor account. If you didn't make this request, you can safely ignore this email.</p>
+            <p>To reset your password, please click the button below:</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{reset_link}" 
+                   style="background-color: #4CAF50; 
+                          color: white; 
+                          padding: 12px 24px; 
+                          text-decoration: none; 
+                          border-radius: 4px; 
+                          display: inline-block;">
+                    Reset Password
+                </a>
+            </div>
+            <p>This link will expire in 1 hour for security reasons.</p>
+            <p>If you're having trouble clicking the button, you can also copy and paste the link from the button into your browser.</p>
+            <p style="margin-top: 30px; color: #666; font-size: 12px;">
+                Best regards,<br>
+                The devMentor Team
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    send_email(email, email_html, "Password Reset Request: devMentor")
     return jsonify({"message": "Recovery password email has been sent!"}), 200
+
+# @api.route("/reset-password/<token>", methods=["PUT"])
+# def reset_password(token):
+#     data = request.get_json()
+#     password = data.get("password")
+
+#     if not password:
+#         return jsonify({"message": "Please provide a new password."}), 400
+
+#     try:
+#         decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
+#         email = decoded_token.get("email")
+#     # except Exception as e:
+#     #     return jsonify({"message": "Invalid or expired token."}), 400
+#     except jwt.ExpiredSignatureError:
+#         return jsonify({"message": "Token has expired"}), 400
+#     except jwt.InvalidTokenError:
+#         return jsonify({"message": "Invalid token"}), 400
+
+#     # email = json_secret.get('email')
+#     # if not email:
+#     #     return jsonify({"message": "Invalid token data."}), 400
+
+#     mentor = Mentor.query.filter_by(email=email).first()
+#     customer = Customer.query.filter_by(email=email).first()
+
+#     user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
+#     if not user:
+#         return jsonify({"message": "Email does not exist"}), 400
+
+#     # user.password = hashlib.sha256(password.encode()).hexdigest()
+#     user.password = generate_password_hash(password)
+#     db.session.commit()
+
+#     send_email(email, "Your password has been changed successfully.", "Password Change Notification")
+
+#     return jsonify({
+#         "message": "Password successfully changed.", 
+#         "role": "mentor" if mentor else "customer" if customer else None
+#     }), 200
 
 @api.route("/reset-password/<token>", methods=["PUT"])
 def reset_password(token):
@@ -148,33 +246,43 @@ def reset_password(token):
     try:
         decoded_token = jwt.decode(token, os.getenv("FLASK_APP_KEY"), algorithms=["HS256"])
         email = decoded_token.get("email")
-    # except Exception as e:
-    #     return jsonify({"message": "Invalid or expired token."}), 400
     except jwt.ExpiredSignatureError:
         return jsonify({"message": "Token has expired"}), 400
     except jwt.InvalidTokenError:
         return jsonify({"message": "Invalid token"}), 400
 
-    # email = json_secret.get('email')
-    # if not email:
-    #     return jsonify({"message": "Invalid token data."}), 400
-
+    # Query both tables
     mentor = Mentor.query.filter_by(email=email).first()
     customer = Customer.query.filter_by(email=email).first()
 
-    user = Mentor.query.filter_by(email=email).first() or Customer.query.filter_by(email=email).first()
-    if not user:
+    # Check if email exists in either table
+    if not mentor and not customer:
         return jsonify({"message": "Email does not exist"}), 400
 
-    # user.password = hashlib.sha256(password.encode()).hexdigest()
-    user.password = generate_password_hash(password)
+    # Generate hashed password once
+    hashed_password = generate_password_hash(password)
+
+    # Update password in relevant table(s)
+    if mentor:
+        mentor.password = hashed_password
+    if customer:
+        customer.password = hashed_password
+
     db.session.commit()
+
+    # Determine roles for response
+    roles = []
+    if mentor:
+        roles.append("mentor")
+    if customer:
+        roles.append("customer")
 
     send_email(email, "Your password has been changed successfully.", "Password Change Notification")
 
     return jsonify({
         "message": "Password successfully changed.", 
-        "role": "mentor" if mentor else "customer" if customer else None
+        "roles": roles,
+        "email": email
     }), 200
 
 
@@ -436,48 +544,60 @@ def all_customers():
     
 #     return jsonify(customer.serialize()), 200
 
+@api.route('/customer/signup', methods=['POST'])
+def customer_signup():
+   
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    first_name = request.json.get("first_name", None)
+    last_name = request.json.get("last_name", None)
+    phone = request.json.get("phone", None)
+    
+    
+    if first_name is None or last_name is None  or phone is None or email is None or password is None:
+        return jsonify({"msg": "Some fields are missing in your request"}), 400
+    existingCustomerEmail = Customer.query.filter_by(email=email).one_or_none()
+    if existingCustomerEmail:
+        return jsonify({"msg": "An account associated with the email already exists"}), 409
+    existingCustomerPhone = Customer.query.filter_by(phone=phone).one_or_none()
+    if existingCustomerPhone:
+        return jsonify({"msg": "An account associated with this phone number already exists. Please try a different phone number."}), 409
+    
+    customer = Customer(
+        email=email, 
+        password=generate_password_hash(password),
+        first_name=first_name, 
+        last_name=last_name, 
+        phone=phone,
+    ) 
+    db.session.add(customer)
+    db.session.commit()
+    db.session.refresh(customer)
+    response_body = {"msg": "Account succesfully created!", "customer":customer.serialize()}
+    return jsonify(response_body), 201
+
 @api.route('/customer/login', methods=['POST'])
 def customer_login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     if email is None or password is None:
         return jsonify({"msg": "No email or password"}), 400
+    
     customer = Customer.query.filter_by(email=email).one_or_none()
     if customer is None:
         return jsonify({"msg": "no such user"}), 404
-    if customer.password != password:
+    if not check_password_hash(customer.password, password):
         return jsonify({"msg": "Bad email or password"}), 401
 
     access_token = create_access_token(
         identity=customer.id,
         additional_claims = {"role": "customer"} 
         )
-    return jsonify(access_token=access_token), 201
-
-@api.route('/customer/signup', methods=['POST'])
-def customer_signup():
-   
-    first_name = request.json.get("first_name", None)
-    last_name = request.json.get("last_name", None)
-    city = request.json.get("city", None)
-    what_state = request.json.get("what_state",None)
-    country = request.json.get("country",None)
-    phone = request.json.get("phone", None)
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    
-    
-    if first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None or email is None or password is None:
-        return jsonify({"msg": "Some fields are missing in your request"}), 400
-    customer = Customer.query.filter_by(email=email).one_or_none()
-    if customer:
-        return jsonify({"msg": "An account associated with the email already exists"}), 409
-    customer = Customer(first_name=first_name, last_name=last_name, city=city, what_state=what_state, country=country, phone=phone, email=email, password=password)
-    db.session.add(customer)
-    db.session.commit()
-    db.session.refresh(customer)
-    response_body = {"msg": "Account succesfully created!", "customer":customer.serialize()}
-    return jsonify(response_body), 201
+    return jsonify({
+        "access_token":access_token,
+        "customer_id": customer.id,
+        "customer_data": customer.serialize()
+    }), 201
 
 @api.route('/customer/edit-self', methods=['PUT'])
 @customer_required

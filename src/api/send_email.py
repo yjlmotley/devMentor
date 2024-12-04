@@ -13,12 +13,13 @@ def send_email(recipient, body, subject):
     try: 
         with smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT) as server:
             server.login(MAIL_USERNAME, MAIL_PASSWORD)
-            smg = EmailMessage()
-            smg["Subject"] = subject
-            smg["From"] = MAIL_USERNAME
-            smg["To"] = recipient
-            smg.set_content(body)
-            server.send_message(smg)
+            msg = EmailMessage()
+            msg["Subject"] = subject
+            msg["From"] = MAIL_USERNAME
+            msg["To"] = recipient
+            # msg.set_content(body)
+            msg.add_alternative(body, subtype='html')
+            server.send_message(msg)
     except smtplib.SMTPException as e: 
         #log the exception e
         raise Exception(f"failed to send email: {str(e)}")

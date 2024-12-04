@@ -1,0 +1,283 @@
+/* Base auth modal styling */
+.auth .btn-close {
+    transform: scale(0.8) !important;
+    z-index: 1;
+}
+
+.auth .vr {
+    opacity: 0.3;
+}
+
+.auth .modal-dialog {
+    max-width: 450px;
+}
+
+/* Form styling */
+.authDiv input {
+    text-align: center;
+}
+
+.authDiv .form-control {
+    transition: border-color 0.3s ease;
+}
+
+/* for when the input fields are active (user typing...) */
+.authDiv .form-control:focus {
+    background-color: #2b2b2b !important;
+    border-color: #6c757d !important;
+    box-shadow: none !important;
+    color: white !important;
+}
+
+.authDiv .form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Button styling */
+.authDiv .btn-secondary:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.authDiv .btn-secondary:active,
+.authDiv .btn-secondary:focus:active,
+.authDiv .btn-secondary.active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    background-color: #4a4f54 !important;
+}
+
+.authDiv .btn-secondary:focus {
+    background-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Link styling */
+.authDiv .auth-link {
+    text-decoration: underline !important;
+}
+
+.authDiv .auth-link:hover {
+    color: #b8b8b8 !important;
+    text-decoration: underline !important;
+    cursor: pointer;
+}
+
+/* Tab styling */
+.auth .auth-tab {
+    position: relative;
+    border-bottom: 1px solid #464646 !important;
+    background-color: transparent;
+}
+
+.auth .login-tab {
+    margin-left: 1rem !important;
+}
+
+.auth .signup-tab {
+    margin-right: 1rem !important;
+}
+
+.auth .auth-tab.active {
+    border-bottom: 2px solid #6c757d !important;
+    margin-bottom: -1px;
+}
+
+.auth .auth-tab::after {
+    display: none !important;
+}
+
+
+/* Phone input styling - flag button and dropdown */
+/* Phone input styling - flag button and dropdown */
+/* Phone input styling - flag button and dropdown */
+.authDiv .react-tel-input .selected-flag {
+    background-color: #212529 !important;
+    /* border: 1px solid #414549; */
+    border: 1px solid #212529;
+    transition: border-color 0.3s ease;
+}
+
+.authDiv .react-tel-input .selected-flag:hover,
+.authDiv .react-tel-input .selected-flag:focus,
+.authDiv .react-tel-input .selected-flag:active {
+    background-color: #2b2b2b !important;
+    border-color: #6c757d;
+}
+
+/* When flag dropdown is open */
+.authDiv .react-tel-input .selected-flag.open {
+    background-color: #2b2b2b !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 3px !important;
+}
+
+/* Hover state for country options */
+.authDiv .react-tel-input .country-list .country:hover,
+.authDiv .react-tel-input .country-list .country.highlight {
+    background-color: #1e2225 !important;
+}
+
+
+/* React-select custom styling for auth pages */
+/* React-select custom styling for auth pages */
+/* React-select custom styling for auth pages */
+/* React-select custom styling for auth pages */
+
+/* this one below controls react select/creatable select border color styling */
+.authDiv .basic-single-select .select__control {
+    min-height: 50px;
+    background-color: #212529;
+    border-color: #414549;
+    text-align: center;
+}
+
+/* for when react select/creatable select is active (user typing...) */
+.authDiv .basic-single-select .select__control--is-focused {
+    border-color: #6c757d !important;
+    background-color: #2b2b2b;
+    box-shadow: none !important;
+}
+
+.authDiv .basic-single-select.is-invalid .select__control {
+    border-color: red !important;
+}
+
+/* value of react selects */
+.authDiv .basic-single-select .select__single-value {
+    color: white;
+    text-align: center;
+    width: 100%;
+}
+
+/* react creatable select when user is typing */
+.authDiv .basic-single-select .select__input-container {
+    color: white;
+    text-align: center;
+    width: 100%;
+}
+
+/* react selects placeholder */
+.authDiv .basic-single-select .select__placeholder {
+    color: #6c757d;
+    text-align: center;
+    width: 100%;
+}
+
+/* Style for the REACT SELECTS dropdown menu */
+/* Style for the REACT SELECTS dropdown menu */
+/* Style for the REACT SELECTS dropdown menu */
+
+/* react selects dropdown div */
+.authDiv .basic-single-select .select__menu {
+    background-color: #2b2b2b;
+    border: 1px solid #6c757d;
+}
+
+/* react selects li */
+.authDiv .basic-single-select .select__option {
+    background-color: #2b2b2b;
+    /* color: #6c757d; */
+    color: #a8a8a8;
+    text-align: center;
+}
+
+/* react selects li hover */
+.authDiv .basic-single-select .select__option--is-focused {
+    /* background-color: #212529; */
+    background-color: #1e2225;
+}
+
+/* Center the content inside the select - not needed rn but good to have just in case */
+/* .authDiv .basic-single-select .select__value-container {
+    justify-content: end;
+    padding: 2px 0;
+} */
+
+
+/* Error message styling */
+/* Error message styling */
+/* Error message styling */
+/* Error message styling */
+.authDiv .invalid-feedback {
+    text-align: left !important;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+    color: #dc3545;
+}
+
+/* Input field with error styling */
+.authDiv .form-control.is-invalid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem 1rem;
+    padding-right: 2.5rem !important;
+}
+
+/* Phone input specific error styling */
+.authDiv .react-tel-input .form-control.is-invalid {
+    background-position: calc(100% - 50px) end;
+}
+
+/* Autofill styling */
+/* Autofill styling */
+/* Autofill styling */
+/* Autofill styling */
+
+.authDiv input:-webkit-autofill,
+.authDiv input:-webkit-autofill:hover,
+.authDiv input:-webkit-autofill:focus,
+.authDiv input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #17191b inset !important;
+    -webkit-text-fill-color: #686868 !important;
+    transition: background-color 5000s ease-in-out 0s;
+    caret-color: white;
+}
+
+/* For Firefox */
+.authDiv input:autofill {
+    background-color: #17191b !important;
+    /* color: white !important; */
+    color: #686868 !important;
+    box-shadow: 0 0 0 30px #cecece inset !important;
+}
+
+/* For Edge */
+/* .authDiv input:-internal-autofill-selected { */
+.authDiv input:-internal-autofill-selected {
+    background-color: #17191b !important;
+    color: #686868 !important;
+}
+
+
+/* Scrollbar styling */
+/* Scrollbar styling */
+/* Scrollbar styling */
+/* Scrollbar styling */
+/* Scrollbar styling */
+.auth ::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.auth ::-webkit-scrollbar-track {
+    background: #2b2b2b !important;
+    border-radius: 4px !important;
+}
+
+.auth ::-webkit-scrollbar-thumb {
+    background: #6c757d !important;
+    border-radius: 4px !important;
+    cursor: grab !important;
+}
+
+.auth ::-webkit-scrollbar-thumb:hover {
+    background: #5a6268 !important;
+    cursor: grab !important;
+}
+
+.auth ::-webkit-scrollbar-thumb:active {
+    cursor: grabbing !important;
+}

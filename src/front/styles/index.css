@@ -1,8 +1,8 @@
-.authDiv input {
-    text-align: center;
-}
-
 input.form-control.disabled.border-0 {
     /* this is for the Mentor Profile's phone input view */
     background-color: transparent;
+}
+
+.small-font {
+    font-size: small;
 }

@@ -18,9 +18,6 @@ class Customer(db.Model):
     phone = db.Column(db.String(30), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(256), unique=False, nullable=False)
-    city = db.Column(db.String(30), unique=False, nullable=False)
-    what_state = db.Column(db.String(30), unique=False, nullable=False)
-    country = db.Column(db.String(30), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False,)
     last_active = db.Column(db.DateTime(timezone=True), unique=False)
     date_joined = db.Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
@@ -37,9 +34,6 @@ class Customer(db.Model):
             "id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "city": self.city,
-            "what_state": self.what_state,
-            "country": self.country,
             "phone": self.phone,
             "email": self.email,
             "is_active": self.is_active,

@@ -1,6 +1,7 @@
 
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
+import ResetPsModal from '../auth/ResetPsModal.js';
 import "../../styles/home.css";
 
 
@@ -110,6 +111,7 @@ export const Home = () => {
           </div>
         </div>
       </section>
+      <ResetPsModal />
     </div>
   );
 };

@@ -22,8 +22,9 @@ export const CustomerDashboard = () => {
 	useEffect(() => {
 		actions.checkStorage();
 		if (!store.token) {
-			navigate("/customer-login")
-
+			// navigate("/customer-login")
+			alert("Please log in again.");
+			navigate("/");
 		}
 	}, [])
 
@@ -475,10 +476,10 @@ export const CustomerDashboard = () => {
 																	<div className="container-fluid">
 																		<div className="row">
 																			<div className="col-12">
-																				<GoogleMeeting 
-																					mentor={store.selectedMentor} 
+																				<GoogleMeeting
+																					mentor={store.selectedMentor}
 																					session={session}
-																					/>
+																				/>
 																				{renderSessionMessages(session, true)}
 																			</div>
 																		</div>

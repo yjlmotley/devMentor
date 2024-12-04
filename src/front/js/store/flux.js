@@ -2,53 +2,63 @@
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
-            isMentorLoggedIn: false,
-            isCustomerLoggedIn: false,
+            isMentorLoggedIn: sessionStorage.getItem("isMentorLoggedIn") === "true" || false,
+            isCustomerLoggedIn: sessionStorage.getItem("isCustomerLoggedIn") === "true" || false,
             mentors: [],
             mentor: null,
             selectedSession: null,
-            currentUserData: null,
+            currentUserData: JSON.parse(sessionStorage.getItem("currentUserData")) || null,
             sessionRequests: [],
-            customerId: undefined,
-            mentorId: undefined,
+            customerId: sessionStorage.getItem("customerId") || null,
+            mentorId: sessionStorage.getItem("mentorId") || null,
             customerSessions: [],
             messages: [],
-            token: sessionStorage.getItem("token"),
+            token: sessionStorage.getItem("token") || null,
             // sessionStorageChecked: !!sessionStorage.getItem("token")
         },
 
         actions: {
 
             getCurrentUser: async () => {
-                const response = await fetch(`${process.env.BACKEND_URL}/api/current/user`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + sessionStorage.getItem('token')
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/current/user`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + sessionStorage.getItem('token')
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        // console.log("userdata from token", data);
+                        if (data.role == "mentor") {
+                            setStore({
+                                isMentorLoggedIn: true,
+                                currentUserData: data,
+                                mentorId: data.user_data.id
+                            });
+                            return true;
+                        }
+                        if (data.role == "customer") {
+                            setStore({
+                                isCustomerLoggedIn: true,
+                                currentUserData: data,
+                                customerId: data.user_data.id
+                            });
+                            return true;
+                        }
+                    } else {
+                        console.error("get current user status:", response.status);
+                        getActions().logOut();
+                        alert("Your login token has expired. Please log in again to continue.");
+                        return false;
                     }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("userdata from token", data);
-                    if (data.role == "mentor") {
-                        setStore({
-                            isMentorLoggedIn: true,
-                            currentUserData: data,
-                            mentorId: data.user_data.id
-                        })
-                        return true
-                    }
-                    if (data.role == "customer") {
-                        setStore({
-                            isCustomerLoggedIn: true,
-                            currentUserData: data
-                        })
-                        return true
-                    }
-                } else {
-                    console.error("Login failed with status:", response.status);
-                    getActions().logOut()
-                    return false
+                } catch (error) {
+                    console.error("Failed to fetch current user:", error);
+                    getActions().logOut();
+                    // alert("Connection error. Please check your internet connection. Otherwise, our server is down at the moment. Please try again at another time.");
+                    alert("Token has expired. Please log in again to continue.");
+                    return false;
                 }
             },
             checkStorage: () => {
@@ -62,45 +72,81 @@ const getState = ({ getStore, getActions, setStore }) => {
             checkStorageMentor: () => {
                 const token = sessionStorage.getItem("token", undefined)
                 const mentor_id = sessionStorage.getItem("mentorId", undefined)
+                const currentUserData = JSON.parse(sessionStorage.getItem("currentUserData"));
                 setStore({
                     token: token,
                     mentorId: mentor_id,
+                    currentUserData: currentUserData,
+                    isMentorLoggedIn: !!token // set to true if token exists
                 });
             },
 
             signUpMentor: async (mentor) => {
-                const response = await fetch(
-                    process.env.BACKEND_URL + "/api/mentor/signup", {
-                    method: "POST",
-                    body: JSON.stringify({ first_name: mentor.first_name, email: mentor.email, password: mentor.password, last_name: mentor.last_name, city: mentor.city, what_state: mentor.what_state, country: mentor.country, phone: mentor.phone }),
-                    headers: {
-                        "Content-Type": "application/json"
+                try {
+                    const response = await fetch(
+                        process.env.BACKEND_URL + "/api/mentor/signup", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            first_name: mentor.first_name,
+                            email: mentor.email.toLowerCase(),
+                            password: mentor.password,
+                            last_name: mentor.last_name,
+                            city: mentor.city,
+                            what_state: mentor.what_state,
+                            country: mentor.country,
+                            phone: mentor.phone
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    const responseBody = await response.json();
+
+                    if (response.status === 201) {
+                        console.log(responseBody);
+                        return {
+                            success: true,
+                            message: responseBody.msg || "Account successfully created! Please log in."
+                        };
+                    } else {
+                        return {
+                            message: false,
+                            message: responseBody.msg || "An error occurred during sign up."
+                        };
                     }
-                });
-                if (response.status !== 201) return false;
+                } catch (error) {
+                    console.error("Signup error:, error");
+                    return {
+                        success: false,
+                        message: "An unexpected error occured. Please try again later."
+                    }
+                }
 
-                const responseBody = await response.json();
-                console.log(responseBody)
-
-                return true;
             },
             logInMentor: async (mentor) => {
                 const response = await fetch(process.env.BACKEND_URL + "/api/mentor/login", {
                     method: "POST",
-                    body: JSON.stringify({ email: mentor.email, password: mentor.password }),
+                    body: JSON.stringify({
+                        email: mentor.email.toLowerCase(),
+                        password: mentor.password
+                    }),
                     headers: {
                         "Content-Type": "application/json"
                     }
                 });
                 if (response.status !== 200) return false;
 
-                const responseBody = await response.json();
+                const data = await response.json();
                 setStore({
-                    token: responseBody.access_token,
-                    isMentorLoggedIn: true
+                    token: data.access_token,
+                    isMentorLoggedIn: true,
+                    mentorId: data.mentor_id,
+                    currentUserData: data.mentor_data,
                 });
-                sessionStorage.setItem("token", responseBody.access_token);
-
+                sessionStorage.setItem("token", data.access_token);
+                sessionStorage.setItem("isMentorLoggedIn", true);
+                sessionStorage.setItem("mentorId", data.mentor_id);
+                sessionStorage.setItem("currentUserData", JSON.stringify(data.mentor_data));
                 return true;
             },
 
@@ -114,7 +160,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
 
                 const response = await fetch(`${process.env.BACKEND_URL}/api/mentorsnosession`, {
-                    method:"GET",
+                    method: "GET",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
@@ -122,7 +168,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 })
                 if (response.ok) {
                     const data = await response.json();
-                    setStore({...store, mentors: data});
+                    setStore({ ...store, mentors: data });
                     return true;
                 } else {
                     console.error("Failed to fetch all Mentors:", response.status)
@@ -153,7 +199,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
 
                     const data = await response.json();
-                    
+
                     // Update both mentor and selectedMentor in the store
                     setStore({
                         ...store,
@@ -244,16 +290,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             logOut: () => {
-                if (getStore().isMentorLoggedIn) {
-                    window.location.href = process.env.FRONTEND_URL + "/mentor-login"
-                }
-                if (getStore().isCustomerLoggedIn) {
-                    window.location.href = process.env.FRONTEND_URL + "/customer-login"
-                }
+                // if (getStore().isMentorLoggedIn) {
+                //     window.location.href = process.env.FRONTEND_URL + "/mentor-login"
+                // }
+                // if (getStore().isCustomerLoggedIn) {
+                //     window.location.href = process.env.FRONTEND_URL + "/customer-login"
+                // }
 
                 setStore({
                     token: undefined,
                     customerId: undefined,
+                    mentorId: undefined,
                     isMentorLoggedIn: false,
                     isCustomerLoggedIn: false,
                     currentUserData: null
@@ -269,26 +316,50 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             signUpCustomer: async (customer) => {
-                const response = await fetch(
-                    process.env.BACKEND_URL + "/api/customer/signup", {
-                    method: "POST",
-                    body: JSON.stringify({ first_name: customer.first_name, last_name: customer.last_name, phone: customer.phone, email: customer.email, password: customer.password, city: customer.city, what_state: customer.what_state, country: customer.country }),
-                    headers: {
-                        "Content-Type": "application/json"
+                try {
+                    const response = await fetch(
+                        process.env.BACKEND_URL + "/api/customer/signup", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            first_name: customer.first_name,
+                            last_name: customer.last_name,
+                            phone: customer.phone,
+                            email: customer.email.toLowerCase(),
+                            password: customer.password
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    const responseBody = await response.json();
+
+                    if (response.status == 201) {
+                        return {
+                            success: true,
+                            message: responseBody.msg || "Account successfully created! Please log in."
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            message: responseBody.msg || "An error occurred during signup"
+                        };
                     }
-                });
-                if (response.status !== 201) return false;
-
-                const responseBody = await response.json();
-                console.log(responseBody)
-
-                return true;
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    return {
+                        success: false,
+                        message: "An unexpected error occurred. Please try again later."
+                    }
+                }
             },
 
-            logInCustomer: async (customerCredentials) => {
+            logInCustomer: async (customer) => {
                 const response = await fetch(`${process.env.BACKEND_URL}/api/customer/login`, {
                     method: "POST",
-                    body: JSON.stringify(customerCredentials),
+                    body: JSON.stringify({
+                        email: customer.email.toLowerCase(),
+                        password: customer.password
+                    }),
                     headers: { "Content-Type": "application/json" }
                 });
                 if (response.ok) {
@@ -296,10 +367,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({
                         token: data.access_token,
                         customerId: data.customer_id,
+                        currentUserData: data.customer_data,
                         isCustomerLoggedIn: true
                     });
                     sessionStorage.setItem("token", data.access_token);
                     sessionStorage.setItem("customerId", data.customer_id);
+                    sessionStorage.setItem("currentUserData", JSON.stringify(data.customer_data));
+                    sessionStorage.setItem("isCustomerLoggedIn", true);
                     return true;
                 } else {
                     console.error("Login failed with status:", response.status);
@@ -320,32 +394,32 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(
                         process.env.BACKEND_URL + "/api/session/create", {
-                            method: "POST",
-                            body: JSON.stringify({
-                                customer_id: session.customer_id,
-                                title: session.title,
-                                description: session.description,
-                                is_active: session.is_active,
-                                schedule: session.schedule,
-                                focus_areas: session.focus_areas,
-                                skills: session.skills,
-                                resourceLink: session.resourceLink,
-                                duration: session.duration,
-                                totalHours: session.totalHours,
-                            }),
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
+                        method: "POST",
+                        body: JSON.stringify({
+                            customer_id: session.customer_id,
+                            title: session.title,
+                            description: session.description,
+                            is_active: session.is_active,
+                            schedule: session.schedule,
+                            focus_areas: session.focus_areas,
+                            skills: session.skills,
+                            resourceLink: session.resourceLink,
+                            duration: session.duration,
+                            totalHours: session.totalHours,
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
                         }
+                    }
                     );
-            
+
                     if (response.status !== 201) {
                         throw new Error("Failed to create session");
                     }
-            
+
                     const responseBody = await response.json();
                     console.log("Session creation response:", responseBody);
-            
+
                     // Return the actual response data instead of just true
                     return responseBody;
                 } catch (error) {
@@ -356,51 +430,51 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             editSession: async (sessionId, updatedSession, token) => {
                 try {
-                  const response = await fetch(
-                    process.env.BACKEND_URL + `/api/session/edit/${sessionId}`, 
-                    {
-                      method: "PUT",
-                      body: JSON.stringify({
-                        title: updatedSession.title,
-                        description: updatedSession.description,
-                        is_active: updatedSession.is_active,
-                        schedule: updatedSession.schedule,
-                        focus_areas: updatedSession.focus_areas,
-                        skills: updatedSession.skills,
-                        resourceLink: updatedSession.resourceLink,
-                        duration: updatedSession.duration,
-                        totalHours: updatedSession.totalHours,
-                      }),
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                      }
+                    const response = await fetch(
+                        process.env.BACKEND_URL + `/api/session/edit/${sessionId}`,
+                        {
+                            method: "PUT",
+                            body: JSON.stringify({
+                                title: updatedSession.title,
+                                description: updatedSession.description,
+                                is_active: updatedSession.is_active,
+                                schedule: updatedSession.schedule,
+                                focus_areas: updatedSession.focus_areas,
+                                skills: updatedSession.skills,
+                                resourceLink: updatedSession.resourceLink,
+                                duration: updatedSession.duration,
+                                totalHours: updatedSession.totalHours,
+                            }),
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                  );
-            
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                  }
-            
-                  const responseBody = await response.json();
-                  console.log(responseBody);
-            
-                  return true;
+
+                    const responseBody = await response.json();
+                    console.log(responseBody);
+
+                    return true;
                 } catch (error) {
-                  console.error("Error in editSession:", error);
-                  return false;
+                    console.error("Error in editSession:", error);
+                    return false;
                 }
-              },
+            },
 
             getAllSessionRequests: async () => {
                 const store = getStore();
                 const token = sessionStorage.getItem("token");
-            
+
                 if (!token) {
                     console.error("No token found in sessionStorage");
                     return false;
                 }
-            
+
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}/api/sessions`, {
                         method: "GET",
@@ -409,7 +483,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-            
+
                     if (response.ok) {
                         const data = await response.json();
                         setStore({ ...store, sessionRequests: data });
@@ -429,7 +503,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 let options = {
                     method: "DELETE",
                     headers: {
-                        Authorization: "Bearer " + token 
+                        Authorization: "Bearer " + token
                     }
                 }
                 let response = await fetch(process.env.BACKEND_URL + "/api/session/delete/" + sessionId, options)
@@ -449,7 +523,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             //         console.error("No token found");
             //         return false;
             //     }
-            
+
             //     try {
             //         const response = await fetch(
             //             process.env.BACKEND_URL + `/api/session/${sessionId}`, {
@@ -459,12 +533,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             //                 "Authorization": `Bearer ${token}`
             //             }
             //         });
-            
+
             //         if (!response.ok) {
             //             console.error("Response not OK:", response.status, response.statusText);
             //             return false;
             //         }
-            
+
             //         const sessionData = await response.json();
             //         console.log("Session data received:", sessionData);
             //         return sessionData;
@@ -480,7 +554,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("No token found. Please log in.");
                     return null;
                 }
-            
+
                 try {
                     const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}`, {
                         method: "GET",
@@ -489,9 +563,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${token}`, // Include the token in the Authorization header
                         },
                     });
-            
+
                     if (!response.ok) throw new Error(`Failed to fetch session. Status: ${response.status}`);
-            
+
                     const data = await response.json();
                     setStore({ selectedSession: data }); // Save the fetched data in the global store
                     console.log("Session data retrieved successfully:", data);
@@ -511,17 +585,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                 const response = await fetch(
                     process.env.BACKEND_URL + "/api/sessions/customer-sessions", {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + sessionStorage.getItem('token')
-                        }
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('token')
                     }
+                }
                 )
                 if (response.ok) {
                     const sessions = await response.json();
                     console.log("Customer sessions:", sessions);
-                    setStore({...store, customerSessions: sessions})
+                    setStore({ ...store, customerSessions: sessions })
                 } else {
                     console.error("Failed to fetch customer sessions with status:", response.status);
                 }
@@ -531,12 +605,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const store = getStore();
                     const token = sessionStorage.getItem("token");
-            
+
                     if (!token) {
                         console.error("No token found, user must be logged in");
                         return false;
                     }
-            
+
                     const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/confirm-mentor/${mentorId}`, {
                         method: "PUT",
                         headers: {
@@ -545,20 +619,20 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ start_time: startTime, end_time: endTime })
                     });
-            
+
                     if (response.ok) {
                         const data = await response.json();
                         console.log("Mentor confirmed for session:", data);
-            
+
                         // Update the relevant store properties
-                        const updatedSessions = store.customerSessions.map(session => 
+                        const updatedSessions = store.customerSessions.map(session =>
                             session.id === sessionId ? data.session : session
                         );
-            
-                        setStore({ 
+
+                        setStore({
                             customerSessions: updatedSessions
                         });
-            
+
                         return true;
                     } else {
                         console.error("Failed to confirm mentor with status:", response.status);
@@ -576,28 +650,28 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const store = getStore();
                     const token = sessionStorage.getItem("token");
-            
+
                     if (!token) {
                         console.error("No token found, user must be logged in");
                         return false;
                     }
-            
+
                     const response = await fetch(`${process.env.BACKEND_URL}/api/session/${sessionId}/appointment/meeting`, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": `Bearer ${token}`
                         },
-                        body: JSON.stringify({ 
-                            appointment_index: appointmentIndex, 
-                            meetingUrl: meetingUrl 
+                        body: JSON.stringify({
+                            appointment_index: appointmentIndex,
+                            meetingUrl: meetingUrl
                         })
                     });
-            
+
                     if (response.ok) {
                         const data = await response.json();
                         console.log("Meeting URL added to appointment:", data);
-            
+
                         // Update the relevant store properties if needed
                         // This might involve updating customerSessions or other state
                         const updatedSessions = store.customerSessions.map(session => {
@@ -605,8 +679,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                                 // Create a new session object with updated appointments
                                 return {
                                     ...session,
-                                    appointments: session.appointments.map((appointment, index) => 
-                                        index === appointmentIndex 
+                                    appointments: session.appointments.map((appointment, index) =>
+                                        index === appointmentIndex
                                             ? { ...appointment, meetingUrl: meetingUrl }
                                             : appointment
                                     )
@@ -614,11 +688,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                             }
                             return session;
                         });
-            
-                        setStore({ 
+
+                        setStore({
                             customerSessions: updatedSessions
                         });
-            
+
                         return data;
                     } else {
                         console.error("Failed to add meeting URL with status:", response.status);
@@ -631,7 +705,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return false;
                 }
             },
-            
+
             sendMessageMentor: async (sessionId, text) => {
                 const token = sessionStorage.getItem("token");
                 if (!token) {
@@ -654,7 +728,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Message sent successfully:", data);
-                    
+
                     return true;
                 } else {
                     console.error("Failed to send message with status:", response.status);
@@ -667,7 +741,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("No token found in sessionStorage");
                     return false;
                 }
-            
+
                 const response = await fetch(`${process.env.BACKEND_URL}/api/message-customer`, {
                     method: "POST",
                     headers: {
@@ -680,7 +754,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         mentor_id: mentorId
                     })
                 });
-            
+
                 if (response.ok) {
                     const data = await response.json();
                     console.log("Message sent successfully:", data);

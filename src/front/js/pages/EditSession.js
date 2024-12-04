@@ -61,10 +61,12 @@ export const EditSession = () => {
   const [totalHours, setTotalHours] = useState(0);
 
   useEffect(() => {
-    if(!store.token) {
-        navigate("/customer-login");
+    if (!store.token) {
+      // navigate("/customer-login");
+      alert("Please log in again.");
+      navigate("/");
     } else {
-        loadSessionData();
+      loadSessionData();
     }
   }, [store.token, sessionId]);
 
