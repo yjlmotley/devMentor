@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { ValidateEmail, ValidatePassword } from "./Validators"; // Ensure path is correct
+import { ValidateEmail, ValidatePassword } from "../component/Validators"; // Ensure path is correct
 
 
 export const CustomerLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
@@ -21,7 +21,7 @@ export const CustomerLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
             if (success) {
                 if (onSuccess) onSuccess();
             } else {
-                alert("Email and or password incorrect");
+                alert("Email and/or password is incorrect. Please try again.");
             }
         }
     };
@@ -68,7 +68,6 @@ export const CustomerLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {
                         {invalidItems.includes("password") && (
                             <div className="invalid-feedback">Password must be 5-20 characters</div>
                         )}
-                        {/* <Link to='/forgot-password' className="text-secondary auth-link small-font">Forgot Password?</Link> */}
                         <div>
                             <span
                                 onClick={() => onForgotPs()}

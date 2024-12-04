@@ -2,51 +2,61 @@
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
-            isMentorLoggedIn: false,
-            isCustomerLoggedIn: false,
+            isMentorLoggedIn: sessionStorage.getItem("isMentorLoggedIn") === "true" || false,
+            isCustomerLoggedIn: sessionStorage.getItem("isCustomerLoggedIn") === "true" || false,
             mentors: [],
-            currentUserData: null,
+            currentUserData: JSON.parse(sessionStorage.getItem("currentUserData")) || null,
             sessionRequests: [],
-            customerId: undefined,
-            mentorId: undefined,
+            customerId: sessionStorage.getItem("customerId") || null,
+            mentorId: sessionStorage.getItem("mentorId") || null,
             customerSessions: [],
             messages: [],
-            token: sessionStorage.getItem("token"),
+            token: sessionStorage.getItem("token") || null,
             // sessionStorageChecked: !!sessionStorage.getItem("token")
         },
 
         actions: {
 
             getCurrentUser: async () => {
-                const response = await fetch(`${process.env.BACKEND_URL}/api/current/user`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + sessionStorage.getItem('token')
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/current/user`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + sessionStorage.getItem('token')
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        // console.log("userdata from token", data);
+                        if (data.role == "mentor") {
+                            setStore({
+                                isMentorLoggedIn: true,
+                                currentUserData: data,
+                                mentorId: data.user_data.id
+                            });
+                            return true;
+                        }
+                        if (data.role == "customer") {
+                            setStore({
+                                isCustomerLoggedIn: true,
+                                currentUserData: data,
+                                customerId: data.user_data.id
+                            });
+                            return true;
+                        }
+                    } else {
+                        console.error("get current user status:", response.status);
+                        getActions().logOut();
+                        alert("Your login token has expired. Please log in again to continue.");
+                        return false;
                     }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("userdata from token", data);
-                    if (data.role == "mentor") {
-                        setStore({
-                            isMentorLoggedIn: true,
-                            currentUserData: data,
-                            mentorId: data.user_data.id
-                        })
-                        return true
-                    }
-                    if (data.role == "customer") {
-                        setStore({
-                            isCustomerLoggedIn: true,
-                            currentUserData: data
-                        })
-                        return true
-                    }
-                } else {
-                    console.error("Login failed with status:", response.status);
-                    getActions().logOut()
-                    return false
+                } catch (error) {
+                    console.error("Failed to fetch current user:", error);
+                    getActions().logOut();
+                    // alert("Connection error. Please check your internet connection. Otherwise, our server is down at the moment. Please try again at another time.");
+                    alert("Token has expired. Please log in again to continue.");
+                    return false;
                 }
             },
             checkStorage: () => {
@@ -60,9 +70,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             checkStorageMentor: () => {
                 const token = sessionStorage.getItem("token", undefined)
                 const mentor_id = sessionStorage.getItem("mentorId", undefined)
+                const currentUserData = JSON.parse(sessionStorage.getItem("currentUserData"));
                 setStore({
                     token: token,
                     mentorId: mentor_id,
+                    currentUserData: currentUserData,
+                    isMentorLoggedIn: !!token // set to true if token exists
                 });
             },
 
@@ -121,13 +134,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                 });
                 if (response.status !== 200) return false;
 
-                const responseBody = await response.json();
+                const data = await response.json();
                 setStore({
-                    token: responseBody.access_token,
-                    isMentorLoggedIn: true
+                    token: data.access_token,
+                    isMentorLoggedIn: true,
+                    mentorId: data.mentor_id,
+                    currentUserData: data.mentor_data,
                 });
-                sessionStorage.setItem("token", responseBody.access_token);
-
+                sessionStorage.setItem("token", data.access_token);
+                sessionStorage.setItem("isMentorLoggedIn", true);
+                sessionStorage.setItem("mentorId", data.mentor_id);
+                sessionStorage.setItem("currentUserData", JSON.stringify(data.mentor_data));
                 return true;
             },
 
@@ -233,16 +250,17 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             logOut: () => {
-                if (getStore().isMentorLoggedIn) {
-                    window.location.href = process.env.FRONTEND_URL + "/mentor-login"
-                }
-                if (getStore().isCustomerLoggedIn) {
-                    window.location.href = process.env.FRONTEND_URL + "/customer-login"
-                }
+                // if (getStore().isMentorLoggedIn) {
+                //     window.location.href = process.env.FRONTEND_URL + "/mentor-login"
+                // }
+                // if (getStore().isCustomerLoggedIn) {
+                //     window.location.href = process.env.FRONTEND_URL + "/customer-login"
+                // }
 
                 setStore({
                     token: undefined,
                     customerId: undefined,
+                    mentorId: undefined,
                     isMentorLoggedIn: false,
                     isCustomerLoggedIn: false,
                     currentUserData: null
@@ -309,10 +327,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({
                         token: data.access_token,
                         customerId: data.customer_id,
+                        currentUserData: data.customer_data,
                         isCustomerLoggedIn: true
                     });
                     sessionStorage.setItem("token", data.access_token);
                     sessionStorage.setItem("customerId", data.customer_id);
+                    sessionStorage.setItem("currentUserData", JSON.stringify(data.customer_data));
+                    sessionStorage.setItem("isCustomerLoggedIn", true);
                     return true;
                 } else {
                     console.error("Login failed with status:", response.status);

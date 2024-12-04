@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MentorLogin } from "./MentorLogin.js";
-import { MentorSignup } from "../pages/MentorSignup.js";
+import { MentorSignup } from "./MentorSignup.js";
 import { ForgotPsModal } from './ForgotPsModal.js';
+import { useNavigate } from 'react-router-dom';
 import "../../styles/auth.css";
 
 
@@ -10,6 +11,7 @@ export const MentorAuthModal = ({ initialTab, show, onHide }) => {
     const [showForgotPs, setShowForgotPs] = useState(false);
     const modalRef = useRef(null);
     const bsModalRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (modalRef.current && window.bootstrap) {
@@ -132,7 +134,11 @@ export const MentorAuthModal = ({ initialTab, show, onHide }) => {
                             <div className="modal-body p-4">
                                 {activeTab === 'login' ? (
                                     <MentorLogin
-                                        onSuccess={handleClose}
+                                        onSuccess={() => {
+                                            console.log('Login successful, rerouting to the mentor dashboard page');
+                                            handleClose();
+                                            navigate("/mentor-dashboard");
+                                        }}
                                         switchToSignUp={handleSwitchSignUp}
                                         onForgotPs={() => setShowForgotPs(true)}
                                     />

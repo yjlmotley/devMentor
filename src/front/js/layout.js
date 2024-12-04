@@ -7,29 +7,19 @@ import { BackendURL } from "./component/backendURL";
 import { Home } from "./pages/Home";
 import injectContext from "./store/appContext";
 
-import { MentorSignup } from "./pages/MentorSignup";
-import { MentorLogin } from "./component/MentorLogin";
+// import ResetPsModal from './auth/ResetPsModal.js';
+import { Navbar } from "./component/Navbar.js";
 import { MentorDashboard } from "./pages/MentorDashboard";
 import { MentorProfile } from "./pages/MentorProfile";
 import { MentorSessionBoard } from "./pages/MentorSessionBoard";
-
-import { ForgotPassword } from "./pages/ForgotPassword.js";
-import { ResetPassword } from "./pages/ResetPassword.js";
-// import ResetPsModal from './component/ResetPsModal.js';
-
-
-import { CustomerSignup } from "./pages/CustomerSignup.js";
-import { CustomerLogin } from "./component/CustomerLogin";
-import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { MentorList } from "./pages/MentorList.js";
-
+import { CustomerDashboard } from "./pages/CustomerDashboard";
 import { CreateSession } from "./pages/CreateSession";
+import { CreateInstantSession } from "./pages/CreateInstantSession.js";
 import { EditSession } from "./pages/EditSession";
 
 import PaymentsPayouts from "./pages/PaymentsPayouts.js";
 
-import { Navbar } from "./component/Navbar.js";
-import { CreateInstantSession } from "./pages/CreateInstantSession.js";
 // import { Footer } from "./component/footer";
 
 
@@ -41,13 +31,27 @@ const Layout = () => {
 
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
-    const { actions } = useContext(Context);
+    const { store, actions } = useContext(Context);
 
+    //useEffect to handle token exp. instances
     useEffect(() => {
-        setInterval(() => {
-            actions.getCurrentUser()
-        }, 60000)
-    }, []);
+        if (store.token) {
+            actions.getCurrentUser();
+        }
+
+        const interval = setInterval(() => {
+            if (store.token) {
+                actions.getCurrentUser();
+            } else {
+                // Handle no token case
+                console.log('User not authenticated');
+            }
+            // actions.getCurrentUser()
+        }, 60000);
+
+        // Cleanup function
+        return () => clearInterval(interval);
+    }, [store.token]);
 
     return (
         <div>
@@ -56,27 +60,14 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         <Route element={<Home />} path="/" />
-
-                        <Route element={<MentorSignup />} path="/mentor-signup" />
-                        <Route element={<MentorLogin />} path="/mentor-login" />
                         <Route element={<MentorProfile />} path="/mentor-profile" />
                         <Route element={<MentorDashboard />} path="/mentor-dashboard" />
                         <Route element={<MentorSessionBoard />} path="/mentor-session-board" />
-
-                        <Route element={<ForgotPassword />} path="/forgot-password" />
-                        {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password" /> */}
-                        {/* <Route element={<ForgotPassword />} path="/mentor-login/forgot-password/:userType" /> */}
-                        <Route element={<ResetPassword />} path="/reset-password" />
-
-                        <Route element={<CustomerSignup />} path="/customer-signup" />
-                        <Route element={<CustomerLogin />} path="/customer-login" />
-                        <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<MentorList />} path="/mentor-list" />
-
+                        <Route element={<CustomerDashboard />} path="/customer-dashboard" />
                         <Route element={<CreateSession />} path="/create-session" />
                         <Route element={<CreateInstantSession />} path="/create-instant-session/:mentorId" />
                         <Route element={<EditSession />} path="edit-session/:sessionId" />
-
                         <Route element={<PaymentsPayouts />} path="payments-and-payouts" />
 
                         <Route

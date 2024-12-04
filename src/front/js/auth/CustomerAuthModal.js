@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerLogin } from './CustomerLogin.js';
-import { CustomerSignup } from '../pages/CustomerSignup.js';
+import { CustomerSignup } from './CustomerSignup.js';
 import { ForgotPsModal } from './ForgotPsModal.js';
 import "../../styles/auth.css";
+import { useNavigate } from 'react-router-dom';
 
 
 export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
@@ -10,6 +11,7 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
   const [showForgotPs, setShowForgotPs] = useState(false);
   const modalRef = useRef(null);
   const bsModalRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (modalRef.current && window.bootstrap) {
@@ -133,6 +135,7 @@ export const CustomerAuthModal = ({ initialTab, show, onHide }) => {
                     onSuccess={() => {
                       console.log('Login successful, rerouting to the customer dashboard page');
                       handleClose();
+                      navigate("/customer-dashboard");
                     }}
                     switchToSignUp={handleSwitchSignUp}
                     onForgotPs={() => setShowForgotPs(true)}

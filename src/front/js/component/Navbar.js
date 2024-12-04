@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { CustomerAuthModal } from "./CustomerAuthModal.js";
-import { MentorAuthModal } from "./MentorAuthModal.js";
+import { CustomerAuthModal } from "../auth/CustomerAuthModal.js";
+import { MentorAuthModal } from "../auth/MentorAuthModal.js";
 import "../../styles/navbar.css";
 
 
@@ -17,7 +17,7 @@ export const Navbar = () => {
 		setActiveAuthTab(tab);
 		setShowCustomerAuthModal(true);
 	};
-	
+
 	const handleShowMentorAuth = (tab) => {
 		setActiveAuthTab(tab);
 		setShowMentorAuthModal(true);
@@ -48,12 +48,12 @@ export const Navbar = () => {
 									<i className="ms-3 fa-solid fa-school" />
 								</button>
 								<ul className="dropdown-menu dropdown-menu-end mt-1">
-									<Link to="/customer-dashboard" className="dropdown-item bold-text text-end">
-										<span className="navbarFont">Customer Dashboard</span>
-										<i className="fa-solid fa-chalkboard" />
-									</Link>
 									{store.isCustomerLoggedIn ? (
 										<>
+											<Link to="/customer-dashboard" className="dropdown-item bold-text text-end">
+												<span className="navbarFont">Customer Dashboard</span>
+												<i className="fa-solid fa-chalkboard" />
+											</Link>
 											<Link to="/create-session" className="dropdown-item bold-text text-end">
 												<span className="navbarFont">Create Session</span>
 												<i className="fa-solid fa-folder-plus" />
@@ -69,14 +69,6 @@ export const Navbar = () => {
 										</>
 									) : (
 										<>
-											{/* <Link to="/customer-signup" className="dropdown-item bold-text text-end">
-											<span className="navbarFont">Customer Sign Up</span>
-											<i className="fa-solid fa-user-plus" />
-										</Link>
-										<Link to="/customer-login" className="dropdown-item bold-text text-end">
-											<span className="navbarFont">Log In</span>
-											<i className="fa-solid fa-right-to-bracket" />
-										</Link> */}
 											<button
 												className="dropdown-item bold-text text-end"
 												onClick={() => handleShowCustomerAuth('signup')}
@@ -125,14 +117,6 @@ export const Navbar = () => {
 										</>
 									) : (
 										<>
-											{/* <Link to="/mentor-signup" className="dropdown-item bold-text text-end">
-												<span className="navbarFont">Mentor Sign Up</span>
-												<i className="fa-solid fa-user-plus" />
-											</Link>
-											<Link to="/mentor-login" className="dropdown-item bold-text text-end">
-												<span className="navbarFont">Log In</span>
-												<i className="fa-solid fa-right-to-bracket" />
-											</Link> */}
 											<button
 												className="dropdown-item bold-text text-end"
 												onClick={() => handleShowMentorAuth('signup')}

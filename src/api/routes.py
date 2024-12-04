@@ -72,9 +72,13 @@ def mentor_signup():
 
     if email is None or password is None or first_name is None or last_name is None or city is None or what_state is None or country is None or phone is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
-    mentor = Mentor.query.filter_by(email=email).one_or_none()
-    if mentor:
+    existingMentorEmail = Mentor.query.filter_by(email=email).one_or_none()
+    if existingMentorEmail:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
+    existingMentorPhone = Mentor.query.filter_by(phone=phone).one_or_none()
+    if existingMentorPhone:
+        return jsonify({"msg": "An account associated with this number already exists. Please try a different phone number."}), 409
+
     mentor = Mentor(
         email=email, 
         password=generate_password_hash(password), 
@@ -113,7 +117,11 @@ def mentor_login():
         identity=mentor.id, 
         additional_claims={"role": "mentor"},
     )
-    return jsonify(access_token=access_token), 200
+    return jsonify({
+        "access_token":access_token,
+        "mentor_id": mentor.id,
+        "mentor_data": mentor.serialize()
+    }), 200
 
 # @api.route("/forgot-password", methods=["POST"])
 # def forgot_password():
@@ -539,9 +547,13 @@ def customer_signup():
     
     if first_name is None or last_name is None  or phone is None or email is None or password is None:
         return jsonify({"msg": "Some fields are missing in your request"}), 400
-    customer = Customer.query.filter_by(email=email).one_or_none()
-    if customer:
+    existingCustomerEmail = Customer.query.filter_by(email=email).one_or_none()
+    if existingCustomerEmail:
         return jsonify({"msg": "An account associated with the email already exists"}), 409
+    existingCustomerPhone = Customer.query.filter_by(phone=phone).one_or_none()
+    if existingCustomerPhone:
+        return jsonify({"msg": "An account associated with this phone number already exists. Please try a different phone number."}), 409
+    
     customer = Customer(
         email=email, 
         password=generate_password_hash(password),
@@ -572,7 +584,11 @@ def customer_login():
         identity=customer.id,
         additional_claims = {"role": "customer"} 
         )
-    return jsonify(access_token=access_token), 201
+    return jsonify({
+        "access_token":access_token,
+        "customer_id": customer.id,
+        "customer_data": customer.serialize()
+    }), 201
 
 @api.route('/customer/edit-self', methods=['PUT'])
 @customer_required

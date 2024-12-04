@@ -46,26 +46,10 @@ export const MentorSignup = ({ switchToLogin }) => {
             });
 
             if (result.success) {
-                setEmail("");
-                setPassword("");
-                setConfirmPassword();
-                setFirst_name("");
-                setLast_name("");
-                setPhone("");
-                setCountry("");
-                setWhat_state("");
-                setCity("");
-
-                if (typeof onSuccess === 'function') {
-                    // console.log("Calling onSucess from MentorSignUp");
-                    switchToLogin();
-                }
-
-                setTimeout(() => {
-                    alert(result.message || "Account successfully created! Please log in.");
-                }, 100)
+                alert(result.message || "Account successfully created! Please log in.");
+                switchToLogin();
             } else {
-                alert(result.message || "An error occurred during signup");
+                alert(result.message || "An error occurred during signup. Please try again at another time.");
             }
         }
     }

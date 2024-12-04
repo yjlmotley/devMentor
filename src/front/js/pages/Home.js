@@ -1,7 +1,7 @@
 
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
-import ResetPsModal from '../component/ResetPsModal.js';
+import ResetPsModal from '../auth/ResetPsModal.js';
 import "../../styles/home.css";
 
 

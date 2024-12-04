@@ -22,10 +22,10 @@ const injectContext = PassedComponent => {
 		);
 
 		useEffect(() => {
-			const loadUser = async () => {
-				await state.actions.getCurrentUser();
-			};
-			loadUser();
+			// const loadUser = async () => {
+			// 	await state.actions.getCurrentUser();
+			// };
+			// loadUser();
 		}, []);
 
 		// The initial value for the context is not null anymore, but the current state of this component,

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
-import { ValidateEmail, ValidatePassword } from "./Validators";
+import { ValidateEmail, ValidatePassword } from "../component/Validators";
 
 
 export const MentorLogin = ({ onSuccess, switchToSignUp, onForgotPs }) => {

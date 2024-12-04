@@ -38,21 +38,8 @@ export const CustomerSignup = ({ switchToLogin }) => {
                 });
 
                 if (result.success) {
-                    setEmail("");
-                    setPassword("");
-                    setConfirmPassword("");
-                    setFirst_name("");
-                    setLast_name("");
-                    setPhone("");
-
-                    if (typeof onSuccess === 'function') {
-                        switchToLogin();
-                    }
-
-                    setTimeout(() => {
-                        alert(result.message || "Account successfully created! Please log in.");
-                    }, 100)
-
+                    alert(result.message || "Account successfully created! Please log in.");
+                    switchToLogin();
                 } else {
                     alert(result.message || "An error occurred during signup");
                 }

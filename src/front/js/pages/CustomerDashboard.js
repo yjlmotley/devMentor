@@ -21,10 +21,11 @@ export const CustomerDashboard = () => {
 	useEffect(() => {
 		actions.checkStorage();
 		if (!store.token) {
-			navigate("/customer-login")
-			
+			// navigate("/customer-login")
+			alert("Please log in again.");
+			navigate("/");
 		}
-	},[])
+	}, [])
 
 	useEffect(() => {
 		console.log("Fetching customer sessions on mount");
@@ -273,62 +274,62 @@ export const CustomerDashboard = () => {
 																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
 																{!isInGoogleMeet && (
 																	<div
-																	className="modal fade"
-																	id={`ConfirmMentorModal${session.id}${mentorId}`}
-																	tabIndex="-1"
-																	role="dialog"
-																	aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
-																	aria-hidden="true"
-																>
-																	<div className="modal-dialog modal-dialog-centered" role="document">
-																		<div className="modal-content">
-																			<div className="modal-header">
-																				<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
-																				<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-																			</div>
-																			<div className="modal-body">
-																				<form>
-																					<div className="mb-3">
-																						<label htmlFor="date" className="form-label">Date</label>
-																						<input
-																							type="date"
-																							className="form-control"
-																							id="date"
-																							value={confirmModalData.date}
-																							onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
-																						/>
-																					</div>
-																					<div className="mb-3">
-																						<label htmlFor="startTime" className="form-label">Start Time</label>
-																						<input
-																							type="time"
-																							className="form-control"
-																							id="startTime"
-																							value={confirmModalData.startTime}
-																							onChange={(e) => setConfirmModalData({ ...confirmModalData, startTime: e.target.value })}
-																						/>
-																					</div>
-																					<div className="mb-3">
-																						<label htmlFor="endTime" className="form-label">End Time</label>
-																						<input
-																							type="time"
-																							className="form-control"
-																							id="endTime"
-																							value={confirmModalData.endTime}
-																							onChange={(e) => setConfirmModalData({ ...confirmModalData, endTime: e.target.value })}
-																						/>
-																					</div>
-																				</form>
-																			</div>
-																			<div className="modal-footer">
-																				<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-																				<button type="button" className="btn btn-success" onClick={() => handleConfirmMentor(session.id, mentorId)}>Confirm Mentor</button>
+																		className="modal fade"
+																		id={`ConfirmMentorModal${session.id}${mentorId}`}
+																		tabIndex="-1"
+																		role="dialog"
+																		aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
+																		aria-hidden="true"
+																	>
+																		<div className="modal-dialog modal-dialog-centered" role="document">
+																			<div className="modal-content">
+																				<div className="modal-header">
+																					<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
+																					<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+																				</div>
+																				<div className="modal-body">
+																					<form>
+																						<div className="mb-3">
+																							<label htmlFor="date" className="form-label">Date</label>
+																							<input
+																								type="date"
+																								className="form-control"
+																								id="date"
+																								value={confirmModalData.date}
+																								onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
+																							/>
+																						</div>
+																						<div className="mb-3">
+																							<label htmlFor="startTime" className="form-label">Start Time</label>
+																							<input
+																								type="time"
+																								className="form-control"
+																								id="startTime"
+																								value={confirmModalData.startTime}
+																								onChange={(e) => setConfirmModalData({ ...confirmModalData, startTime: e.target.value })}
+																							/>
+																						</div>
+																						<div className="mb-3">
+																							<label htmlFor="endTime" className="form-label">End Time</label>
+																							<input
+																								type="time"
+																								className="form-control"
+																								id="endTime"
+																								value={confirmModalData.endTime}
+																								onChange={(e) => setConfirmModalData({ ...confirmModalData, endTime: e.target.value })}
+																							/>
+																						</div>
+																					</form>
+																				</div>
+																				<div className="modal-footer">
+																					<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																					<button type="button" className="btn btn-success" onClick={() => handleConfirmMentor(session.id, mentorId)}>Confirm Mentor</button>
+																				</div>
 																			</div>
 																		</div>
+
+
 																	</div>
-
-
-																</div>
 
 																)}
 															</div>

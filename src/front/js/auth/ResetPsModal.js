@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ForgotPsModal } from './ForgotPsModal';
-import { LogIn } from 'lucide-react';
-import { MentorSignup } from '../pages/MentorSignup';
+
 
 const ResetPsModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,9 +38,7 @@ const ResetPsModal = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          password,
-        }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await response.json();
@@ -52,13 +48,13 @@ const ResetPsModal = () => {
       }
 
       setIsOpen(false);
-      alert('Password successfully changed!');
+      alert('Password is successfully changed! Please log in.');
       // Redirect based on user role
-      if (data.roles.includes('mentor')) {
-        navigate('/mentor-login');
-      } else {
-        navigate('/customer-login');
-      }
+      // if (data.roles.includes('mentor')) {
+      //   navigate('/mentor-login');
+      // } else {
+      //   navigate('/customer-login');
+      // }
     } catch (err) {
       setError(err.message || 'Failed to reset password. Please try again.');
     }
@@ -146,4 +142,4 @@ const ResetPsModal = () => {
 
 export default ResetPsModal;
 
-// TODO: ADD EYE (TO SEE PS: ResetPsModal, LogIn, Signup)
+// TODO: ADD EYE (TO SEE PS: ResetPsModal, ChangePs, LogIn, Signup)
