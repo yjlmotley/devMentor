@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Calendar, DollarSign, Clock, Users, X, Edit2, Trash2, Plus, Link as LinkIcon } from "lucide-react";
+import StripePaymentForm from "./PaymentForm";
+import PaymentsPayouts from "../pages/PaymentsPayouts";
 
 export const GoogleMeeting = ({ mentor, session }) => {
     const { store, actions } = useContext(Context);
@@ -19,7 +21,7 @@ export const GoogleMeeting = ({ mentor, session }) => {
         attendees: "",
         isFormVisible: false,
     });
-    const [sessionTotal, setSessionTotal] = useState("60");
+    const [sessionTotal, setSessionTotal] = useState("0");
 
     const startAuth = async () => {
         try {
@@ -51,7 +53,7 @@ export const GoogleMeeting = ({ mentor, session }) => {
             ...prev,
             [name]: value,
         }));
-    
+
         // Calculate session total when duration changes
         if (name === 'duration') {
             const hourlyRate = mentor?.price || 0;
@@ -403,6 +405,12 @@ export const GoogleMeeting = ({ mentor, session }) => {
                                         {/* End Stripe Payments */}
                                         {/* End Stripe Payments */}
                                         {/* End Stripe Payments */}
+                                    </div>
+                                    <div className="col-12">
+                                        <PaymentsPayouts
+                                           
+                                            sessionTotal={sessionTotal}
+                                        />
                                     </div>
                                 </div>
                             </div>
