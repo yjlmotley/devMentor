@@ -63,58 +63,6 @@ export const GoogleMeeting = ({ mentor, session }) => {
         }
     };
 
-    // const createMeeting = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         setMeetingInfo((prev) => ({ ...prev, loading: true, error: "" }));
-
-    //         const attendeesList = meetingForm.attendees
-    //             .split(",")
-    //             .map((email) => email.trim())
-    //             .filter((email) => email);
-
-    //         const response = await fetch(`${process.env.BACKEND_URL}/api/meet/create-meeting`, {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify({
-    //                 summary: meetingForm.summary,
-    //                 duration_minutes: parseInt(meetingForm.duration),
-    //                 description: meetingForm.description,
-    //                 attendees: attendeesList,
-    //             }),
-    //             credentials: "include",
-    //         });
-
-    //         if (!response.ok) {
-    //             const errorData = await response.json();
-    //             throw new Error(errorData.error || "Failed to create meeting");
-    //         }
-
-    //         const data = await response.json();
-    //         setMeetingInfo((prev) => ({
-    //             ...prev,
-    //             meetings: [...prev.meetings, data],
-    //             loading: false,
-    //         }));
-    //         setMeetingForm((prev) => ({
-    //             ...prev,
-    //             isFormVisible: false,
-    //             summary: "New Meeting",
-    //             duration: 60,
-    //             description: "",
-    //             attendees: "",
-    //         }));
-    //     } catch (error) {
-    //         setMeetingInfo((prev) => ({
-    //             ...prev,
-    //             error: error.message,
-    //             loading: false,
-    //         }));
-    //     }
-    // };
-
     const createMeeting = async (e) => {
         e.preventDefault();
         try {

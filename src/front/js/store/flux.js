@@ -569,6 +569,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await response.json();
                     setStore({ selectedSession: data }); // Save the fetched data in the global store
                     console.log("Session data retrieved successfully:", data);
+                    return data;
                 } catch (error) {
                     console.error("Error fetching session data:", error);
                 }

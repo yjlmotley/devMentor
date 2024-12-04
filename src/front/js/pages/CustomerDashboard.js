@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "../../styles/customerDashboard.css";
 import { GoogleMeeting } from "../component/GoogleMeeting";
 import { useNavigate } from "react-router-dom";
+import ReactSlider from "react-slider";
 
 export const CustomerDashboard = () => {
 	const { store, actions } = useContext(Context);
@@ -14,8 +15,13 @@ export const CustomerDashboard = () => {
 		sessionId: null,
 		mentorId: null,
 		date: "",
-		startTime: "",
-		endTime: ""
+		startTime: "09:00", // Default start time (9:00 AM)
+		endTime: "17:00"    // Default end time (5:00 PM)
+	});
+
+	const [timeSliderValue, setTimeSliderValue] = useState({
+		start: 540, // 9:00 AM default
+		end: 1020   // 5:00 PM default
 	});
 
 	// Token Check Auth or login
@@ -64,6 +70,37 @@ export const CustomerDashboard = () => {
 			localStorage.removeItem('pendingMeetingSessionId');
 		}
 	}, []);
+
+	const TimeRangeSlider = ({ value, onChange }) => {
+		const formatTime = (minutes) => {
+			const hours = Math.floor(minutes / 60);
+			const mins = minutes % 60;
+			const period = hours < 12 ? 'AM' : 'PM';
+			const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+			return `${displayHours}:${mins.toString().padStart(2, '0')} ${period}`;
+		};
+
+		return (
+			<div className="mb-3">
+				<ReactSlider
+					className="time-range-slider"
+					thumbClassName="time-range-thumb"
+					trackClassName="time-range-track"
+					value={[value.start, value.end]}
+					min={0}
+					max={1440}
+					step={30}
+					pearling
+					minDistance={60}
+					onChange={([start, end]) => onChange({ start, end })}
+				/>
+				<div className="d-flex justify-content-between mt-2">
+					<span>{formatTime(value.start)}</span>
+					<span>{formatTime(value.end)}</span>
+				</div>
+			</div>
+		);
+	};
 
 
 	// Function to handle opening the Google Meet modal
@@ -117,8 +154,21 @@ export const CustomerDashboard = () => {
 
 	const handleConfirmMentor = async () => {
 		const { sessionId, mentorId, date, startTime, endTime } = confirmModalData;
-		if (!sessionId || !mentorId || !date || !startTime || !endTime) {
-			alert("Please fill in all fields");
+
+		// More robust validation
+		if (!sessionId || !mentorId) {
+			alert("Session or Mentor information is missing");
+			return;
+		}
+
+		// Add validation for date, startTime, and endTime
+		if (!date || !date.trim()) {
+			alert("Please select a date");
+			return;
+		}
+
+		if (!startTime || !endTime) {
+			alert("Please select a time range");
 			return;
 		}
 
@@ -129,11 +179,9 @@ export const CustomerDashboard = () => {
 		if (success) {
 			alert("Mentor confirmed successfully");
 			actions.getCustomerSessions(); // Refresh the sessions
-			cleanupModal()
-			// Close the modal
+			cleanupModal();
 		} else {
 			console.error("Failed to confirm mentor");
-			// You might want to show an error message to the user here
 		}
 	};
 
@@ -172,6 +220,28 @@ export const CustomerDashboard = () => {
 		return `${hours}:${minutes}${ampm}`;
 	};
 
+	const handleTimeRangeChange = ({ start, end }) => {
+		setTimeSliderValue({ start, end });
+
+		// Convert minutes to time strings
+		const startHours = Math.floor(start / 60);
+		const startMins = start % 60;
+		const endHours = Math.floor(end / 60);
+		const endMins = end % 60;
+
+		const formatTimeString = (hours, mins) => {
+			const paddedHours = hours.toString().padStart(2, '0');
+			const paddedMins = mins.toString().padStart(2, '0');
+			return `${paddedHours}:${paddedMins}`;
+		};
+
+		setConfirmModalData(prev => ({
+			...prev,
+			startTime: formatTimeString(startHours, startMins),
+			endTime: formatTimeString(endHours, endMins)
+		}));
+	};
+
 	const renderSessionMessages = (session, isInGoogleMeet = false) => {
 
 		const groupedMessages = session.messages ? session.messages.reduce((acc, msg) => {
@@ -186,182 +256,178 @@ export const CustomerDashboard = () => {
 		const mentors = Object.keys(groupedMessages);
 
 		return (
-			<tr key={`${session.id}-messages`}>
-				<td colSpan="6">
-					<div className="accordion accordion-flush" id={`accordionFlush${session.id}`}>
-						<div className="accordion-item">
-							<h2 className="accordion-header">
-								<button
-									className="accordion-button collapsed"
-									type="button"
-									data-bs-toggle="collapse"
-									data-bs-target={`#flush-collapse${session.id}`}
-									aria-expanded="false"
-									aria-controls={`flush-collapse${session.id}`}
-								>
-									Messages for this session ({mentors.length} mentor{mentors.length !== 1 ? 's' : ''})
-								</button>
-							</h2>
-							<div
-								id={`flush-collapse${session.id}`}
-								className="accordion-collapse collapse"
-								data-bs-parent={`#accordionFlush${session.id}`}
-							>
-								<div className="accordion-body">
-									{mentors.length > 0 ? (
-										<div className="accordion" id={`mentorAccordion${session.id}`}>
-											{mentors.map((mentorId, index) => {
-												const mentorMessages = groupedMessages[mentorId] || [];
-												const allMessages = mentorMessages.sort((a, b) => new Date(a.time_created) - new Date(b.time_created));
+			<table className="table table-sm">
+				<tbody>
+					<tr key={`${session.id}-messages`}>
+						<td colSpan="6">
+							<div className="accordion accordion-flush" id={`accordionFlush${session.id}`}>
+								<div className="accordion-item">
+									<h2 className="accordion-header">
+										<button
+											className="accordion-button collapsed"
+											type="button"
+											data-bs-toggle="collapse"
+											data-bs-target={`#flush-collapse${session.id}`}
+											aria-expanded="false"
+											aria-controls={`flush-collapse${session.id}`}
+										>
+											Messages for this session ({mentors.length} mentor{mentors.length !== 1 ? 's' : ''})
+										</button>
+									</h2>
+									<div
+										id={`flush-collapse${session.id}`}
+										className="accordion-collapse collapse"
+										data-bs-parent={`#accordionFlush${session.id}`}
+									>
+										<div className="accordion-body">
+											{mentors.length > 0 ? (
+												<div className="accordion" id={`mentorAccordion${session.id}`}>
+													{mentors.map((mentorId, index) => {
+														const mentorMessages = groupedMessages[mentorId] || [];
+														const allMessages = mentorMessages.sort((a, b) => new Date(a.time_created) - new Date(b.time_created));
 
-												return (
-													<div className="accordion-item" key={`${session.id}-${mentorId}`}>
-														<h2 className="accordion-header">
-															<button
-																className="accordion-button collapsed"
-																type="button"
-																data-bs-toggle="collapse"
-																data-bs-target={`#mentor-collapse-${session.id}-${mentorId}`}
-																aria-expanded="false"
-																aria-controls={`mentor-collapse-${session.id}-${mentorId}`}
-															>
-																Mentor {allMessages[0]?.mentor_name || `#${index + 1}`} ({allMessages.length} message{allMessages.length !== 1 ? 's' : ''})
-															</button>
-														</h2>
-														<div
-															id={`mentor-collapse-${session.id}-${mentorId}`}
-															className="accordion-collapse collapse"
-															data-bs-parent={`#mentorAccordion${session.id}`}
-														>
-															<div className="accordion-body">
-																{allMessages.map((msg) => (
-																	<div key={msg.id} className="message-row">
-																		<strong>{msg.sender === "mentor" ? `Mentor ${msg.mentor_name}` : "You"}:</strong> {msg.text}
-																		<p className="text-muted">{new Date(msg.time_created).toLocaleString()}</p>
-																	</div>
-																))}
-															</div>
-															<div>
-																<textarea
-																	className="form-control"
-																	id={`textInput-${session.id}-${mentorId}`}
-																	rows="5"
-																	value={messageInputs[`${session.id}-${mentorId}`] || ''}
-																	onChange={(e) => handleMessageInputChange(session.id, mentorId, e.target.value)}
-																	onKeyDown={(e) => {
-																		if (e.key === 'Enter' && !e.shiftKey) {
-																			e.preventDefault();
-																			handleMessageReply(session.id, mentorId);
-																		}
-																	}}
-																	placeholder={`Type your message for Mentor ${allMessages[0]?.mentor_name || `#${mentorId}`} here...`}
-																></textarea>
-																<button
-																	className="btn btn-primary mt-2"
-																	onClick={() => handleMessageReply(session.id, mentorId)}
-																>
-																	Send to Mentor {allMessages[0]?.mentor_name || `#${mentorId}`}
-																</button>
-
-																{/* Only show Confirm Mentor button if not in Google Meet modal */}
-																{/* Confirm Mentor Modal Button */}
-																{/* Confirm Mentor Modal Button */}
-																{/* Confirm Mentor Modal Button */}
-
-																{!isInGoogleMeet && (
+														return (
+															<div className="accordion-item" key={`${session.id}-${mentorId}`}>
+																<h2 className="accordion-header">
 																	<button
+																		className="accordion-button collapsed"
 																		type="button"
-																		className="btn btn-success"
-																		data-bs-toggle="modal"
-																		data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
-																		onClick={() => setConfirmModalData({ ...confirmModalData, sessionId: session.id, mentorId: mentorId })}
+																		data-bs-toggle="collapse"
+																		data-bs-target={`#mentor-collapse-${session.id}-${mentorId}`}
+																		aria-expanded="false"
+																		aria-controls={`mentor-collapse-${session.id}-${mentorId}`}
 																	>
-																		Confirm Mentor
+																		Mentor {allMessages[0]?.mentor_name || `#${index + 1}`} ({allMessages.length} message{allMessages.length !== 1 ? 's' : ''})
 																	</button>
-																)}
+																</h2>
+																<div
+																	id={`mentor-collapse-${session.id}-${mentorId}`}
+																	className="accordion-collapse collapse"
+																	data-bs-parent={`#mentorAccordion${session.id}`}
+																>
+																	<div className="accordion-body">
+																		{allMessages.map((msg) => (
+																			<div key={msg.id} className="message-row">
+																				<strong>{msg.sender === "mentor" ? `Mentor ${msg.mentor_name}` : "You"}:</strong> {msg.text}
+																				<p className="text-muted">{new Date(msg.time_created).toLocaleString()}</p>
+																			</div>
+																		))}
+																	</div>
+																	<div>
+																		<textarea
+																			className="form-control"
+																			id={`textInput-${session.id}-${mentorId}`}
+																			rows="5"
+																			value={messageInputs[`${session.id}-${mentorId}`] || ''}
+																			onChange={(e) => handleMessageInputChange(session.id, mentorId, e.target.value)}
+																			onKeyDown={(e) => {
+																				if (e.key === 'Enter' && !e.shiftKey) {
+																					e.preventDefault();
+																					handleMessageReply(session.id, mentorId);
+																				}
+																			}}
+																			placeholder={`Type your message for Mentor ${allMessages[0]?.mentor_name || `#${mentorId}`} here...`}
+																		></textarea>
+																		<button
+																			className="btn btn-primary mt-2"
+																			onClick={() => handleMessageReply(session.id, mentorId)}
+																		>
+																			Send to Mentor {allMessages[0]?.mentor_name || `#${mentorId}`}
+																		</button>
 
-																{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
-																{/* Confirm Mentor Modal */}
-																{/* Confirm Mentor Modal */}
-																{/* Confirm Mentor Modal */}
-																{!isInGoogleMeet && (
-																	<div
-																		className="modal fade"
-																		id={`ConfirmMentorModal${session.id}${mentorId}`}
-																		tabIndex="-1"
-																		role="dialog"
-																		aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
-																		aria-hidden="true"
-																	>
-																		<div className="modal-dialog modal-dialog-centered" role="document">
-																			<div className="modal-content">
-																				<div className="modal-header">
-																					<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
-																					<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-																				</div>
-																				<div className="modal-body">
-																					<form>
-																						<div className="mb-3">
-																							<label htmlFor="date" className="form-label">Date</label>
-																							<input
-																								type="date"
-																								className="form-control"
-																								id="date"
-																								value={confirmModalData.date}
-																								onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
-																							/>
+																		{/* Only show Confirm Mentor button if not in Google Meet modal */}
+																		{/* Confirm Mentor Modal Button */}
+																		{/* Confirm Mentor Modal Button */}
+																		{/* Confirm Mentor Modal Button */}
+
+																		{!isInGoogleMeet && (
+																			<button
+																				type="button"
+																				className="btn btn-success mx-2 mt-2"
+																				data-bs-toggle="modal"
+																				data-bs-target={`#ConfirmMentorModal${session.id}${mentorId}`}
+																				onClick={() => setConfirmModalData({ ...confirmModalData, sessionId: session.id, mentorId: mentorId })}
+																			>
+																				Confirm Mentor
+																			</button>
+																		)}
+
+																		{/* Confirm Mentor Modal - only rendered if not in Google Meet modal */}
+																		{/* Confirm Mentor Modal */}
+																		{/* Confirm Mentor Modal */}
+																		{/* Confirm Mentor Modal */}
+																		{!isInGoogleMeet && (
+																			<div
+																				className="modal fade"
+																				id={`ConfirmMentorModal${session.id}${mentorId}`}
+																				tabIndex="-1"
+																				role="dialog"
+																				aria-labelledby={`ConfirmMentorModalTitle${session.id}${mentorId}`}
+																				aria-hidden="true"
+																			>
+																				<div className="modal-dialog modal-dialog-centered" role="document">
+																					<div className="modal-content">
+																						<div className="modal-header">
+																							<h5 className="modal-title" id={`ConfirmMentorModalTitle${session.id}${mentorId}`}>Confirm Mentor</h5>
+																							<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 																						</div>
-																						<div className="mb-3">
-																							<label htmlFor="startTime" className="form-label">Start Time</label>
-																							<input
-																								type="time"
-																								className="form-control"
-																								id="startTime"
-																								value={confirmModalData.startTime}
-																								onChange={(e) => setConfirmModalData({ ...confirmModalData, startTime: e.target.value })}
-																							/>
+																						<div className="modal-body">
+																							<form>
+																								<div className="mb-3">
+																									<label htmlFor="date" className="form-label">Date</label>
+																									<input
+																										type="date"
+																										className="form-control"
+																										id="date"
+																										value={confirmModalData.date}
+																										onChange={(e) => setConfirmModalData({ ...confirmModalData, date: e.target.value })}
+																									/>
+																								</div>
+
+																								<div className="mb-3">
+																									<label className="form-label">Select Session Time</label>
+																									<TimeRangeSlider
+																										value={timeSliderValue}
+																										onChange={handleTimeRangeChange}
+																									/>
+																								</div>
+																							</form>
 																						</div>
-																						<div className="mb-3">
-																							<label htmlFor="endTime" className="form-label">End Time</label>
-																							<input
-																								type="time"
-																								className="form-control"
-																								id="endTime"
-																								value={confirmModalData.endTime}
-																								onChange={(e) => setConfirmModalData({ ...confirmModalData, endTime: e.target.value })}
-																							/>
+																						<div className="modal-footer">
+																							<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+																							<button
+																								type="button"
+																								className="btn btn-success"
+																								onClick={() => handleConfirmMentor()}
+																							>
+																								Confirm Mentor
+																							</button>
 																						</div>
-																					</form>
-																				</div>
-																				<div className="modal-footer">
-																					<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-																					<button type="button" className="btn btn-success" onClick={() => handleConfirmMentor(session.id, mentorId)}>Confirm Mentor</button>
+																					</div>
 																				</div>
 																			</div>
-																		</div>
-
-
+																		)}
+																		{/* Confirm Mentor Modal End */}
+																		{/* Confirm Mentor Modal End */}
+																		{/* Confirm Mentor Modal End */}
 																	</div>
-
-																)}
-																{/* Confirm Mentor Modal End */}
-																{/* Confirm Mentor Modal End */}
-																{/* Confirm Mentor Modal End */}
+																</div>
 															</div>
-														</div>
-													</div>
-												);
-											})}
+														);
+													})}
+												</div>
+											) : (
+												<p>No messages for this session yet.</p>
+											)}
 										</div>
-									) : (
-										<p>No messages for this session yet.</p>
-									)}
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				</td>
-			</tr>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
 		);
 	};
 
@@ -469,7 +535,10 @@ export const CustomerDashboard = () => {
 																		type="button"
 																		className="btn-close"
 																		data-bs-dismiss="modal"
-																		aria-label="Close">
+																		aria-label="Close"
+																		onClick={cleanupModal}
+																	>
+
 																	</button>
 																</div>
 																<div className="modal-body">
