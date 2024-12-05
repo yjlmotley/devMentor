@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const PaymentForm = () => {
+const PaymentForm = ({ sessionTotal }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentProcessing, setPaymentProcessing] = useState(false);
@@ -18,6 +18,8 @@ const PaymentForm = () => {
     const cardElement = elements.getElement(CardElement);
 
     setPaymentProcessing(true);
+    setError(null);
+    setSuccess(false);
 
     // Call your backend to create a PaymentIntent
     try {
@@ -28,7 +30,7 @@ const PaymentForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ amount: 500000 }), // amount in cents ($5000.00)
+          body: JSON.stringify({ amount: (sessionTotal * 100 ) }), // amount in cents ($5000.00)
         }
       );
 
@@ -61,14 +63,64 @@ const PaymentForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
-      <button type="submit" disabled={paymentProcessing || !stripe}>
-        {paymentProcessing ? "Processing..." : "Pay"}
-      </button>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      {success && <div style={{ color: "green" }}>Payment successful!</div>}
-    </form>
+    <div className="card mx-auto shadow-sm" style={{ maxWidth: '800px', width: '100%' }}>
+      <div className="card-header bg-primary text-white text-center">
+        <h4 className="mb-0">Payment Details</h4>
+      </div>
+      <div className="card-body">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="cardDetails" className="form-label">Card Details</label>
+            <div className="border rounded p-2">
+              <CardElement 
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '16px',
+                      color: '#424770',
+                      '::placeholder': {
+                        color: '#aab7c4',
+                      },
+                    },
+                    invalid: {
+                      color: '#9e2146',
+                    },
+                  },
+                }} 
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger mt-3" role="alert">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="alert alert-success mt-3" role="alert">
+              Payment successful!
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            className="btn btn-primary w-100 mt-3" 
+            disabled={paymentProcessing || !stripe}
+          >
+            {paymentProcessing ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Processing...
+              </>
+            ) : (
+              // 'Pay $5,000.00'
+              `Pay $${sessionTotal}.00`
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

@@ -8,12 +8,16 @@ import Payouts from "../component/Payouts"; // Component to handle provider payo
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const PaymentsPayouts = () => {
+const PaymentsPayouts = ({ sessionTotal }) => {
   return (
     <div className="payments-payouts">
       <h2>Payments & Payouts</h2>
       <Elements stripe={stripePromise}>
-        <PaymentForm /> {/* For clients to make payments */}
+        <PaymentForm
+          // mentor={store.selectedMentor}
+          // session={session} 
+          sessionTotal={sessionTotal}
+        /> {/* For clients to make payments */}
         <Payouts /> {/* For providers to receive payouts */}
       </Elements>
     </div>

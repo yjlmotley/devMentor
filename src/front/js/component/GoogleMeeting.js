@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Calendar, DollarSign, Clock, Users, X, Edit2, Trash2, Plus, Link as LinkIcon } from "lucide-react";
+import StripePaymentForm from "./PaymentForm";
+import PaymentsPayouts from "../pages/PaymentsPayouts";
 
 export const GoogleMeeting = ({ mentor, session }) => {
     const { store, actions } = useContext(Context);
@@ -19,7 +21,7 @@ export const GoogleMeeting = ({ mentor, session }) => {
         attendees: "",
         isFormVisible: false,
     });
-    const [sessionTotal, setSessionTotal] = useState("60");
+    const [sessionTotal, setSessionTotal] = useState("0");
 
     const startAuth = async () => {
         try {
@@ -51,7 +53,7 @@ export const GoogleMeeting = ({ mentor, session }) => {
             ...prev,
             [name]: value,
         }));
-    
+
         // Calculate session total when duration changes
         if (name === 'duration') {
             const hourlyRate = mentor?.price || 0;
@@ -60,58 +62,6 @@ export const GoogleMeeting = ({ mentor, session }) => {
             setSessionTotal(total);
         }
     };
-
-    // const createMeeting = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         setMeetingInfo((prev) => ({ ...prev, loading: true, error: "" }));
-
-    //         const attendeesList = meetingForm.attendees
-    //             .split(",")
-    //             .map((email) => email.trim())
-    //             .filter((email) => email);
-
-    //         const response = await fetch(`${process.env.BACKEND_URL}/api/meet/create-meeting`, {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify({
-    //                 summary: meetingForm.summary,
-    //                 duration_minutes: parseInt(meetingForm.duration),
-    //                 description: meetingForm.description,
-    //                 attendees: attendeesList,
-    //             }),
-    //             credentials: "include",
-    //         });
-
-    //         if (!response.ok) {
-    //             const errorData = await response.json();
-    //             throw new Error(errorData.error || "Failed to create meeting");
-    //         }
-
-    //         const data = await response.json();
-    //         setMeetingInfo((prev) => ({
-    //             ...prev,
-    //             meetings: [...prev.meetings, data],
-    //             loading: false,
-    //         }));
-    //         setMeetingForm((prev) => ({
-    //             ...prev,
-    //             isFormVisible: false,
-    //             summary: "New Meeting",
-    //             duration: 60,
-    //             description: "",
-    //             attendees: "",
-    //         }));
-    //     } catch (error) {
-    //         setMeetingInfo((prev) => ({
-    //             ...prev,
-    //             error: error.message,
-    //             loading: false,
-    //         }));
-    //     }
-    // };
 
     const createMeeting = async (e) => {
         e.preventDefault();
@@ -403,6 +353,12 @@ export const GoogleMeeting = ({ mentor, session }) => {
                                         {/* End Stripe Payments */}
                                         {/* End Stripe Payments */}
                                         {/* End Stripe Payments */}
+                                    </div>
+                                    <div className="col-12">
+                                        <PaymentsPayouts
+                                           
+                                            sessionTotal={sessionTotal}
+                                        />
                                     </div>
                                 </div>
                             </div>

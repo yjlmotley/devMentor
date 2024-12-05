@@ -164,7 +164,9 @@ class Session(db.Model):
             "customer_name": f"{self.customer.first_name} {self.customer.last_name}" if self.customer else None,
             "mentor_id": self.mentor_id,
             "mentor_name": f"{self.mentor.first_name} {self.mentor.last_name}" if self.mentor else None,
-            "mentor_photo_url": self.mentor.profile_photo.image_url if self.mentor else None, 
+            
+            "mentor_photo_url": self.mentor.profile_photo.image_url if self.mentor and self.mentor.profile_photo else None,
+
             "mentor_price": str(self.mentor.price) if self.mentor and self.mentor.price else None,
             "messages": [ message.serialize() for message in self.messages ],
             "appointments": [
