@@ -1,5 +1,6 @@
 {
     "version": 2,
+    "buildCommand": "pnpm install --no-frozen-lockfile && pnpm run build",
     "git": {
         "deploymentEnabled": {
             "main": false,
