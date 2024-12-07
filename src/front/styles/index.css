@@ -1,3 +1,37 @@
+html,
+body {
+    background-color: #f5f5e6;
+    /* Light tan color for cardstock feel */
+    /* background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/ep_naturalwhite.png'); */
+    /* background-image: url('https://media.istockphoto.com/id/1370544962/photo/white-paper-background-fibrous-cardboard-texture-for-scrapbooking.jpg?s=2048x2048&w=is&k=20&c=03EyzKQ5wXpwfg2wzPrXHo8z2gHnotDbXCizeuSYs8A='); */
+    background-image: url('../img/so-white.png');
+    background-size: cover;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    /* Keep the background fixed during scrolling */
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    /* Optional: Set a clean font for readability */
+}
+
+#paper {
+    background-image: url('../img/paper.png');
+    /* Path to the image */
+    background-size: cover;
+    /* Cover the entire element */
+    background-repeat: repeat;
+    /* Repeat the background image */
+    background-attachment: scroll;
+    /* Adjust if you want it to be fixed */
+    height: 300px;
+    /* Set a specific height for the div */
+    width: 100%;
+    /* Make sure it covers the width of the parent */
+    border: 3px solid black;
+    /* Optional: border to visualize the div */
+}
+
 input.form-control.disabled.border-0 {
     /* this is for the Mentor Profile's phone input view */
     background-color: transparent;
@@ -5,4 +39,29 @@ input.form-control.disabled.border-0 {
 
 .small-font {
     font-size: small;
+}
+
+
+/* Double underline styling */
+.double-underline {
+    position: relative;
+    display: inline-block;
+}
+
+.double-underline::after,
+.double-underline::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px; /* Thickness of the underline */
+    background-color: currentColor; /* Use the current text color */
+}
+
+.double-underline::before {
+    bottom: -4px; /* Position of the first underline */
+}
+
+.double-underline::after {
+    bottom: -8px; /* Position of the second underline */
 }

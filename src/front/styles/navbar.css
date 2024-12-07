@@ -54,3 +54,17 @@
     font-size: 15px;
     margin-right: .5rem;
 }
+
+.navbar .dancing-script-text {
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 35px;
+}
+
+.navbar-link {
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Use the text color of the parent */
+    /* font-size: 30px; */
+}

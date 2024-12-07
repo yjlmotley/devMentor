@@ -41,18 +41,18 @@ const ProfilePhoto = ({ url, setMentor, editMode }) => {
   }
 
   const deleteProfilePhoto = () => {
-      fetch(process.env.BACKEND_URL + "/api/mentor/delete-photo", {
-        headers: { Authorization: "Bearer " + sessionStorage.getItem("token") },
-        method: 'DELETE'
-      })
-        .then(resp => resp.json())
-        .then(data => setMentor(data.mentor))
-        .catch(error => console.log(error))
+    fetch(process.env.BACKEND_URL + "/api/mentor/delete-photo", {
+      headers: { Authorization: "Bearer " + sessionStorage.getItem("token") },
+      method: 'DELETE'
+    })
+      .then(resp => resp.json())
+      .then(data => setMentor(data.mentor))
+      .catch(error => console.log(error))
   }
 
   return (
-    <div className="row">
-      <div className="col-8 position-relative">
+    <div className="column px-5">
+      <div className="position-relative">
         {editMode && <i className="fa-solid fa-x position-absolute top-0 end-0" onClick={deleteProfilePhoto} />}
         <img
           src={url}
@@ -62,23 +62,24 @@ const ProfilePhoto = ({ url, setMentor, editMode }) => {
         />
       </div>
       {editMode &&
-        <div className='col-4'>
-        <input
-          type="file"
-          id="profile-picture"
-          className="form-control-file"
-          onChange={handleImageUpload}
-        />
-        {imageSizeError ? (<label className="text-danger">Error: The size of the image must be below 100kb</label>) : ""}
-        <button
-          className="btn btn-primary"
-          onClick={handleNewImage}
-        >
-          Upload Photo
-        </button>
-      </div>
+        <div className='row my-3'>
+          <input
+            type="file"
+            id="profile-picture"
+            // className="form-control-file"
+            className="form-control"
+            onChange={handleImageUpload}
+          />
+          {imageSizeError ? (<label className="text-danger">Error: The size of the image must be below 100kb</label>) : ""}
+          <button
+            className="btn btn-primary mt-1"
+            onClick={handleNewImage}
+          >
+            Upload Photo
+          </button>
+        </div>
       }
-      
+
     </div>
   );
 };
