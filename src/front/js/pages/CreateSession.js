@@ -262,7 +262,7 @@ export const CreateSession = () => {
         <div className="mb-3">
           <label className="form-label">Focus areas</label>
           <div className="d-flex flex-wrap">
-            {["Career advice", "Resume review", "Mock interview", "Machine Learning", "Algorithums", "AI", "SAAS", "WebApp Building", "Codeing"].map((area) => (
+            {["Career advice", "Resume review", "Mock interview", "Machine Learning", "Algorithms", "AI", "SAAS", "WebApp Building", "Coding"].map((area) => (
               <div key={area} className="form-check me-3">
                 <input
                   className="form-check-input"
