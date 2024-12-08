@@ -63,15 +63,15 @@ const PaymentForm = ({ sessionTotal }) => {
   };
 
   return (
-    <div className="card mx-auto shadow-sm" style={{ maxWidth: '800px', width: '100%' }}>
-      <div className="card-header bg-primary text-white text-center">
-        <h4 className="mb-0">Payment Details</h4>
+    <div className="card border border-secondary rounded shadow-sm" >
+      <div className="card-header text-center">
+        <h4 className="mb-0">Payment Due</h4>
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="cardDetails" className="form-label">Card Details</label>
-            <div className="border rounded p-2">
+            <div className="border p-2">
               <CardElement 
                 options={{
                   style: {
