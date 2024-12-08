@@ -8,7 +8,7 @@ export const MentorSessionBoard = () => {
     const [characterCount, setCharacterCount] = useState(0);
     const [message, setMessage] = useState("");
     const [currentSessionId, setCurrentSessionId] = useState(null);
-	const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,7 +70,7 @@ export const MentorSessionBoard = () => {
     };
 
     const filterSessionsIsActiveAndIsNotCompleted = (sessions) => {
-        return sessions.filter(session => 
+        return sessions.filter(session =>
             session.is_active === true &&
             session.is_completed === false
         );
@@ -89,7 +89,7 @@ export const MentorSessionBoard = () => {
             ));
     };
 
-	if (isLoading) {
+    if (isLoading) {
         return <div>Loading...</div>;
     }
 
@@ -140,11 +140,20 @@ export const MentorSessionBoard = () => {
                                         <td>{session.title}</td>
                                         <td>{session.description}</td>
                                         <td>{session.skills.join(', ')}</td>
-                                        <td>{formatSchedule(session.schedule)}</td>
+                                        <td>
+                                            <div style={{ fontSize: '0.755rem', lineHeight: '1.5' }}>
+                                                {formatSchedule(session.schedule)
+                                                    .split(', ')
+                                                    .map((item, index) => (
+                                                        <div key={index}>{item}</div>
+                                                    ))}
+                                            </div>
+                                        </td>
                                         <td>{new Date(session.time_created).toLocaleDateString()}</td>
                                         <td>{session.focus_areas.join(', ')}</td>
                                         <td>
-                                            <a href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
+                                            <a className="d-inline-block text-truncate"
+                                                style={{ maxWidth: '8ch' }} href={session.resourceLink.startsWith('http') ? session.resourceLink : `https://${session.resourceLink}`}>
                                                 {session.resourceLink}
                                             </a>
                                         </td>
