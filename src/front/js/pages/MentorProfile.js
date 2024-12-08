@@ -230,9 +230,10 @@ export const MentorProfile = () => {
 
 	return (
 
-		<div className="container card  border-secondary shadow border-2 px-0 mt-5">
-			<div id="header" className="card-header bg-light-subtle mb-5">
-				<h2 className="mb-4 text-center">
+		<div className="container card border-secondary shadow border-2 pt-0 mentor-profile">
+
+			<div id="header" className="card-header bg-light-subtle">
+				<h2 className="my-2 header-text d-flex align-items-center justify-content-center">
 					Mentor Profile
 					{editMode == false
 						? (<button onClick={() => setEditMode(true)} className="btn btn-secondary fa-solid fa-pencil ms-4"></button>)
@@ -246,32 +247,35 @@ export const MentorProfile = () => {
 				)}
 			</div>
 
-
-
-			<div className="row">
-				<div className="col-7 mb-4">
-					<div className=" ps-5">
-						<div className=" ps-5">
-							<div className="dflex ps-5">
-								<ProfilePhoto  url={profileImageUrl} setMentor={setMentor} editMode={editMode} />
-							</div>
-						</div>
+			<div className="row pt-5">
+				{/* <div className="col-7 mb-4"> */}
+				<div className="col-5 mb-4">
+					<div className="d-flex justify-content-center">
+						<ProfilePhoto url={profileImageUrl} setMentor={setMentor} editMode={editMode} />
 					</div>
-					
 					<PortfolioImage portfolioImgs={portfolioImageUrls} setMentor={setMentor} editMode={editMode} />
 				</div>
-				<div className="col-5" style={{ marginTop: "50px" }}>
+				{/* <div className="col-5" style={{ marginTop: "50px" }}> */}
+				<div className="col-7 pe-5">
 					{editMode &&
-						<>
-							<button onClick={handleCancelChanges}>Cancel Changes</button>
-							<button onClick={(e) => { handleSubmit(e) }}>Save Changes</button>
-						</>
+						<div className="d-flex justify-content-end mb-5 gap-2">
+							<button className="btn btn-danger" onClick={handleCancelChanges}>Cancel Changes</button>
+							<button className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>Save Changes</button>
+						</div>
 					}
 					<dl className="row">
 						<dt className="col-sm-4">Email:</dt>
 						<dd className="col-sm-8">
 							{editMode ? (
-								<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled />
+								<>
+									<input type="email" name="email" value={mentor.email} onChange={handleChange} className="form-control" disabled />
+									<button
+										className="mt-2 btn btn-sm btn-outline-secondary"
+										onClick={handleShowChangePsModal}
+									>
+										Change Password
+									</button>
+								</>
 							) : (
 								mentor.email
 							)}
@@ -512,12 +516,6 @@ export const MentorProfile = () => {
 							)}
 						</dd>
 					</dl>
-					<button
-						className="btn btn-light"
-						onClick={handleShowChangePsModal}
-					>
-						Change Password
-					</button>
 				</div>
 			</div>
 
@@ -536,7 +534,8 @@ export const MentorProfile = () => {
 
 			<div className="d-flex justify-content-center gap-3">
 				{mentor.is_active ? (
-					<button onClick={handleDeactivate}>Deactivate Account</button>
+					<button className="btn btn-danger my-3" onClick={handleDeactivate}>Deactivate Account</button>
+					// TODO: add a "are you sure" before pushing this request through
 				) : (
 					<button onClick={handleReactivate}>Reactivate Account</button>
 				)}
