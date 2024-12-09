@@ -111,12 +111,26 @@ export const CustomerDashboard = () => {
 	};
 
 	const cleanupModal = () => {
-		const backdrop = document.querySelector('.modal-backdrop');
-		if (backdrop) {
-			backdrop.remove();
-		}
+		// Remove any lingering modal backdrop
+		const backdrops = document.querySelectorAll('.modal-backdrop');
+		backdrops.forEach((backdrop) => backdrop.remove());
+	
+		// Ensure `modal-open` class is removed from the body
 		document.body.classList.remove('modal-open');
+		
+		// Clear inline styles for padding-right or overflow
 		document.body.style.removeProperty('padding-right');
+		document.body.style.removeProperty('overflow');
+		
+		// Ensure all modals are hidden
+		const modals = document.querySelectorAll('.modal');
+		modals.forEach((modal) => modal.classList.remove('show'));
+		
+		// Reset modal attributes to ensure proper state
+		modals.forEach((modal) => {
+			modal.setAttribute('aria-hidden', 'true');
+			modal.style.display = 'none';
+		});
 	};
 
 	const acceptedSessions = store.customerSessions.filter(session => session.mentor_id != null);
@@ -530,7 +544,6 @@ export const CustomerDashboard = () => {
 																			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 																			.join(" ")}`}
 																	</h1>
-																	<h2>{session.mentor_id}</h2>
 																	<button
 																		type="button"
 																		className="btn-close"
@@ -554,7 +567,7 @@ export const CustomerDashboard = () => {
 																		</div>
 																	</div>
 																</div>
-																<div className="modal-footer">
+																{/* <div className="modal-footer">
 																	<button
 																		type="button"
 																		className="btn btn-secondary"
@@ -566,7 +579,7 @@ export const CustomerDashboard = () => {
 																	<button type="button" className="btn btn-primary">
 																		Save changes
 																	</button>
-																</div>
+																</div> */}
 															</div>
 														</div>
 													</div>
@@ -618,16 +631,18 @@ export const CustomerDashboard = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 													aria-label={`Resource link for ${session.title}`}
+													className="d-inline-block text-truncate"
+													style={{ maxWidth: '8ch' }}
 												>
 													{session.resourceLink}
 												</a>
 											</td>
 											<td>
-												<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm" aria-label={`Edit session ${session.title}`}>
+												<Link to={`/edit-session/${session.id}`} className="btn btn-primary btn-sm my-1 ms-1" aria-label={`Edit session ${session.title}`}>
 													Edit
 												</Link>
 												<button
-													className="btn btn-danger mt-2"
+													className="btn btn-danger btn-sm my-1 ms-1 "
 													onClick={() => handleDeleteSession(session.id)}
 													aria-label={`Delete session ${session.title}`}
 												>
@@ -635,7 +650,11 @@ export const CustomerDashboard = () => {
 												</button>
 											</td>
 										</tr>
-										{renderSessionMessages(session)}
+										<tr>
+											<td colSpan="6" className="bg-light">
+												{renderSessionMessages(session)}
+											</td>
+										</tr>
 									</React.Fragment>
 								))}
 							</tbody>
@@ -674,6 +693,8 @@ export const CustomerDashboard = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 													aria-label={`Resource link for ${session.title}`}
+													className="d-inline-block text-truncate"
+													style={{ maxWidth: '8ch' }}
 												>
 													{session.resourceLink}
 												</a>
@@ -681,13 +702,13 @@ export const CustomerDashboard = () => {
 											<td>
 												<Link
 													to={`/edit-session/${session.id}`}
-													className="btn btn-primary btn-sm"
+													className="btn btn-primary btn-sm my-1 ms-1"
 													aria-label={`Edit session ${session.title}`}
 												>
 													Edit
 												</Link>
 												<button
-													className="btn btn-danger mt-2"
+													className="btn btn-danger btn-sm ms-1 my-1"
 													onClick={() => handleDeleteSession(session.id)}
 													aria-label={`Delete session ${session.title}`}
 												>
@@ -695,7 +716,11 @@ export const CustomerDashboard = () => {
 												</button>
 											</td>
 										</tr>
-										{renderSessionMessages(session)}
+										<tr>
+											<td colSpan="6" className="bg-light">
+												{renderSessionMessages(session)}
+											</td>
+										</tr>
 									</React.Fragment>
 								))}
 							</tbody>
@@ -735,6 +760,8 @@ export const CustomerDashboard = () => {
 													target="_blank"
 													rel="noopener noreferrer"
 													aria-label={`Resource link for ${session.title}`}
+													className="d-inline-block text-truncate"
+													style={{ maxWidth: '8ch' }}
 												>
 													{session.resourceLink}
 												</a>
@@ -742,13 +769,13 @@ export const CustomerDashboard = () => {
 											<td>
 												<Link
 													to={`/edit-session/${session.id}`}
-													className="btn btn-primary btn-sm"
+													className="btn btn-primary btn-sm my-1 ms-1"
 													aria-label={`Edit session ${session.title}`}
 												>
 													Edit
 												</Link>
 												<button
-													className="btn btn-danger btn-sm mt-2"
+													className="btn btn-danger btn-sm my-1 ms-1"
 													onClick={() => handleDeleteSession(session.id)}
 													aria-label={`Delete session ${session.title}`}
 												>
@@ -756,7 +783,11 @@ export const CustomerDashboard = () => {
 												</button>
 											</td>
 										</tr>
-										{renderSessionMessages(session)}
+										<tr>
+											<td colSpan="6" className="bg-light">
+												{renderSessionMessages(session)}
+											</td>
+										</tr>
 									</React.Fragment>
 								))}
 							</tbody>

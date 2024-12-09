@@ -10,15 +10,14 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const PaymentsPayouts = ({ sessionTotal }) => {
   return (
-    <div className="payments-payouts">
-      <h2>Payments & Payouts</h2>
+    <div className="col-12">
       <Elements stripe={stripePromise}>
         <PaymentForm
           // mentor={store.selectedMentor}
           // session={session} 
           sessionTotal={sessionTotal}
         /> {/* For clients to make payments */}
-        <Payouts /> {/* For providers to receive payouts */}
+        {/* <Payouts /> */}
       </Elements>
     </div>
   );
