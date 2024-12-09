@@ -44,9 +44,8 @@ const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
 
 
   return (
-    <div>
-      <div>
-        <div className="row">
+    <div className="mt-5">
+      <>
           {uploadedImages.map((image, index) => (
             <div key={index} className="col">
               <img
@@ -77,10 +76,9 @@ const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
               </button>
             </div>
           ))}
-        </div>
 
         {editMode &&
-          <>
+          <div className="row d-flex justify-content-center mb-4 px-5">
             <input
               type="file"
               className="form-control"
@@ -92,14 +90,14 @@ const PortfolioImage = ({ portfolioImgs, setMentor, editMode }) => {
               filename={`${uploadedImages.length > 0 ? uploadedImages.length : "No"} selected file${uploadedImages.length === 1 ? "" : "s"}`}
             />
             <button
-              className="btn btn-primary"
+              className="btn btn-primary mt-1"
               onClick={handleNewImage}
             >
               Upload Portfolio Images
             </button>
-          </>
+          </div>
         }
-      </div>
+      </>
 
       <div className="container-flex">
         <div className="row gap-1 justify-content-center">
